@@ -1,0 +1,6 @@
+﻿     Creating library ./../../../lib/win64/NvFlexExtReleaseCUDA_x64.lib and object ./../../../lib/win64/NvFlexExtReleaseCUDA_x64.exp
+  Generating code
+  All 1861 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  flexExtCUDA.vcxproj -> C:\Users\ilya\Desktop\flex\extensions\compiler\vc14win64\./../../../bin/win64\NvFlexExtReleaseCUDA_x64.dll
+  flexExtCUDA.vcxproj -> ./../../../bin/win64\/NvFlexExtReleaseCUDA_x64.dll.pdb (Full PDB)

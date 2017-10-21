@@ -1,0 +1,15 @@
+﻿  Building ..\..\cuda\flexExt.cu
+  flexExt.cu
+  flexExtCloth.cpp
+  flexExtContainer.cpp
+  flexExtMovingFrame.cpp
+  flexExtRigid.cpp
+  flexExtSoft.cpp
+  sdf.cpp
+  voxelize.cpp
+  maths.cpp
+  aabbtree.cpp
+  Generating Code...
+     Creating library ./../../../lib/win64/NvFlexExtDebugCUDA_x64.lib and object ./../../../lib/win64/NvFlexExtDebugCUDA_x64.exp
+  flexExtCUDA.vcxproj -> C:\Users\ilya\Desktop\flex\extensions\compiler\vc14win64\./../../../bin/win64\NvFlexExtDebugCUDA_x64.dll
+  flexExtCUDA.vcxproj -> ./../../../bin/win64\/NvFlexExtDebugCUDA_x64.dll.pdb (Full PDB)
