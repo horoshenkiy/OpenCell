@@ -24,13 +24,17 @@ public:
 	void Initialize(SimBuffers *buffers, Shell *shell) {
 		this->buffers = buffers;
 
-		int indBeginBufferShell = shell->GetIndBeginPosition();
-		int indEndBufferShell = shell->GetIndEndPosition();
+		size_t indBeginBufferShell = shell->GetIndBeginPosition();
+		size_t indEndBufferShell = shell->GetIndEndPosition();
+
+		// TODO: add exception
+		if (indEndBufferShell < indBeginBufferShell)
+			printf("error!");
 
 		urd = std::uniform_int_distribution<>(indBeginBufferShell, indEndBufferShell);
 
 		std::set<int> setInd;
-		int countReceptors = (indEndBufferShell - indEndBufferShell) / 10;
+		int countReceptors = indEndBufferShell - indBeginBufferShell / 10;
 		for (int i = 0; i < countReceptors; i++) {
 			setInd.insert(urd(gen));
 		}

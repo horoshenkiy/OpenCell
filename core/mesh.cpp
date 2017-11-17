@@ -401,7 +401,7 @@ Mesh* ImportMeshFromObj(const char* path)
     vector<Point3> positions;
     vector<Vector3> normals;
     vector<Vector2> texcoords;
-    vector<Vector3> colors;
+    vector<Vector3> colors; //-V808
     vector<uint32_t>& indices = m->m_indices;
 
     //typedef unordered_map<VertexKey, uint32_t, MemoryHash<VertexKey> > VertexMap;

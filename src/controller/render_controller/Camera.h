@@ -1,9 +1,6 @@
 #pragma once
 
 #include "../../../core/cloth.h"
-#include "../../../external/SDL2-2.0.4/include/SDL.h"
-
-//#include "scenes.h"
 
 class Camera {
 
@@ -22,17 +19,17 @@ public:
 	Camera() {}
 
 	// инкапсул€ци€
-	float GetCamSpeed() {
+	float GetCamSpeed() const {
 		return camSpeed;
 	}
 	void SetCamSpeed(float camSpeed) {
 		this->camSpeed = camSpeed;
 	}
 
-	Vec3 GetCamVel() {
+	Vec3 GetCamVel() const {
 		return camVel;
 	}
-	void SetCamVel(Vec3 camVel) {
+	void SetCamVel(const Vec3 &camVel) {
 		this->camVel = camVel;
 	}
 	
@@ -46,28 +43,28 @@ public:
 		this->camVel.z = z;
 	}
 
-	Vec3 GetCamAngle() {
+	Vec3 GetCamAngle() const {
 		return camAngle;
 	}
-	void SetCamAngle(Vec3 camAngle) {
+	void SetCamAngle(const Vec3 &camAngle) {
 		this->camAngle = camAngle;
 	}
 
-	Vec3 GetCamPos() {
+	Vec3 GetCamPos() const {
 		return camPos;
 	}
-	void SetCamPos(Vec3 camPos) {
+	void SetCamPos(const Vec3 &camPos) {
 		this->camPos = camPos;
 	}
 
-	float GetCamNear() {
+	float GetCamNear() const {
 		return this->camNear;
 	}
 	void SetCamNear(float camNear) {
 		this->camNear = camNear;
 	}
 
-	float GetCamFar() {
+	float GetCamFar() const {
 		return this->camFar;
 	}
 	void SetCamFar(float camFar) {

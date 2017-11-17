@@ -1,14 +1,7 @@
 #pragma once
 
 #include "../../../external/SDL2-2.0.4/include/SDL.h"
-
-#include "../../opengl/imguiRenderGL.h"
-#include "../../opengl/shader.h"
-
-#include "../../shaders.h"
-
 #include "../../../core/maths.h"
-#include "../../../core/platform.h"
 
 #include "RenderParam.h"
 #include "RenderBuffer.h"
@@ -59,8 +52,8 @@ private:
 	SDL_Window* window;			// window handle
 	bool fullscreen = false;
 
-	int screenWidth = 1280;
-	int screenHeight = 720;
+	uint32_t screenWidth = 1280;
+	uint32_t screenHeight = 720;
 
 	/////////////////////////////////////////////
 	//functions for rendering
@@ -101,21 +94,21 @@ public:
 	void RenderDebug();
 
 	//костыль потому и по-русски
-	void DrawShapes();
+	void DrawShapes() const;
 
 	/////////////////////////////////////////////////////
 	// getters and setters
 	////////////////////////////////////////////
 
-	FluidRenderer* GetFluidRenderer() { return fluidRenderer; }
+	FluidRenderer* GetFluidRenderer() const { return fluidRenderer; }
 
-	Scene* GetScene() { return scene; }
+	Scene* GetScene() const { return scene; }
 	void SetScene(Scene *scene) { this->scene = scene; }
 
-	ShadowMap* GetShadowMap() { return shadowMap; }
+	ShadowMap* GetShadowMap() const { return shadowMap; }
 	void SetShadowMap(ShadowMap *shadowMap) { this->shadowMap = shadowMap; }
 
-	RenderBuffers* GetRenderBuffers() { return renderBuffers; }
+	RenderBuffers* GetRenderBuffers() const { return renderBuffers; }
 	void SetRenderBuffers(RenderBuffers *renderBuffers) { this->renderBuffers = renderBuffers; }
 
 	void SetComputeBuffers(SimBuffers *buffers) { this->buffers = buffers; }
@@ -124,17 +117,17 @@ public:
 	//public interface for windows
 	//////////////////////////////////////////////////////////////////////
 
-	SDL_Window* GetWindow() { return window; }
+	SDL_Window* GetWindow() const { return window; }
 	void SetWindow(SDL_Window* window) { this->window = window; }
 
-	bool GetFullscreen() { return this->fullscreen; }
+	bool GetFullscreen() const { return this->fullscreen; }
 	void SetFullscreen(bool fullscreen) { this->fullscreen = fullscreen; }
 
-	int GetWidth() { return this->screenWidth; }
-	void SetWidth(int width) { this->screenWidth = width; }
+	uint32_t GetWidth() const { return this->screenWidth; }
+	void SetWidth(uint32_t width) { this->screenWidth = width; }
 
-	int GetHeight() { return this->screenHeight; }
-	void SetHeight(int height) { this->screenHeight = height; }
+	uint32_t GetHeight() const { return this->screenHeight; }
+	void SetHeight(uint32_t height) { this->screenHeight = height; }
 
 	void ReshapeWindow(int width, int height);
 	void ReshapeWindow();

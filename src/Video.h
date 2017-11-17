@@ -19,6 +19,6 @@ public:
 private:
 	
 	bool capture = false;
-	FILE* ffmpeg;
+	FILE* ffmpeg = nullptr;
 };
 

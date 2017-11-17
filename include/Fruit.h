@@ -8,6 +8,8 @@ class Fruit {
 
 public:
 
+	virtual ~Fruit() {}
+
 	// functions for particles 
 	virtual void SetParticles(FruitSolver solver, FruitBuffer p, int n) = 0;
 	virtual void GetParticles(FruitSolver solver, FruitBuffer p, int n) = 0;

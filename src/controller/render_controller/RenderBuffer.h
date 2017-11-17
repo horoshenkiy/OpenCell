@@ -13,7 +13,7 @@ struct RenderBuffers {
 	// mesh used for deformable object rendering
 	Mesh* mesh;
 	
-	std::vector<int> meshSkinIndices;
+	std::vector<size_t> meshSkinIndices;
 	std::vector<float> meshSkinWeights;
 	std::vector<Point3> meshRestPositions;
 	

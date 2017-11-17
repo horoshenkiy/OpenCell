@@ -21,7 +21,8 @@ set(SOURCE_EXT
 link_directories("../lib/win64")
 
 add_library(flexExtCUDA SHARED ${SOURCE_EXT} ${SOURCE_EXT_CUDA} ${SOURCE_CORE})
-target_link_libraries(flexExtCUDA NvFlexReleaseCUDA_x64)
+target_link_libraries(flexExtCUDA optimized NvFlexReleaseCUDA_x64)
+target_link_libraries(flexExtCUDA debug NvFlexDebugCUDA_x64)
 
 set_target_properties(flexExtCUDA PROPERTIES OUTPUT_NAME_DEBUG NvFlexExtDebugCUDA_x64)
 set_target_properties(flexExtCUDA PROPERTIES OUTPUT_NAME_RELEASE NvFlexExtReleaseCUDA_x64)

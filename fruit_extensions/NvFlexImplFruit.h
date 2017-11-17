@@ -7,69 +7,71 @@ class FruitNvFlex : public Fruit {
 
 public:
 
+	~FruitNvFlex() {}
+
 	//particles
-	void SetParticles(FruitSolver solver, FruitBuffer buffer, int n) {
+	void SetParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexSetParticles(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
-	void GetParticles(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetParticles(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
 	//rest particles
-	void SetRestParticles(FruitSolver solver, FruitBuffer buffer, int n) {
+	void SetRestParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexSetRestParticles(solver.GetSolver(), buffer.GetBuffer(), n);
 	};
-	void GetRestParticles(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetRestParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetRestParticles(solver.GetSolver(), buffer.GetBuffer(), n);
 	};
 
 	//velocities
-	void SetVelocities(FruitSolver solver, FruitBuffer buffer, int n) {
+	void SetVelocities(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexSetVelocities(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
-	void GetVelocities(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetVelocities(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetVelocities(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
 	//phases
-	void SetPhases(FruitSolver solver, FruitBuffer buffer, int n) {
+	void SetPhases(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexSetPhases(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
-	void GetPhases(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetPhases(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetPhases(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
 	//densities
-	void SetDensities(FruitSolver solver, FruitBuffer p, int n) {}
+	void SetDensities(FruitSolver solver, FruitBuffer p, int n) override {}
 
-	void GetDensities(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetDensities(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetDensities(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
 	//anisotropy
 	void SetAnisotropy(FruitSolver solver, FruitBuffer anisotropy1, FruitBuffer anisotropy2, FruitBuffer anisotropy3) override {}
 
-	void GetAnisotropy(FruitSolver solver, FruitBuffer anisotropy1, FruitBuffer anisotropy2, FruitBuffer anisotropy3) {
+	void GetAnisotropy(FruitSolver solver, FruitBuffer anisotropy1, FruitBuffer anisotropy2, FruitBuffer anisotropy3) override {
 		NvFlexGetAnisotropy(solver.GetSolver(), anisotropy1.GetBuffer(), anisotropy2.GetBuffer(), anisotropy3.GetBuffer());
 	}
 
 	//normals
-	void SetNormals(FruitSolver solver, FruitBuffer normals, int n) {
+	void SetNormals(FruitSolver solver, FruitBuffer normals, int n) override {
 		NvFlexSetNormals(solver.GetSolver(), normals.GetBuffer(), n);
 	}
-	void GetNormals(FruitSolver solver, FruitBuffer normals, int n) {
+	void GetNormals(FruitSolver solver, FruitBuffer normals, int n) override {
 		NvFlexGetNormals(solver.GetSolver(), normals.GetBuffer(), n);
 	}
 
 	//smooth particles
 	void SetSmoothParticles(FruitSolver solver, FruitBuffer particles, int numParticles) override {}
 
-	void GetSmoothParticles(FruitSolver solver, FruitBuffer buffer, int n) {
+	void GetSmoothParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexGetSmoothParticles(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
 	//indices
-	void SetActiveIndices(FruitSolver solver, FruitBuffer buffer, int n) {
+	void SetActiveIndices(FruitSolver solver, FruitBuffer buffer, int n) override {
 		NvFlexSetActive(solver.GetSolver(), buffer.GetBuffer(), n);
 	}
 
@@ -84,7 +86,7 @@ public:
 		FruitBuffer prevPositions,
 		FruitBuffer prevRotations,
 		FruitBuffer flags,
-		int numShapes) {
+		int numShapes) override {
 
 		NvFlexSetShapes(
 			solver.GetSolver(),
@@ -119,7 +121,7 @@ public:
 		FruitBuffer rotations,
 		FruitBuffer translations,
 		int numRigids,
-		int numIndices) {
+		int numIndices) override {
 	
 		NvFlexSetRigids(
 			solver.GetSolver(),
@@ -134,7 +136,7 @@ public:
 			numIndices);
 	};
 
-	void GetRigidTransforms(FruitSolver solver, FruitBuffer rotations, FruitBuffer translations) {
+	void GetRigidTransforms(FruitSolver solver, FruitBuffer rotations, FruitBuffer translations) override {
 		NvFlexGetRigidTransforms(solver.GetSolver(), rotations.GetBuffer(), translations.GetBuffer());
 	}
 
@@ -146,7 +148,7 @@ public:
 		FruitBuffer volumes,
 		FruitBuffer pressures,
 		FruitBuffer constraints,
-		int numInflatables) {
+		int numInflatables) override {
 	
 		NvFlexSetInflatables(
 			solver.GetSolver(),
@@ -164,7 +166,7 @@ public:
 		FruitBuffer indices,
 		FruitBuffer lengths,
 		FruitBuffer stiffness,
-		int numSprings) {
+		int numSprings) override {
 	
 		NvFlexSetSprings(
 			solver.GetSolver(),
@@ -175,11 +177,11 @@ public:
 	};
 
 	//dynamic triangles
-	void SetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) {
+	void SetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) override {
 		NvFlexSetDynamicTriangles(solver.GetSolver(), indices.GetBuffer(), normals.GetBuffer(), numTris);
 	};
 
-	void GetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) {
+	void GetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) override {
 		NvFlexGetDynamicTriangles(solver.GetSolver(), indices.GetBuffer(), normals.GetBuffer(), numTris);
 	}
 };

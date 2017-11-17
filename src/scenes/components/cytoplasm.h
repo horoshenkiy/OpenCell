@@ -1,31 +1,31 @@
 #pragma once
 
 #include "component.h"
+#include "../../controller/compute_controller/FlexParams.h"
 
-struct FlexParams;
+class Serializer;
 
 class Cytoplasm : public Component {
-
-private:
-	int group;
-	int numberOfParticles;
 
 public:
 
 	// constructors and initialize
 	Cytoplasm();
-	Cytoplasm(int group);
+	
+	explicit Cytoplasm(SimBuffers *buffers) : Component(buffers, nullptr) {}
+	
+	explicit Cytoplasm(int group, SimBuffers *buffers);
 
-	void Initialize(FlexParams *flexParams, SimBuffers *buffers);
-	void PostInitialize() {}
+	void Initialize(FlexParams *flexParams);
 
 	// getters and setters
-	int GetNumberOfParticles() { return numberOfParticles; }
+	int GetNumberOfParticles() const { return numberOfParticles; }
 
-	// update
-	void Update() {}
+private:
 
-	void Sync() {}
+	friend Serializer;
+	friend bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
 
-	void Draw() {}
+	int group = -1;
+	int numberOfParticles = 0;
 };

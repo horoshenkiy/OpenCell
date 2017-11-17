@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../../../include/NvFlex.h"
-
 #include "../SDLController.h"
 
 #include "../compute_controller/FlexController.h"
@@ -10,9 +8,7 @@
 
 #include "../render_controller/RenderController.h"
 
-#include "imgui.h"
-
-#include <vector>
+#include "../imgui_controller/imgui.h"
 
 #include "../../scenes.h"
 #include "../../Timer.h"

@@ -15,8 +15,6 @@ FILE* Video::GetFFMpeg() const {
 
 void Video::CreateFrame() const {
 	TgaImage img;
-	img.m_width = renderController.GetWidth();
-	img.m_height = renderController.GetHeight();
 	img.m_data = new uint32_t[renderController.GetWidth()*renderController.GetHeight()];
 
 	ReadFrame(reinterpret_cast<int*>(img.m_data), renderController.GetWidth(), renderController.GetHeight());

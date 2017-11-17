@@ -9,14 +9,14 @@ template <typename T>
 class FruitNvFlexVector : public FruitVector<T> {
 
 private:
-	NvFlexLibrary* lib;
-	NvFlexBuffer* buffer;
+	NvFlexLibrary* lib = nullptr;
+	NvFlexBuffer* buffer = nullptr;
 
 public:
 
-	FruitNvFlexVector() {};
+	FruitNvFlexVector() {}
 	
-	FruitNvFlexVector(NvFlexLibrary* l, int size = 0) : lib(l) {
+	FruitNvFlexVector(NvFlexLibrary* l, size_t size = 0) : lib(l) {
 		this->mappedPtr = NULL;
 		this->buffer = NULL;
 		this->count = 0;
@@ -30,7 +30,7 @@ public:
 		}
 	}
 
-	FruitNvFlexVector(NvFlexLibrary* l, const T* ptr, int size) : lib(l) {
+	FruitNvFlexVector(NvFlexLibrary* l, const T* ptr, size_t size) : lib(l) {
 		this->mappedPtr = NULL;
 		this->buffer = NULL;
 		this->count = 0;
@@ -44,20 +44,20 @@ public:
 		destroy();
 	}
 
-	FruitBuffer GetBuffer() {
+	FruitBuffer GetBuffer() override {
 		FruitBuffer fruitBuffer;
 		fruitBuffer.SetBuffer(buffer);
 
 		return fruitBuffer;
 	}
 
-	void init(int size) {
+	void init(size_t size) override {
 		destroy();
 		resize(size);
 		unmap();
 	}
 
-	void destroy() {
+	void destroy() override {
 		if (mappedPtr)
 			NvFlexUnmap(buffer);
 
@@ -88,28 +88,28 @@ public:
 		mappedPtr = 0;
 	}
 
-	const T& operator[](int index) const {
+	const T& operator[](size_t index) const override {
 		assert(mappedPtr);
 		assert(index < count);
 
 		return mappedPtr[index];
 	}
 
-	T& operator[](int index) {
+	T& operator[](size_t index) override {
 		assert(mappedPtr);
 		assert(index < count);
 
 		return mappedPtr[index];
 	}
 
-	T& get(int index) {
+	T& get(size_t index) override {
 		assert(mappedPtr);
 		assert(index < count);
 
 		return mappedPtr[index];
 	}
 
-	void set(int index, T value) {
+	void set(size_t index, T value) {
 		assert(mappedPtr);
 		assert(index < count);
 
@@ -125,37 +125,35 @@ public:
 		mappedPtr[count++] = t;
 	}
 
-	void assign(const T* srcPtr, int newCount) {
+	void assign(const T* srcPtr, size_t newCount) override {
 		assert(mappedPtr || !buffer);
 
 		resize(newCount);
 		memcpy(mappedPtr, srcPtr, newCount * sizeof(T));
 	}
 
-	void copyto(T* dest, int count)
-	{
+	void copyto(T* dest, size_t count) override {
 		assert(mappedPtr);
-
 		memcpy(dest, mappedPtr, sizeof(T)*count);
 	}
 
-	int size() const { return count; }
+	size_t size() const override { return count; }
 
-	bool empty() const { return size() == 0; }
+	bool empty() const override { return size() == 0; }
 
-	const T& back() const {
+	const T& back() const override {
 		assert(mappedPtr);
 		assert(!empty());
 
 		return mappedPtr[count - 1];
 	}
 
-	void reserve(int minCapacity) {
+	void reserve(size_t minCapacity) override {
 		if (minCapacity > capacity) {
 			// growth factor of 1.5
-			const int newCapacity = minCapacity * 3 / 2;
+			const size_t newCapacity = minCapacity * 3 / 2;
 
-			NvFlexBuffer* newBuf = NvFlexAllocBuffer(lib, newCapacity, sizeof(T), eNvFlexBufferHost);
+			NvFlexBuffer* newBuf = NvFlexAllocBuffer(lib, newCapacity, sizeof(T), eNvFlexBufferHost); //-V107
 
 			// copy contents to new buffer			
 			void* newPtr = NvFlexMap(newBuf, eNvFlexMapWait);
@@ -175,7 +173,7 @@ public:
 	}
 
 	// resizes mapped buffer and leaves new buffer mapped 
-	void resize(int newCount) {
+	void resize(size_t newCount) override {
 		assert(mappedPtr || !buffer);
 
 		reserve(newCount);
@@ -184,21 +182,21 @@ public:
 		count = newCount;
 	}
 
-	void resize(int newCount, const T& val) {
+	void resize(size_t newCount, const T& val) override {
 		assert(mappedPtr || !buffer);
 
-		const int startInit = count;
-		const int endInit = newCount;
+		const size_t startInit = count;
+		const size_t endInit = newCount;
 
 		resize(newCount);
 
 		// init any new entries
-		for (int i = startInit; i < endInit; ++i)
+		for (size_t i = startInit; i < endInit; ++i)
 			mappedPtr[i] = val;
 	}
 
 	// need rewrite for Fruit Vector
-	void erase(int start, int end) {
+	void erase(size_t start, size_t end) override {
 		assert(mappedPtr || !buffer);
 
 		if (end == count) {

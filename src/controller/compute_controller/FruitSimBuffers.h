@@ -9,14 +9,14 @@ struct FruitSimBuffers
 	Fruit *fruit = new FruitNvFlex();
 
 	// global vars
-	uint32_t numParticles;
-	uint32_t maxParticles;
-	const int maxDiffuseParticles = 0;
+	size_t numParticles = 0;
+	size_t maxParticles = 0;
+	const size_t maxDiffuseParticles = 0;
 
-	int numExtraParticles = 0;
-	int numExtraMultiplier = 1;
+	size_t numExtraParticles = 0;
+	size_t numExtraMultiplier = 1;
 
-	int numSolidParticles = 0;
+	size_t numSolidParticles = 0;
 
 	// data of particles
 	TypeVector<Vec4> positions;
@@ -72,7 +72,7 @@ struct FruitSimBuffers
 	TypeVector<Vec3> triangleNormals;
 	TypeVector<Vec3> uvs;
 
-	FruitSimBuffers() {};
+	FruitSimBuffers() = default;
 
 	//void Initialize() = 0;
 };

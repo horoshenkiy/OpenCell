@@ -630,7 +630,7 @@ enum { // languageID for STBTT_PLATFORM_ID_MAC
 static int stbtt__isfont(const stbtt_uint8 *font)
 {
    // check the version number
-   if (stbtt_tag(font, "1"))   return 1; // TrueType 1
+   if (stbtt_tag(font, "1"))   return 1; // TrueType 1 //-V557
    if (stbtt_tag(font, "typ1"))   return 1; // TrueType with type 1 font -- we don't support this!
    if (stbtt_tag(font, "OTTO"))   return 1; // OpenType with CFF
    if (stbtt_tag4(font, 0,1,0,0)) return 1; // OpenType 1.0
@@ -1062,7 +1062,7 @@ int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index, stbtt_verte
                if (comp_verts) STBTT_free(comp_verts, info->userdata);
                return 0;
             }
-            if (num_vertices > 0) memcpy(tmp, vertices, num_vertices*sizeof(stbtt_vertex));
+            if (num_vertices > 0) memcpy(tmp, vertices, num_vertices*sizeof(stbtt_vertex)); //-V595
             memcpy(tmp+num_vertices, comp_verts, comp_num_verts*sizeof(stbtt_vertex));
             if (vertices) STBTT_free(vertices, info->userdata);
             vertices = tmp;

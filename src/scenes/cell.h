@@ -8,30 +8,32 @@
 
 #include "BiologyObject.h"
 
+class Serializer;
+
 class Cell : public BiologyObject {
-
-private:
-	int group = 0;
-
-	int mNumFluidParticles;
 
 public:
 	
 	// need incapsulation
-	Cytoplasm*  cytoplasm;
-	Kernel*		kernel;
-	Shell*		shell;
-	Cytoskeleton* cytoskeleton;
-	Receptors*	receptors;
+	Cytoplasm*  cytoplasm = nullptr;
+	Kernel*		kernel = nullptr;
+	Shell*		shell = nullptr;
+	Cytoskeleton* cytoskeleton = nullptr;
+	//Receptors*	receptors;
 
 	// constructors and initialize
-	Cell() {}
+	Cell() = default;
+
+	Cell(SimBuffers* buffers, RenderBuffers* renderBuffers) {
+		this->buffers = buffers;
+		this->renderBuffers = renderBuffers;
+	}
 
 	void Initialize(FlexController *flexController,
-					SimBuffers *buffers,
-					FlexParams *flexParams,
-					RenderBuffers *renderBuffers,
-					RenderParam *renderParam);
+		SimBuffers *buffers,
+		FlexParams *flexParams,
+		RenderBuffers *renderBuffers,
+		RenderParam *renderParam) override;
 
 	// destructors (need add delete)
 	~Cell();
@@ -39,9 +41,20 @@ public:
 	void clearBuffers();
 
 	// update
-	void Update();
+	void Update() override;
 
-	void Sync();
+	void Sync() override;
 
 	void Draw();
+
+private:
+
+	friend Serializer;
+	friend bool operator==(const Cell &lCell, const Cell &rCell);
+
+	int group = 0;
+
+	int mNumFluidParticles = 0;
 };
+
+#include "../Serializer.h"

@@ -2,13 +2,12 @@
 
 #include "../../../include/NvFlex.h"
 
-#include "../../../core/mesh.h"
-
-#include <iostream>
-
 class Scene;
 
 struct FlexParams {
+
+	FlexParams() = default;
+	~FlexParams() {}
 
 	unsigned char maxNeighborsPerParticle = 96;
 

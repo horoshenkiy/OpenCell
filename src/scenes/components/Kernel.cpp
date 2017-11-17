@@ -2,9 +2,7 @@
 
 #include "../../../core/platform.h"
 
-void Kernel::Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers) {
-	this->buffers = buffers;
-	this->renderBuffers = renderBuffers;
+void Kernel::Initialize() {
 
 	float radius = 0.05f;
 	float restDistance = radius*0.5f;
@@ -16,7 +14,7 @@ void Kernel::Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers) {
 
 	const float mass[] = { 1.0f, 0.25f, 0.005f };
 
-	int startBuffers = buffers->positions.size();
+	size_t startBuffers = buffers->positions.size();
 	
 	CreateParticleShape(buffers, 
 						renderBuffers, 
@@ -27,18 +25,18 @@ void Kernel::Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers) {
 						mass[0],
 						true, 
 						1.0, 
-						NvFlexMakePhase(group++, 0), 
+						NvFlexMakePhase(group, 0), 
 						true, 
 						0.0001f);
 
-	int endBuffers = buffers->positions.size();
+	size_t endBuffers = buffers->positions.size();
 
 	Vec3 startVec = buffers->positions[startBuffers];
 	float minX = startVec.x, maxX = startVec.x;
 	float minY = startVec.y, maxY = startVec.y;
 	float minZ = startVec.z, maxZ = startVec.z;
 
-	for (int i = startBuffers; i < endBuffers; i++) {
+	for (size_t i = startBuffers; i < endBuffers; i++) {
 		minX = (minX > buffers->positions[i].x) ? buffers->positions[i].x : minX;
 		maxX = (maxX < buffers->positions[i].x) ? buffers->positions[i].x : maxX;
 
@@ -55,7 +53,7 @@ void Kernel::Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers) {
 
 	indexCenter = startBuffers;
 	float distMin = maxX - minX;
-	for (int i = startBuffers; i < endBuffers; i++) {
+	for (size_t i = startBuffers; i < endBuffers; i++) {
 		float dist = sqrt(sqr(buffers->positions[i].x - xCenter) +
 			sqr(buffers->positions[i].y - yCenter) +
 			sqr(buffers->positions[i].z - zCenter));

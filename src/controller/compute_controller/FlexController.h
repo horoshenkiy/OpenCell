@@ -1,10 +1,6 @@
 #pragma once
 
 #include "../../../include/NvFlex.h"
-#include "../../../include/NvFlexExt.h"
-#include "../../../include/NvFlexDevice.h"
-
-#include <iostream>
 
 extern bool g_extensions;
 
@@ -12,10 +8,10 @@ void ErrorCallback(NvFlexErrorSeverity, const char* msg, const char* file, int l
 
 class FlexController {
 private:
-	NvFlexLibrary *lib;
-	NvFlexSolver *solver;
+	NvFlexLibrary *lib = nullptr;
+	NvFlexSolver *solver = nullptr;
 	NvFlexTimers timers;
-	NvFlexDetailTimer * detailTimers;
+	NvFlexDetailTimer * detailTimers = nullptr;
 
 	// a setting of -1 means Flex will use the device specified in the NVIDIA control panel
 	int device = -1;
@@ -28,9 +24,9 @@ private:
 
 public:
 	//конструктор и инициализаторы
-	FlexController() {}
+	FlexController() = default;
 
-	int GetDevice() {
+	int GetDevice() const {
 		return device;
 	}
 	void SetDevice(int device) {
@@ -41,22 +37,22 @@ public:
 		return deviceName;
 	}
 
-	NvFlexLibrary* GetLib() {
+	NvFlexLibrary* GetLib() const {
 		return lib;
 	}
 
-	NvFlexSolver* GetSolver() {
+	NvFlexSolver* GetSolver() const {
 		return solver;
 	}
 	void SetSolver(NvFlexSolver* solver) {
 		this->solver = solver;
 	}
 
-	NvFlexTimers GetTimers() {
+	NvFlexTimers GetTimers() const {
 		return timers;
 	}
 
-	NvFlexDetailTimer* GetDetailTimers() {
+	NvFlexDetailTimer* GetDetailTimers() const {
 		return detailTimers;
 	}
 

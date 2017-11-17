@@ -36,7 +36,6 @@
 #include "NvFlex.h"
 
 #include <cassert>
-#include <cstddef>
 
 // A vector type that wraps a NvFlexBuffer, behaves like a standard vector for POD types (no construction)
 // The vector must be mapped using map() before any read/write access to elements or resize operation
@@ -44,7 +43,7 @@
 template <typename T>
 struct NvFlexVector
 {
-	NvFlexVector(NvFlexLibrary* l, int size=0) : lib(l), buffer(NULL), mappedPtr(NULL), count(0), capacity(0)
+	NvFlexVector(NvFlexLibrary* l, size_t size=0) : lib(l), buffer(nullptr), mappedPtr(nullptr), count(0), capacity(0)
 	{
 		if (size)
 		{
@@ -55,7 +54,7 @@ struct NvFlexVector
 		}		
 	}
 	
-	NvFlexVector(NvFlexLibrary* l, const T* ptr, int size) : lib(l), buffer(NULL), mappedPtr(NULL), count(0), capacity(0)
+	NvFlexVector(NvFlexLibrary* l, const T* ptr, size_t size) : lib(l), buffer(NULL), mappedPtr(NULL), count(0), capacity(0)
 	{
 		assign(ptr, size);
 		unmap();
@@ -71,11 +70,11 @@ struct NvFlexVector
 	NvFlexBuffer* buffer;
 
 	T* mappedPtr;
-	int count;
-	int capacity;
+	size_t count;
+	size_t capacity;
 
 	// reinitialize the vector leaving it unmapped
-	void init(int size)
+	void init(size_t size)
 	{
 		destroy();
 		resize(size);
@@ -116,7 +115,7 @@ struct NvFlexVector
 		mappedPtr = 0;
 	}
 
-	const T& operator[](int index) const
+	const T& operator[](size_t index) const
 	{	
 		assert(mappedPtr);
 		assert(index < count);
@@ -124,7 +123,7 @@ struct NvFlexVector
 		return mappedPtr[index];
 	}
 
-	T& operator[](int index)
+	T& operator[](size_t index)
 	{
 		assert(mappedPtr);
 		assert(index < count);
@@ -142,7 +141,7 @@ struct NvFlexVector
 		mappedPtr[count++] = t;		
 	}
 
-	void assign(const T* srcPtr, int newCount)
+	void assign(const T* srcPtr, size_t newCount)
 	{
 		assert(mappedPtr || !buffer);
 
@@ -151,14 +150,14 @@ struct NvFlexVector
 		memcpy(mappedPtr, srcPtr, newCount*sizeof(T));
 	}
 
-	void copyto(T* dest, int count)	
+	void copyto(T* dest, size_t count)	
 	{
 		assert(mappedPtr);
 
 		memcpy(dest, mappedPtr, sizeof(T)*count);
 	}
 
-	int size() const { return count; }
+	size_t size() const { return count; }
 
 	bool empty() const { return size() == 0; }
 
@@ -170,14 +169,14 @@ struct NvFlexVector
 		return mappedPtr[count-1];
 	}
 
-	void reserve(int minCapacity)
+	void reserve(size_t minCapacity)
 	{
 		if (minCapacity > capacity)
 		{
 			// growth factor of 1.5
-			const int newCapacity = minCapacity*3/2;
+			const size_t newCapacity = minCapacity*3/2;
 
-			NvFlexBuffer* newBuf = NvFlexAllocBuffer(lib, newCapacity, sizeof(T), eNvFlexBufferHost);
+			NvFlexBuffer* newBuf = NvFlexAllocBuffer(lib, newCapacity, sizeof(T), eNvFlexBufferHost); //-V107
 
 			// copy contents to new buffer			
 			void* newPtr = NvFlexMap(newBuf, eNvFlexMapWait);
@@ -197,7 +196,7 @@ struct NvFlexVector
 	}
 
 	// resizes mapped buffer and leaves new buffer mapped 
-	void resize(int newCount)
+	void resize(size_t newCount)
 	{
 		assert(mappedPtr || !buffer);
 
@@ -207,22 +206,22 @@ struct NvFlexVector
 		count = newCount;
 	}
 
-	void resize(int newCount, const T& val)
+	void resize(size_t newCount, const T& val)
 	{
 		assert(mappedPtr || !buffer);
 
-		const int startInit = count;
-		const int endInit = newCount;
+		const size_t startInit = count;
+		const size_t endInit = newCount;
 
 		resize(newCount);
 
 		// init any new entries
-		for (int i=startInit; i < endInit; ++i)
+		for (size_t i=startInit; i < endInit; ++i)
 			mappedPtr[i] = val;
 	}
 
 	// need rewrite for Fruit Vector
-	void erase(int start, int end) {
+	void erase(size_t start, size_t end) {
 		assert(mappedPtr || !buffer);
 
 		if (end == count) {

@@ -20,7 +20,7 @@ struct Timer {
 							// the above times don't include waiting for vsync
 	float simLatency;     // the time the GPU spent between the first and last NvFlexUpdateSolver() operation. Because some GPUs context switch, this can include graphics time.
 
-	float GetDeviceLatency() {
+	static float GetDeviceLatency() {
 		return NvFlexGetDeviceLatency(flexController.GetSolver());
 	}
 };

@@ -27,8 +27,6 @@ public:
 							RenderBuffers *renderBuffers,
 							RenderParam *renderParam) = 0;
 
-	virtual void PostInitialize() {}
-
 	// update any buffers (all guaranteed to be mapped here)
 	virtual void Update() {}
 

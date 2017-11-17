@@ -151,7 +151,7 @@ void AABBTree::Build()
     // calculate bounds of each face and store
     m_faceBounds.reserve(numFaces);   
     
-	std::vector<Bounds> stack;
+	std::vector<Bounds> stack; //-V808
 	for (uint32_t i=0; i < numFaces; ++i)
     {
 		Bounds top;

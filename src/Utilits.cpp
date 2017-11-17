@@ -9,6 +9,7 @@
 #include "Utilits.h"
 
 #include "controller/compute_controller/SimBuffers.h"
+#include "controller/compute_controller/FlexController.h"
 #include "controller/render_controller/RenderBuffer.h"
 
 /////////////////////////////////////////////////////////////
@@ -141,7 +142,7 @@ void GetParticleBounds(SimBuffers *buffers, Vec3& lower, Vec3& upper)
 
 // calculates local space positions given a set of particles and rigid indices
 void CalculateRigidLocalPositions(const Vec4* restPositions, 
-								int numRestPositions, 
+								size_t numRestPositions, 
 								const int* offsets, 
 								const int* indices, 
 								int numRigids, 
@@ -153,29 +154,28 @@ void CalculateRigidLocalPositions(const Vec4* restPositions,
 	// Calculate mean
 	Vec3 shapeOffset(0.0f);
 
-	for (int i = 0; i < numRestPositions; i++)
+	for (size_t i = 0; i < numRestPositions; i++)
 	{
 		shapeOffset += Vec3(restPositions[i]);
 	}
 
 	shapeOffset /= float(numRestPositions);
 
-	int count = 0;
+	size_t count = 0;
 
 	for (int r = 0; r < numRigids; ++r)
 	{
-		const int startIndex = offsets[r];
-		const int endIndex = offsets[r + 1];
+		const size_t startIndex = offsets[r];
+		const size_t endIndex = offsets[r + 1];
 
-		const int n = endIndex - startIndex;
+		const size_t n = endIndex - startIndex;
 
 		assert(n);
 
 		Vec3 com;
 
-		for (int i = startIndex; i < endIndex; ++i)
-		{
-			const int r = indices[i];
+		for (size_t i = startIndex; i < endIndex; ++i) {
+			const size_t r = indices[i];
 
 			// By substracting meshOffset the calculation is done in relative coordinates
 			com += Vec3(restPositions[r]) - shapeOffset;
@@ -183,9 +183,9 @@ void CalculateRigidLocalPositions(const Vec4* restPositions,
 
 		com /= float(n);
 
-		for (int i = startIndex; i < endIndex; ++i)
+		for (size_t i = startIndex; i < endIndex; ++i)
 		{
-			const int r = indices[i];
+			const size_t r = indices[i];
 
 			// By substracting meshOffset the calculation is done in relative coordinates
 			localPositions[count++] = (Vec3(restPositions[r]) - shapeOffset) - com;
@@ -1362,7 +1362,7 @@ void SampleMesh(Mesh* mesh,
 
 	std::vector<int> clusterIndices;
 	std::vector<int> clusterOffsets;
-	std::vector<Vec3> clusterPositions;
+	std::vector<Vec3> clusterPositions; //-V808
 	std::vector<float> priority(samples.size());
 
 	CreateClusters(&samples[0], &priority[0], samples.size(), clusterOffsets, clusterIndices, outPositions, radius);
@@ -1486,4 +1486,41 @@ Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, 
 
 	return shape;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+// functions for save state
+/////////////////////////////////////////////////////////////////////////////////////
+
+#ifdef _WINDOWS
+
+#include <windows.h>
+#include "../fruit_extensions/NvFlexImplFruitExt.h"
+
+bool DirExists(const std::string &dirName) {
+	DWORD fileType = GetFileAttributesA(dirName.c_str());
+
+	if (fileType == INVALID_FILE_ATTRIBUTES)
+		return false;
+
+	if (fileType == FILE_ATTRIBUTE_DIRECTORY)
+		return true;
+
+	return false;
+}
+
+
+bool SaveState(SimBuffers *buffers, std::string nameState) {
+	if (!DirExists("../../data/states"))
+		CreateDirectory("../../data/states", nullptr);
+
+	std::string pathState = "../../data/states/" + nameState;
+	if (DirExists(pathState))
+		return false;
+
+	CreateDirectory(pathState.c_str(), nullptr);
+
+	return true;
+} //-V591
+
+#endif
 

@@ -1,12 +1,13 @@
 #include "Cytoskeleton.h"
 #include "Branch.h"
 
-Cytoskeleton::Cytoskeleton(SimBuffers *buffers, int group, Vec3 start) {
+Cytoskeleton::Cytoskeleton(Cell *cell, SimBuffers *buffers, int group, Vec3 start) {
+	this->cell = cell;
 	this->buffers = buffers;
 	this->group = group;
 
-	start.x += 0.1;
-	start.y = 0.15;
+	start.x += 0.1f;
+	start.y = 0.15f;
 	this->start = start;
 }
 
@@ -24,18 +25,18 @@ void Cytoskeleton::Initialize(Cell *cell, SimBuffers *buffers) {
 
 	Vec3 position = start;
 
-	branches.push_back(new Branch(0));
+	branches.push_back(new Branch());
 	branches.back()->Initialize(buffers, this, start, 0, true, true);
 
-	position.x += 0.1;
-	position.z += 0.2;
-	branches.push_back(new Branch(0));
+	position.x += 0.1f;
+	position.z += 0.2f;
+	branches.push_back(new Branch());
 	branches.back()->Initialize(buffers, this, position, 0, true, true);
 
 	position = start;
-	position.x += 0.1;
-	position.z -= 0.2;
-	branches.push_back(new Branch(0));
+	position.x += 0.1f;
+	position.z -= 0.2f;
+	branches.push_back(new Branch());
 	branches.back()->Initialize(buffers, this, position, 0, true, true);
 }
 

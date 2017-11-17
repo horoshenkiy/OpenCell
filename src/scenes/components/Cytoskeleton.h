@@ -13,23 +13,23 @@ class Cytoskeleton : public Component {
 
 	Vec3 start = Vec3(2.9f, 0.2f, 1.85f);
 	
-	int group;
+	int group = -1;
 
-	Vec3 ratePointGrow = Vec3(0.003, 0.0, 0.0);
+	Vec3 ratePointGrow = Vec3(0.003f, 0.0f, 0.0f);
 	const int rateGrow = 0;
 	int itGrow = 0;
 
 public:
 
 	// need incapsulation
-	Cell *cell;
+	Cell *cell = nullptr;
 
 	Cytoskeleton() {};
 
-	Cytoskeleton(SimBuffers *buffers, int group, Vec3 start);
+	Cytoskeleton(Cell *cell, SimBuffers *buffers, int group, Vec3 start);
 
 	// getters
-	Vec3 GetRatePointGrow() {
+	Vec3 GetRatePointGrow() const {
 		return ratePointGrow;
 	}
 
@@ -43,6 +43,6 @@ public:
 
 	void Update(Vec3 rateKernelCenter);
 
-	int indexUpdateCapsule;
+	int indexUpdateCapsule = 0;
 
 };
