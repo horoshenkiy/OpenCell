@@ -9,6 +9,8 @@ extern bool g_debug;
 extern bool g_reset;
 extern bool g_step;
 
+class Serializer;
+
 class SDLController {
 private:
 	// for control of window and camera
@@ -18,6 +20,9 @@ private:
 
 	// for control of parameters for flex
 	FlexParams *flexParams = nullptr;
+
+	// for save state
+	Serializer *serializer;
 
 	// mouse
 	int lastx = -1;
@@ -57,7 +62,12 @@ public:
 	//конструктор и инициализация
 	SDLController() {}
 
-	void SDLInit(RenderController *renderController, Camera *camera, FlexParams *flexParams, const char* title);
+	void SDLInit(RenderController *renderController, 
+				 Camera *camera, 
+				 FlexParams *flexParams,  
+				 const char* title);
+
+	void SDLPostInit(Serializer *serializer);
 
 	// return true, if program is running
 	bool SDLMainLoop();

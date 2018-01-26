@@ -9,8 +9,10 @@
 
 #include "../include/NvFlex.h"
 
+#include <iomanip>
 #include <iostream>
 #include <map>
+#include <ctime>
 
 #include "shaders.h"
 
@@ -36,12 +38,14 @@
 
 // my core
 #include "../fruit_core/platform.h"
-
 #include "../fruit_extensions/NvFlexImplFruitExt.h"
 
 // scene
 #include "scenes.h"
 #include "scenes\SceneCell.h"
+
+// serializer
+Serializer serializer;
 
 // camera
 static Camera camera;
@@ -90,6 +94,9 @@ bool g_extensions = true;
 // logging
 bool g_teamCity = false;
 
+// download state
+bool g_state = false;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -137,6 +144,12 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	renderBuffers->meshSkinIndices.resize(0);
 	renderBuffers->meshSkinWeights.resize(0);
 	renderController.SetRenderBuffers(renderBuffers);
+
+	// create serializer
+	serializer = Serializer((SceneCell*)scene, g_buffers, renderBuffers);
+	
+	// post initialization SDL Controller
+	sdlController.SDLPostInit(&serializer);
 	
 	// initialize params
 	flexParams.InitFlexParams(scene);
@@ -144,11 +157,19 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	// map during initialization
 	g_buffers->MapBuffers();
 	
-	// initialize buffers of particles
-	g_buffers->Initialize();
+	// initialize buffers of particles and scene
+	//////////////////////////////////////////////////////////////////
+	if (!g_state) {
+		g_buffers->Initialize();
+		scene->Initialize(&flexController, g_buffers, &flexParams, renderBuffers, renderParam);
+	}
+	else {
+		scene->InitializeFromFile(&flexController, g_buffers, &flexParams, renderBuffers, renderParam);
 
-	// create scene
-	scene->Initialize(&flexController, g_buffers, &flexParams, renderBuffers, renderParam);
+		serializer.LoadStateBinary("123");
+		scene->PostInitialize();
+	}
+	//////////////////////////////////////////////////////////////////
 
 	g_buffers->numParticles = g_buffers->positions.size();
 	g_buffers->maxParticles = g_buffers->numParticles + g_buffers->numExtraParticles * g_buffers->numExtraMultiplier;
@@ -220,8 +241,7 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	computeController.Initialize(&flexController, &flexParams, g_buffers, renderParam, scene);
 }
 
-void Reset()
-{
+void Reset() {
 	InitScene(scene, false);
 }
 
@@ -304,7 +324,7 @@ void UpdateFrame()
 
 	camera.UpdateCamera();
 
-	if (!g_pause || g_step)		
+	if (!g_pause || g_step)
 		UpdateScene();
 
 	//g_buffers->BuildConstraints();
@@ -315,8 +335,14 @@ void UpdateFrame()
 	// Render
 	float newRenderTime = Render();
 
+	if (serializer.GetIsNeedSave()) {
+		std::time_t t = std::time(0);
+		std::stringstream ss;
+		ss << std::put_time(std::localtime(&t), "%Y-%m-%d-%H_%M_%S");
 
-	SaveState(g_buffers, std::string("123"));
+		serializer.SaveStateBinary(ss.str() + "_" + std::to_string(std::rand()));
+		serializer.SetIsNeedSave(false);
+	}
 
 	g_buffers->UnmapBuffers();
 

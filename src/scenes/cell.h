@@ -35,6 +35,14 @@ public:
 		RenderBuffers *renderBuffers,
 		RenderParam *renderParam) override;
 
+	virtual void InitializeFromFile(FlexController *flexController,
+									SimBuffers *buffers,
+									FlexParams *flexParams,
+									RenderBuffers *renderBuffers,
+									RenderParam *renderParam) override;
+
+	virtual void PostInitialize() override;
+
 	// destructors (need add delete)
 	~Cell();
 
@@ -47,9 +55,31 @@ public:
 
 	void Draw();
 
+	//////////////////////////////////////////////////////
+	template<class Archive>
+	void save(Archive &archive) const {
+		archive(group, mNumFluidParticles);
+		archive(*cytoplasm, *kernel, *shell);
+	}
+
+	template<class Archive>
+	void load(Archive &archive) {
+		archive(group, mNumFluidParticles);
+
+		if (cytoplasm == nullptr)
+			cytoplasm = new Cytoplasm(buffers);
+
+		if (kernel == nullptr)
+			kernel = new Kernel(buffers, renderBuffers);
+
+		if (shell == nullptr)
+			shell = new Shell(buffers);
+
+		archive(*cytoplasm, *kernel, *shell);
+	}
+
 private:
 
-	friend Serializer;
 	friend bool operator==(const Cell &lCell, const Cell &rCell);
 
 	int group = 0;

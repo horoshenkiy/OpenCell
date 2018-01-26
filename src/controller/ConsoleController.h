@@ -20,5 +20,6 @@ extern RenderParam *renderParam;
 extern bool g_extensions;
 extern bool g_benchmark;
 extern bool g_teamCity;
+extern bool g_state;
 
 void ConsoleController(int argc, char* argv[]);

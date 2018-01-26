@@ -51,4 +51,21 @@ public:
 
 	// need rewrite for Fruit Vector
 	virtual void erase(size_t start, size_t end) = 0;
+
+	// operators
+	bool operator==(const FruitVector<T> &rVector) const {
+		if (this->size() != rVector.size())
+			return false;
+
+		for (size_t i = 0; i < this->size(); i++) {
+			if (this->mappedPtr[i] != rVector[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	bool operator!=(const FruitVector<T> &rVector) const {
+		return !(*this == rVector);
+	}
 };

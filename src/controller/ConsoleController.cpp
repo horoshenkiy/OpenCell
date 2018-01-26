@@ -42,5 +42,8 @@ void ConsoleController(int argc, char* argv[]) {
 		{
 			flexParams.interop = false;
 		}
+
+		if (strstr(argv[i], "-state"))
+			g_state = true;
 	}
 }

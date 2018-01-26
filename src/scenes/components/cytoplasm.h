@@ -21,9 +21,13 @@ public:
 	// getters and setters
 	int GetNumberOfParticles() const { return numberOfParticles; }
 
+	template<class Archive>
+	void serialize(Archive &archive) {
+		archive(group, numberOfParticles);
+	}
+
 private:
 
-	friend Serializer;
 	friend bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
 
 	int group = -1;

@@ -33,9 +33,14 @@ public:
 	// update
 	void Update() override;
 
+	template<class Archive>
+	void serialize(Archive &archive) {
+		archive(group, indexCenter);
+		archive(positionCenter, prevPositionCenter, rateCenter);
+	}
+
 private:
 	
-	friend Serializer;
 	friend bool operator==(const Kernel &lKernel, const Kernel &rKernel);
 
 	int group = -1;
@@ -45,6 +50,7 @@ private:
 
 	Vec4 positionCenter, prevPositionCenter;
 	Vec3 rateCenter;
+
 };
 
 #include "../../Serializer.h"

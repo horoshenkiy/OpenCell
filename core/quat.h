@@ -65,6 +65,7 @@ public:
 	CUDA_CALLABLE XQuat<T>& operator +=(const XQuat<T>& v) {x += v.x; y += v.y; z += v.z; w += v.w;  return *this;}
 	CUDA_CALLABLE XQuat<T>& operator -=(const XQuat<T>& v) {x -= v.x; y -= v.y; z -= v.z; w -= v.w;  return *this;}
 
+	CUDA_CALLABLE bool operator == (const XQuat<T>& v) const { return (x == v.x || y == v.y || z == v.z || w == v.w); }
 	CUDA_CALLABLE bool operator != (const XQuat<T>& v) const { return (x != v.x || y != v.y || z != v.z || w != v.w); }
 
 	// negate

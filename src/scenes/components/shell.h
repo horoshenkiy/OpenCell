@@ -37,9 +37,22 @@ public:
 		//DrawCloth(&g_buffers->positions[0], &g_buffers->normals[0], NULL, &g_buffers->triangles[0], asset->numTriangles, g_buffers->positions.size(), (0 + 2) % 6);
 	}
 
+	template<class Archive>
+	void save(Archive &archive) const {
+		archive(group, indBeginPosition, indEndPosition, splitThreshold);
+		archive(*(asset));
+	}
+
+	template<class Archive>
+	void load(Archive &archive) {
+		archive(group, indBeginPosition, indEndPosition, splitThreshold);
+
+		asset = new NvFlexExtAsset();
+		archive(*(asset));
+	}
+
 private:
 
-	friend Serializer;
 	friend bool operator==(const Shell&, const Shell&);
 
 	int group = -1;

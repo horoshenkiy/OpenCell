@@ -27,6 +27,14 @@ public:
 							RenderBuffers *renderBuffers,
 							RenderParam *renderParam) = 0;
 
+	virtual void InitializeFromFile(FlexController *flexController,
+									SimBuffers *buffers,
+									FlexParams *flexParams,
+									RenderBuffers *renderBuffers,
+									RenderParam *renderParam) = 0;
+
+	virtual void PostInitialize() = 0;
+
 	// update any buffers (all guaranteed to be mapped here)
 	virtual void Update() {}
 

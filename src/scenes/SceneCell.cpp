@@ -34,6 +34,24 @@ void SceneCell::Initialize(FlexController *flexController,
 	cell->Initialize(flexController, buffers, flexParams, renderBuffers, renderParam);
 }
 
+void SceneCell::InitializeFromFile(FlexController *flexController,
+	SimBuffers *buffers,
+	FlexParams *flexParams,
+	RenderBuffers *renderBuffers,
+	RenderParam *renderParam) {
+
+	this->flexController = flexController;
+	this->buffers = buffers;
+	this->flexParams = flexParams;
+
+	this->renderBuffers = renderBuffers;
+	this->renderParam = renderParam;
+}
+
+void SceneCell::PostInitialize() {
+	this->cell->PostInitialize();
+}
+
 // destroy
 //////////////////////////////////////////////
 SceneCell::~SceneCell() {

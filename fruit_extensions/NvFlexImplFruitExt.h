@@ -5,6 +5,9 @@
 
 #include "../include/FruitExt.h"
 
+#include <cereal/access.hpp>
+#include "../include/serialize_types.h"
+
 template <typename T>
 class FruitNvFlexVector : public FruitVector<T> {
 

@@ -11,6 +11,7 @@ struct SimBuffers;
 struct RenderBuffers;
 
 struct Shape;
+class SceneCell;
 
 ///////////////////////////////////////////////////////////
 // simple helper functions
@@ -120,6 +121,16 @@ struct Seed
 //////////////////////////////////////////////////////////////
 // functions for create
 ////////////////////////////////////////////////////////
+
+// TODO: Add namespace
+
+// create rigid capsule
+
+void CreateRigidCapsule(SimBuffers &buffers, RenderBuffers &renderBuffers,
+						float radius, float halfLength, int slices, int segments,
+						Vec3 lower, Vec3 scale, float rotation, float samplingMesh,
+						Vec3 velocity, float mass, int phase);
+
 void CreateParticleGrid(SimBuffers *buffers,
 						Vec3 lower,
 						int dimx, int dimy, int dimz,
@@ -254,15 +265,6 @@ Shape AddCapsule(float radius, float halfHeight, Vec3 position, Quat rotation);
 
 Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, Quat rotation);
 
-/////////////////////////////////////////////////////////////////////////////////////
-// functions for save state
-/////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef _WINDOWS
-
-bool SaveState(SimBuffers *buffers, std::string nameState);
-
-#endif 
 
 
 

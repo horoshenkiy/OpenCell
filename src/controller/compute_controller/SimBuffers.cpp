@@ -384,3 +384,14 @@ void SimBuffers::ClearShapes() {
 	this->shapePrevRotations.resize(0);
 	this->shapeFlags.resize(0);
 }
+
+// method for logging
+///////////////////////////////////////////////////////////////
+void SimBuffers::StartLogging() {
+	printf("Start logging...\n");
+}
+
+void SimBuffers::EndLogging() {
+	printf("End logging...\n");
+}
+

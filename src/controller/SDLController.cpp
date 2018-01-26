@@ -1,4 +1,5 @@
 #include "SDLController.h"
+#include "../Serializer.h"
 
 // methods of control keys
 ///////////////////////////////////////////////////////////////////
@@ -120,6 +121,9 @@ bool SDLController::InputKeyboardDown(unsigned char key, int x, int y)
 		g_debug = !g_debug;
 		break;
 	}
+	case 'b':
+		serializer->SetIsNeedSave(true);
+		break;
 	};
 
 	return false;
@@ -198,7 +202,10 @@ void SDLController::MouseMotionFunc(unsigned state, int x, int y) {
 
 // initialize and loop
 ////////////////////////////////////////////////////////////////////////
-void SDLController::SDLInit(RenderController *renderController, Camera *camera, FlexParams *flexParams, const char* title)
+void SDLController::SDLInit(RenderController *renderController, 
+							Camera *camera, 
+							FlexParams *flexParams, 
+							const char* title)
 {
 	this->camera = camera;
 	this->renderController = renderController;
@@ -211,6 +218,10 @@ void SDLController::SDLInit(RenderController *renderController, Camera *camera, 
 		renderController->GetWidth(), renderController->GetHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE));
 
 	windowId = SDL_GetWindowID(renderController->GetWindow());
+}
+
+void SDLController::SDLPostInit(Serializer *serializer) {
+	this->serializer = serializer;
 }
 
 // return true, if program is running

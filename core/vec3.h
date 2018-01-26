@@ -76,6 +76,7 @@ public:
     CUDA_CALLABLE inline XVector3<T>& operator /=(const XVector3<T>& v) {x /= v.x; y /= v.y; z /= v.z; VEC3_VALIDATE(); return *this; }
     CUDA_CALLABLE inline XVector3<T>& operator *=(const XVector3<T>& v) {x *= v.x; y *= v.y; z *= v.z; VEC3_VALIDATE(); return *this; }
 
+	CUDA_CALLABLE inline bool operator == (const XVector3<T>& v) const { return (x == v.x || y == v.y || z == v.z); }
 	CUDA_CALLABLE inline bool operator != (const XVector3<T>& v) const { return (x != v.x || y != v.y || z != v.z); }
 
 	// negate

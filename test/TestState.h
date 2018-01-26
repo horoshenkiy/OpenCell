@@ -5,12 +5,14 @@
 #include <controller/render_controller/RenderController.h>
 #include <controller/render_controller/RenderBuffer.h>
 
-#include <Serializer.h>
+#include "SerializerTest.h"
 #include <scenes\SceneCell.h>
 #include <cereal\archives\binary.hpp>
 #include <NvFlexImplFruitExt.h>
 #include <gtest\gtest.h>
 #include "platform.h"
+
+#include <FruitExt.h>
 
 bool g_extensions = true;
 
@@ -20,15 +22,152 @@ RenderBuffers *renderBuffers;
 RenderParam *renderParam;
 RenderController renderController;
 
+SerializerTest serializer;
 std::stringstream ss;
 
 bool operator==(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset);
-bool operator==(const Shell& lShell, const Shell& rShell);
-bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
-bool operator==(const Kernel &lKernel, const Kernel &rKernel);
-bool operator==(const Cell &lCell, const Cell &rCell);
-bool operator==(const SceneCell &lScene, const SceneCell &rScene);
+bool operator!=(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset);
 
+bool operator==(const Shell& lShell, const Shell& rShell);
+bool operator!=(const Shell& lShell, const Shell& rShell);
+
+bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
+bool operator!=(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
+
+bool operator==(const Kernel &lKernel, const Kernel &rKernel);
+bool operator!=(const Kernel &lKernel, const Kernel &rKernel);
+
+bool operator==(const Cell &lCell, const Cell &rCell);
+bool operator!=(const Cell &lCell, const Cell &rCell);
+
+bool operator==(const SceneCell &lScene, const SceneCell &rScene);
+bool operator!=(const SceneCell &lScene, const SceneCell &rScene);
+
+bool operator==(const SimBuffers &lSimBuffers, const SimBuffers &rSimBuffers);
+bool operator!=(const SimBuffers &lSimBuffers, const SimBuffers &rSimBuffers);
+
+bool operator==(const Mesh &lMesh, const Mesh &rMesh);
+bool operator!=(const Mesh &lMesh, const Mesh &rMesh);
+
+bool operator==(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRenderBuffers);
+bool operator!=(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRenderBuffers);
+
+TEST(StateCase, StateFruitNvFlexVector) {
+	flexController.InitFlex();
+
+	int size = 100;
+
+	// Vec4
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	FruitVector<Vec4> &outFruitVec4 = FruitNvFlexVector<Vec4>(flexController.GetLib());
+	outFruitVec4.map();
+	outFruitVec4.resize(size);
+	FruitVector<Vec4> &inFruitVec4 = FruitNvFlexVector<Vec4>(flexController.GetLib());
+	inFruitVec4.map();
+	inFruitVec4.resize(size);
+
+	// Vec3
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	FruitVector<Vec3> &outFruitVec3 = FruitNvFlexVector<Vec3>(flexController.GetLib());
+	outFruitVec3.map();
+	outFruitVec3.resize(size);
+	FruitVector<Vec3> &inFruitVec3 = FruitNvFlexVector<Vec3>(flexController.GetLib());
+	inFruitVec3.map();
+	inFruitVec3.resize(size);
+
+	// float
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	FruitVector<float> &outFruitFloat = FruitNvFlexVector<float>(flexController.GetLib());
+	outFruitFloat.map();
+	outFruitFloat.resize(size);
+	FruitVector<float> &inFruitFloat = FruitNvFlexVector<float>(flexController.GetLib());
+	inFruitFloat.map();
+	inFruitFloat.resize(size);
+
+	// int
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	FruitVector<int> &outFruitInt = FruitNvFlexVector<int>(flexController.GetLib());
+	outFruitInt.map();
+	outFruitInt.resize(size);
+	FruitVector<int> &inFruitInt = FruitNvFlexVector<int>(flexController.GetLib());
+	inFruitInt.map();
+	inFruitInt.resize(size);
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	for (int i = 0; i < outFruitVec4.size(); i++) {
+		outFruitVec4[i] = Vec4(1.0f, 2.0f, 3.0f, 4.0f);
+		outFruitVec3[i] = Vec3(1.0f, 2.0f, 3.0f);
+		outFruitFloat[i] = 1.0f;
+		outFruitInt[i] = 1;
+	}
+
+	cereal::BinaryOutputArchive oarchive(ss);
+	serializer.Save(oarchive, outFruitVec4);
+	serializer.Save(oarchive, outFruitVec3);
+	serializer.Save(oarchive, outFruitFloat);
+	serializer.Save(oarchive, outFruitInt);
+
+	cereal::BinaryInputArchive iarchive(ss);
+	serializer.Load(iarchive, inFruitVec4);
+	serializer.Load(iarchive, inFruitVec3);
+	serializer.Load(iarchive, inFruitFloat);
+	serializer.Load(iarchive, inFruitInt);
+
+	ASSERT_EQ(inFruitVec4, outFruitVec4);
+	ASSERT_EQ(inFruitVec3, inFruitVec3);
+	ASSERT_EQ(inFruitFloat, outFruitFloat);
+	ASSERT_EQ(inFruitInt, outFruitInt);
+
+	outFruitVec4.unmap();
+	inFruitVec4.unmap();
+
+	outFruitVec3.unmap();
+	inFruitVec3.unmap();
+
+	outFruitFloat.unmap();
+	inFruitFloat.unmap();
+
+	outFruitInt.unmap();
+	inFruitInt.unmap();
+}
+
+TEST(StateCase, StateRenderBuffers) {
+	SceneCell *scene = new SceneCell();
+	flexController.InitFlex();
+
+	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
+	buffers->MapBuffers();
+	buffers->Initialize();
+
+	FlexParams *flexParams = new FlexParams();
+	flexParams->InitFlexParams(scene);
+
+	RenderBuffers *oRenderBuffers = new RenderBuffers();
+	oRenderBuffers->meshSkinIndices.resize(0);
+	oRenderBuffers->meshSkinWeights.resize(0);
+	oRenderBuffers->meshRestPositions.resize(0);
+
+	RenderBuffers *iRenderBuffers = new RenderBuffers();
+	//iRenderBuffers->mesh = new Mesh();
+
+	renderParam = new RenderParam();
+
+	scene->Initialize(&flexController, buffers, flexParams, oRenderBuffers, renderParam);
+
+	cereal::BinaryOutputArchive out(ss);
+	serializer.Save(out, *oRenderBuffers);
+
+	cereal::BinaryInputArchive in(ss);
+	serializer.Load(in, *iRenderBuffers);
+
+	ASSERT_EQ(*oRenderBuffers, *iRenderBuffers);
+}
+ 
 TEST(StateCase, StateSimBuffers) {
 	SceneCell *scene = new SceneCell();
 	flexController.InitFlex();
@@ -56,12 +195,16 @@ TEST(StateCase, StateSimBuffers) {
 	scene->Initialize(&flexController, oBuffers, flexParams, renderBuffers, renderParam);
 
 	cereal::BinaryOutputArchive out(ss);
-	Serializer::Save(out, *oBuffers);
+	oBuffers->serialize(out);
+	//out(*oBuffers);
+	//serializer.Save(out, *oBuffers);
 
 	cereal::BinaryInputArchive in(ss);
-	Serializer::Load(in, *iBuffers);
+	iBuffers->serialize(in);
+	//in(*iBuffers);
+	//serializer.Load(in, *iBuffers);
 
-	//ASSERT_EQ(*oScene, *iScene);
+	ASSERT_EQ(*iBuffers, *oBuffers);
 
 	delete scene;
 	delete oBuffers;
@@ -94,12 +237,12 @@ TEST(StateCase, StateScene) {
 	oScene->Initialize(temp, buffers, flexParams, renderBuffers, renderParam);
 
 	cereal::BinaryOutputArchive out(ss);
-	Serializer::Save(out, *oScene);
+	serializer.Save(out, *oScene);
 
 	SceneCell *iScene = new SceneCell("cell", temp, buffers, flexParams, renderBuffers, renderParam);
 
 	cereal::BinaryInputArchive in(ss);
-	Serializer::Load(in, *iScene);
+	serializer.Load(in, *iScene);
 
 	ASSERT_EQ(*oScene, *iScene);
 	
@@ -134,10 +277,10 @@ TEST(StateCase, StateCell) {
 	oCell.Initialize(&flexController, buffers, flexParams, renderBuffers, renderParam);
 
 	cereal::BinaryOutputArchive out(ss);
-	Serializer::Save(out, oCell);
+	serializer.Save(out, oCell);
 
 	cereal::BinaryInputArchive in(ss);
-	Serializer::Load(in, iCell);
+	serializer.Load(in, iCell);
 
 	ASSERT_EQ(iCell, oCell);
 
@@ -159,11 +302,11 @@ TEST(StateCase, StateShell) {
 	oShell.Initialize();
 
 	cereal::BinaryOutputArchive out(ss);
-	Serializer::Save(out, oShell);
+	serializer.Save(out, oShell);
 
 	Shell iShell(buffers);
 	cereal::BinaryInputArchive in(ss);
-	Serializer::Load(in, iShell);
+	serializer.Load(in, iShell);
 
 	ASSERT_EQ(iShell, oShell);
 }
@@ -205,11 +348,11 @@ TEST(StateCase, StateNvFlexExtAsset) {
 		mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f));
 
 	cereal::BinaryOutputArchive oArchive(ss);
-	Serializer::Save(oArchive, oCloth);
+	serializer.Save(oArchive, oCloth);
 
 	NvFlexExtAsset &iCloth = NvFlexExtAsset();
 	cereal::BinaryInputArchive iArchive(ss);
-	Serializer::Load(iArchive, iCloth);
+	serializer.Load(iArchive, iCloth);
 
 	ASSERT_EQ(iCloth, oCloth);
 }
@@ -235,11 +378,11 @@ TEST(StateCase, StateCytoplasm) {
 	oCytoplasm.Initialize(flexParams);
 
 	cereal::BinaryOutputArchive oArchive(ss);
-	Serializer::Save(oArchive, oCytoplasm);
+	serializer.Save(oArchive, oCytoplasm);
 
 	Cytoplasm iCytoplasm = Cytoplasm(buffers);
 	cereal::BinaryInputArchive iArchive(ss);
-	Serializer::Load(iArchive, iCytoplasm);
+	serializer.Load(iArchive, iCytoplasm);
 
 	ASSERT_EQ(oCytoplasm, iCytoplasm);
 
@@ -266,11 +409,11 @@ TEST(StateCase, StateKernel) {
 	oKernel.Initialize();
 
 	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, oKernel);
+	serializer.Save(oarchive, oKernel);
 
 	Kernel &iKernel = Kernel(buffers, renderBuffers);
 	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, iKernel);
+	serializer.Load(iarchive, iKernel);
 
 	ASSERT_EQ(iKernel, oKernel);
 
@@ -287,11 +430,11 @@ TEST(StateCase, StatePrimitive) {
 		oMas[i] = i % 32;
 
 	cereal::BinaryOutputArchive oArchive(ss);
-	Serializer::Save(oArchive, oMas, sizeMas);
+	serializer.Save(oArchive, oMas, sizeMas);
 
 	float *iMas = nullptr;
 	cereal::BinaryInputArchive iArchive(ss);
-	Serializer::Load(iArchive, &iMas, sizeMas);
+	serializer.Load(iArchive, &iMas, sizeMas);
 
 	for (int i = 0; i < sizeMas; i++)
 		ASSERT_EQ(iMas[i], oMas[i]);
@@ -303,30 +446,25 @@ TEST(StateCase, StatePrimitive) {
 TEST(StateCase, StateVec4) {
 	Vec4 &outputVec = Vec4(1.0f, 2.0f, 3.0f, 4.0f);
 	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, outputVec);
+	serializer.Save(oarchive, outputVec);
 
 	Vec4 inputVec;
 	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, inputVec);
+	serializer.Load(iarchive, inputVec);
 
-	ASSERT_EQ(inputVec.x, outputVec.x);
-	ASSERT_EQ(inputVec.y, outputVec.y);
-	ASSERT_EQ(inputVec.z, outputVec.z);
-	ASSERT_EQ(inputVec.w, outputVec.w);
+	ASSERT_EQ(inputVec, outputVec);
 }
 
 TEST(StateCase, StateVec3) {
 	Vec3 &outputVec = Vec3(1.0f, 2.0f, 3.0f);
 	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, outputVec);
+	serializer.Save(oarchive, outputVec);
 
 	Vec3 inputVec;
 	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, inputVec);
+	serializer.Load(iarchive, inputVec);
 
-	ASSERT_EQ(inputVec.x, outputVec.x);
-	ASSERT_EQ(inputVec.y, outputVec.y);
-	ASSERT_EQ(inputVec.z, outputVec.z);
+	ASSERT_EQ(inputVec, outputVec);
 }
 
 TEST(StateCase, StateNvFlexCollisionGeometry) {
@@ -335,10 +473,10 @@ TEST(StateCase, StateNvFlexCollisionGeometry) {
 	oCollGeom.capsule.radius = 4.0f;
 
 	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, oCollGeom);
+	serializer.Save(oarchive, oCollGeom);
 
 	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, iCollGeom);
+	serializer.Load(iarchive, iCollGeom);
 
 	ASSERT_EQ(oCollGeom.capsule.halfHeight, iCollGeom.capsule.halfHeight);
 	ASSERT_EQ(iCollGeom.capsule.radius, iCollGeom.capsule.radius);
@@ -348,95 +486,99 @@ TEST(StateCase, StateQuat) {
 	Quat oQuat = Quat(1.0f, 2.0f, 3.0f, 4.0f), iQuat;
 
 	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, oQuat);
+	serializer.Save(oarchive, oQuat);
 
 	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, iQuat);
+	serializer.Load(iarchive, iQuat);
 
-	ASSERT_EQ(oQuat.x, iQuat.x);
-	ASSERT_EQ(oQuat.y, iQuat.y);
-	ASSERT_EQ(oQuat.z, iQuat.z);
-	ASSERT_EQ(oQuat.w, iQuat.w);
+	ASSERT_EQ(oQuat, iQuat);
 }
 
-TEST(StateCase, StateFruitNvFlexVector) {
-	flexController.InitFlex();
 
-	int sizeFruitVec4 = 100;
 
-	auto outFruitVec4 = FruitNvFlexVector<Vec4>(flexController.GetLib());
-	outFruitVec4.map();
-	outFruitVec4.resize(sizeFruitVec4);
-	auto inFruitVec4 = FruitNvFlexVector<Vec4>(flexController.GetLib());
-	inFruitVec4.map();
-	inFruitVec4.resize(sizeFruitVec4);
+// SimBuffers 
+/////////////////////////////////////////////////////////////////
 
-	auto outFruitVec3 = FruitNvFlexVector<Vec3>(flexController.GetLib());
-	outFruitVec3.map();
-	outFruitVec3.resize(sizeFruitVec4);
-	auto inFruitVec3 = FruitNvFlexVector<Vec3>(flexController.GetLib());
-	inFruitVec3.map();
-	inFruitVec3.resize(sizeFruitVec4);
+bool operator==(const SimBuffers &lBuf, const SimBuffers &rBuf) {
+	if (lBuf.numParticles != rBuf.numParticles || lBuf.maxParticles != rBuf.maxParticles)
+		return false;
 
-	auto outFruitFloat = FruitNvFlexVector<float>(flexController.GetLib());
-	outFruitFloat.map();
-	outFruitFloat.resize(sizeFruitVec4);
-	auto inFruitFloat = FruitNvFlexVector<float>(flexController.GetLib());
-	inFruitFloat.map();
-	inFruitFloat.resize(sizeFruitVec4);
+	if (lBuf.numExtraParticles  != rBuf.numExtraParticles  ||
+		lBuf.numExtraMultiplier != rBuf.numExtraMultiplier ||
+		lBuf.numSolidParticles  != rBuf.numSolidParticles)
+		return false;
 
-	auto outFruitInt = FruitNvFlexVector<int>(flexController.GetLib());
-	outFruitInt.map();
-	outFruitInt.resize(sizeFruitVec4);
-	auto inFruitInt = FruitNvFlexVector<int>(flexController.GetLib());
-	inFruitInt.map();
-	inFruitInt.resize(sizeFruitVec4);
+	// data of particles
+	if (lBuf.positions != rBuf.positions ||
+		lBuf.restPositions != rBuf.restPositions ||
+		lBuf.velocities != rBuf.velocities ||
+		lBuf.phases != rBuf.phases ||
+		lBuf.densities != rBuf.densities ||
+		lBuf.activeIndices != rBuf.activeIndices)
+		return false;
 
-	for (int i = 0; i < outFruitVec4.size(); i++) {
-		outFruitVec4[i] = Vec4(1.0f, 2.0f, 3.0f, 4.0f);
-		outFruitVec3[i] = Vec3(1.0f, 2.0f, 3.0f);
-		outFruitFloat[i] = 1.0f;
-		outFruitInt[i] = 1;
-	}
+	if (lBuf.anisotropy1 != rBuf.anisotropy1 ||
+		lBuf.anisotropy2 != rBuf.anisotropy2 ||
+		lBuf.anisotropy3 != rBuf.anisotropy3 ||
+		lBuf.normals	 != rBuf.normals)
+		return false;
 
-	cereal::BinaryOutputArchive oarchive(ss);
-	Serializer::Save(oarchive, outFruitVec4);
-	Serializer::Save(oarchive, outFruitVec3);
-	Serializer::Save(oarchive, outFruitFloat);
-	Serializer::Save(oarchive, outFruitInt);
+	if (lBuf.smoothPositions != rBuf.smoothPositions ||
+		lBuf.diffusePositions != rBuf.diffusePositions ||
+		lBuf.diffuseVelocities != rBuf.diffuseVelocities ||
+		lBuf.diffuseIndices != rBuf.diffuseIndices)
+		return false;
 
-	cereal::BinaryInputArchive iarchive(ss);
-	Serializer::Load(iarchive, inFruitVec4);
-	Serializer::Load(iarchive, inFruitVec3);
-	Serializer::Load(iarchive, inFruitFloat);
-	Serializer::Load(iarchive, inFruitInt);
+	//shape
+	// TODO: add operator == for CollisionGeometry
+	if (//lBuf.shapeGeometry != rBuf.shapeGeometry ||
+		lBuf.shapePositions != rBuf.shapePositions ||
+		lBuf.shapeRotations != rBuf.shapeRotations ||
+		lBuf.shapePrevPositions != rBuf.shapePrevPositions ||
+		lBuf.shapePrevRotations != rBuf.shapePrevRotations ||
+		lBuf.shapeFlags != rBuf.shapeFlags)
+		return false;
 
-	for (int i = 0; i < inFruitVec4.size(); i++) {
-		ASSERT_EQ(inFruitVec4[i].x, outFruitVec4[i].x);
-		ASSERT_EQ(inFruitVec4[i].y, outFruitVec4[i].y);
-		ASSERT_EQ(inFruitVec4[i].z, outFruitVec4[i].z);
-		ASSERT_EQ(inFruitVec4[i].w, outFruitVec4[i].w);
+	//rigid
+	if (lBuf.rigidOffsets != rBuf.rigidOffsets ||
+		lBuf.rigidIndices != rBuf.rigidIndices ||
+		lBuf.rigidMeshSize != rBuf.rigidMeshSize ||
+		lBuf.rigidCoefficients != rBuf.rigidCoefficients ||
+		lBuf.rigidRotations != rBuf.rigidRotations ||
+		lBuf.rigidTranslations != rBuf.rigidTranslations ||
+		lBuf.rigidLocalPositions != rBuf.rigidLocalPositions ||
+		lBuf.rigidLocalNormals != rBuf.rigidLocalNormals)
+		return false;
 
-		ASSERT_EQ(inFruitVec3[i].x, outFruitVec3[i].x);
-		ASSERT_EQ(inFruitVec3[i].y, outFruitVec3[i].y);
-		ASSERT_EQ(inFruitVec3[i].z, outFruitVec3[i].z);
+	// inflatables
+	if (lBuf.inflatableTriOffsets != rBuf.inflatableTriOffsets ||
+		lBuf.inflatableTriCounts != rBuf.inflatableTriCounts ||
+		lBuf.inflatableVolumes != rBuf.inflatableVolumes ||
+		lBuf.inflatableCoefficients != rBuf.inflatableCoefficients ||
+		lBuf.inflatablePressures != rBuf.inflatablePressures)
+		return false;
 
-		ASSERT_EQ(inFruitFloat[i], outFruitFloat[i]);
-		ASSERT_EQ(inFruitInt[i], outFruitInt[i]);
-	}
+	// springs
+	if (lBuf.springIndices != rBuf.springIndices ||
+		lBuf.springLengths != rBuf.springLengths ||
+		lBuf.springStiffness != rBuf.springStiffness)
+		return false;
 
-	outFruitVec4.unmap();
-	inFruitVec4.unmap();
+	// dynamic triangles
+	if (lBuf.triangles != rBuf.triangles ||
+		lBuf.triangleNormals != rBuf.triangleNormals ||
+		lBuf.uvs != rBuf.uvs)
+		return false;
 
-	outFruitVec3.unmap();
-	inFruitVec3.unmap();
-
-	outFruitFloat.unmap();
-	inFruitFloat.unmap();
-
-	outFruitInt.unmap();
-	inFruitInt.unmap();
+	return true;
 }
+
+bool operator!=(const SimBuffers &lBuf, const SimBuffers &rBuf) {
+	return !(lBuf == rBuf);
+}
+
+// NvFlexExtAsset
+/////////////////////////////////////////////////////////////////
 
 bool operator==(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset) {
 	// particles
@@ -492,6 +634,13 @@ bool operator==(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset) {
 	return true;
 }
 
+bool operator!=(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset) {
+	return !(lAsset == rAsset);
+}
+
+// Shell
+/////////////////////////////////////////////////////////////////
+
 bool operator==(const Shell& lShell, const Shell& rShell) {
 	if (lShell.buffers != rShell.buffers)
 		return false;
@@ -509,6 +658,13 @@ bool operator==(const Shell& lShell, const Shell& rShell) {
 	return true;
 }
 
+bool operator!=(const Shell& lShell, const Shell& rShell) {
+	return !(lShell == rShell);
+}
+
+// Cytoplasm
+/////////////////////////////////////////////////////////////////
+
 bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm) {
 	if (lCytoplasm.buffers != rCytoplasm.buffers)
 		return false;
@@ -519,6 +675,13 @@ bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm) {
 	else
 		return true;
 }
+
+bool operator!=(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm) {
+	return !(lCytoplasm == rCytoplasm);
+}
+
+// Kernel
+/////////////////////////////////////////////////////////////////
 
 bool operator==(const Kernel &lKernel, const Kernel &rKernel) {
 	if (lKernel.buffers != rKernel.buffers)
@@ -539,6 +702,13 @@ bool operator==(const Kernel &lKernel, const Kernel &rKernel) {
 		return true;
 }
 
+bool operator!=(const Kernel &lKernel, const Kernel &rKernel) {
+	return !(lKernel == rKernel);
+}
+
+// Cell
+/////////////////////////////////////////////////////////////////
+
 bool operator==(const Cell &lCell, const Cell &rCell) {
 	if (lCell.group != rCell.group)
 		return false;
@@ -553,6 +723,13 @@ bool operator==(const Cell &lCell, const Cell &rCell) {
 
 	return true;
 }
+
+bool operator!=(const Cell &lCell, const Cell &rCell) {
+	return !(lCell == rCell);
+}
+
+// SceneCell
+/////////////////////////////////////////////////////////////////
 
 bool operator==(const SceneCell &lScene, const SceneCell &rScene) {
 	if (!(*lScene.cell == *rScene.cell))
@@ -577,4 +754,44 @@ bool operator==(const SceneCell &lScene, const SceneCell &rScene) {
 		return false;
 
 	return true;
+}
+
+bool operator!=(const SceneCell &lScene, const SceneCell &rScene) {
+	return !(lScene == rScene);
+}
+
+// Mesh
+/////////////////////////////////////////////////////////////////
+
+bool operator==(const Mesh &lMesh, const Mesh &rMesh) {
+	if (lMesh.m_positions != rMesh.m_positions ||
+		lMesh.m_normals != rMesh.m_normals ||
+		lMesh.m_texcoords[0] != rMesh.m_texcoords[0] ||
+		lMesh.m_texcoords[1] != rMesh.m_texcoords[1] ||
+		lMesh.m_indices != rMesh.m_indices ||
+		lMesh.m_colours != rMesh.m_colours)
+		return false;
+
+	return true;
+}
+
+bool operator!=(const Mesh &lMesh, const Mesh &rMesh) {
+	return !(lMesh == rMesh);
+}
+
+// Render Buffers
+/////////////////////////////////////////////////////////////////
+
+bool operator==(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRenderBuffers) {
+	if (lRenderBuffers.meshRestPositions != rRenderBuffers.meshRestPositions ||
+		lRenderBuffers.meshSkinIndices != rRenderBuffers.meshSkinIndices ||
+		lRenderBuffers.meshSkinWeights != rRenderBuffers.meshSkinWeights ||
+		*lRenderBuffers.mesh != *rRenderBuffers.mesh)
+		return false;
+
+	return true;
+}
+
+bool operator!=(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRenderBuffers) {
+	return !(lRenderBuffers == rRenderBuffers);
 }

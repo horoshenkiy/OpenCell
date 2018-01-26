@@ -12,6 +12,8 @@
 #include "controller/compute_controller/FlexController.h"
 #include "controller/render_controller/RenderBuffer.h"
 
+#include "scenes/cell.h"
+
 /////////////////////////////////////////////////////////////
 // simple helper functions
 ///////////////////////////////////////////////////////////
@@ -310,6 +312,39 @@ void GetShapeBounds(SimBuffers *buffers, Vec3& totalLower, Vec3& totalUpper)
 //////////////////////////////////////////////////////////////
 // functions for create
 ////////////////////////////////////////////////////////
+
+void CreateRigidCapsule(SimBuffers &buffers, RenderBuffers &renderBuffers,
+						float radius, float halfLength, int slices, int segments,
+						Vec3 lower, Vec3 scale, float rotation, float samplingMesh, 
+						Vec3 velocity, float mass, int phase) {
+	
+	Mesh *mesh = CreateCapsule(slices, segments, radius, halfLength);
+	mesh->m_colours = std::vector<Colour>(mesh->m_positions.size());
+
+	CreateParticleShape(&buffers, &renderBuffers, mesh, 
+						lower, scale, rotation, 
+						samplingMesh, velocity, mass, 
+						true, 1.5, NvFlexMakePhase(phase, 0), true);
+
+	buffers.numParticles = buffers.positions.size();
+	buffers.maxParticles = buffers.numParticles + buffers.numExtraParticles * buffers.numExtraMultiplier;
+
+	//size_t indexCapsule = buffers.restPositions.size();
+
+	for (int i = buffers.restPositions.size(); i < buffers.positions.size(); i++) {
+		buffers.restPositions.push_back(buffers.positions[i]);
+		buffers.activeIndices.push_back(i);
+	}
+
+	buffers.BuildConstraints();
+
+	// need refactoring
+	for (int i = renderBuffers.meshRestPositions.size(); i < renderBuffers.mesh->m_positions.size(); i++) {
+		renderBuffers.meshRestPositions.push_back(renderBuffers.mesh->m_positions[i]);
+	}
+
+}
+
 void CreateParticleGrid(SimBuffers *buffer,
 						Vec3 lower, 
 						int dimx, int dimy, int dimz, 
@@ -1486,41 +1521,3 @@ Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, 
 
 	return shape;
 }
-
-/////////////////////////////////////////////////////////////////////////////////////
-// functions for save state
-/////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef _WINDOWS
-
-#include <windows.h>
-#include "../fruit_extensions/NvFlexImplFruitExt.h"
-
-bool DirExists(const std::string &dirName) {
-	DWORD fileType = GetFileAttributesA(dirName.c_str());
-
-	if (fileType == INVALID_FILE_ATTRIBUTES)
-		return false;
-
-	if (fileType == FILE_ATTRIBUTE_DIRECTORY)
-		return true;
-
-	return false;
-}
-
-
-bool SaveState(SimBuffers *buffers, std::string nameState) {
-	if (!DirExists("../../data/states"))
-		CreateDirectory("../../data/states", nullptr);
-
-	std::string pathState = "../../data/states/" + nameState;
-	if (DirExists(pathState))
-		return false;
-
-	CreateDirectory(pathState.c_str(), nullptr);
-
-	return true;
-} //-V591
-
-#endif
-

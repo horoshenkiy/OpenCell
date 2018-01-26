@@ -34,6 +34,14 @@ public:
 		RenderBuffers *renderBuffers,
 		RenderParam *renderParam) override;
 
+	void InitializeFromFile(FlexController *flexController,
+							SimBuffers *buffers,
+							FlexParams *flexParams,
+							RenderBuffers *renderBuffers,
+							RenderParam *renderParam) override;
+
+	void PostInitialize() override;
+
 	// destroy
 	//////////////////////////////////////////////
 	~SceneCell();
@@ -47,6 +55,22 @@ public:
 	void Update() override;
 
 	void Draw() override;
+
+	//////////////////////////////////////////////////////
+	template<class Archive>
+	void save(Archive &archive) const {
+		archive(*cell, sceneLower, sceneUpper);
+	}
+
+	template<class Archive>
+	void load(Archive &archive) {
+		if (cell == nullptr) {
+			cell = new Cell();
+			cell->InitializeFromFile(flexController, buffers, flexParams, renderBuffers, renderParam);
+		}
+
+		archive(*cell, sceneLower, sceneUpper);
+	}
 
 };
 

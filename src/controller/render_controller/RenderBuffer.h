@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../core/mesh.h"
+#include <mesh.h>
 #include <vector>
 #include <map>
 
@@ -11,7 +11,7 @@
 struct RenderBuffers {
 
 	// mesh used for deformable object rendering
-	Mesh* mesh;
+	Mesh* mesh = new Mesh();
 	
 	std::vector<size_t> meshSkinIndices;
 	std::vector<float> meshSkinWeights;
@@ -23,4 +23,12 @@ struct RenderBuffers {
 	std::map<NvFlexDistanceFieldId, GpuMesh*> fields;
 
 	FluidRenderBuffers fluidRenderBuffers;
+
+	// serialize
+	template<class Archive>
+	void serialize(Archive &archive) {
+		archive(*mesh);
+		archive(meshSkinIndices, meshSkinWeights, meshRestPositions);
+	}
 };
+
