@@ -1,9 +1,30 @@
 #include "SimBuffers.h"
 
+bool SimBuffers::isInitialize = false;
+
 //constructors, destructors and initialize
 ////////////////////////////////////////////////////////////
-SimBuffers::SimBuffers(NvFlexLibrary* l)
-{
+SimBuffers& SimBuffers::Instance(NvFlexLibrary *l) {
+	static SimBuffers instance(l);
+	return instance;
+}
+
+SimBuffers& SimBuffers::Get() {
+	return Instance(nullptr);
+}
+
+SimBuffers::SimBuffers(NvFlexLibrary* l) {
+	if (l == nullptr)
+		throw std::runtime_error("SimBuffers: Flex Library did n't initialize!\n");
+
+	Initialize(l);
+}
+
+SimBuffers::~SimBuffers() {
+	Destroy();
+}
+
+void SimBuffers::Initialize(NvFlexLibrary *l) {
 	positions = FruitNvFlexVector<Vec4>(l);
 	restPositions = FruitNvFlexVector<Vec4>(l);
 	velocities = FruitNvFlexVector<Vec3>(l);
@@ -53,92 +74,14 @@ SimBuffers::SimBuffers(NvFlexLibrary* l)
 	uvs = FruitNvFlexVector<Vec3>(l);
 }
 
-SimBuffers::~SimBuffers()
-{
-	// particles
-	this->positions.destroy();
-	this->restPositions.destroy();
-	this->velocities.destroy();
-	this->phases.destroy();
-	this->densities.destroy();
-	this->anisotropy1.destroy();
-	this->anisotropy2.destroy();
-	this->anisotropy3.destroy();
-	this->normals.destroy();
-	this->diffusePositions.destroy();
-	this->diffuseVelocities.destroy();
-	this->diffuseIndices.destroy();
-	this->smoothPositions.destroy();
-	this->activeIndices.destroy();
-
-	// convexes
-	this->shapeGeometry.destroy();
-	this->shapePositions.destroy();
-	this->shapeRotations.destroy();
-	this->shapePrevPositions.destroy();
-	this->shapePrevRotations.destroy();
-	this->shapeFlags.destroy();
-
-	// rigids
-	this->rigidOffsets.destroy();
-	this->rigidIndices.destroy();
-	this->rigidMeshSize.destroy();
-	this->rigidCoefficients.destroy();
-	this->rigidRotations.destroy();
-	this->rigidTranslations.destroy();
-	this->rigidLocalPositions.destroy();
-	this->rigidLocalNormals.destroy();
-
-	// springs
-	this->springIndices.destroy();
-	this->springLengths.destroy();
-	this->springStiffness.destroy();
-
-	// inflatables
-	this->inflatableTriOffsets.destroy();
-	this->inflatableTriCounts.destroy();
-	this->inflatableVolumes.destroy();
-	this->inflatableCoefficients.destroy();
-	this->inflatablePressures.destroy();
-
-	// triangles
-	this->triangles.destroy();
-	this->triangleNormals.destroy();
-	this->uvs.destroy();
-}
-
-void SimBuffers::Initialize() {
-	this->positions.resize(0);
-	this->velocities.resize(0);
-	this->phases.resize(0);
-
-	this->rigidOffsets.resize(0);
-	this->rigidIndices.resize(0);
-	this->rigidMeshSize.resize(0);
-	this->rigidRotations.resize(0);
-	this->rigidTranslations.resize(0);
-	this->rigidCoefficients.resize(0);
-	this->rigidLocalPositions.resize(0);
-	this->rigidLocalNormals.resize(0);
-
-	this->springIndices.resize(0);
-	this->springLengths.resize(0);
-	this->springStiffness.resize(0);
-	this->triangles.resize(0);
-	this->triangleNormals.resize(0);
-	this->uvs.resize(0);
-
-	this->shapeGeometry.resize(0);
-	this->shapePositions.resize(0);
-	this->shapeRotations.resize(0);
-	this->shapePrevPositions.resize(0);
-	this->shapePrevRotations.resize(0);
-	this->shapeFlags.resize(0);
-
-
-}
-
 void SimBuffers::PostInitialize() {
+
+	// for singleton initialize
+	if (isInitialize) 
+		return;
+	isInitialize = true;
+
+	// resize diffuse
 	this->diffusePositions.resize(maxDiffuseParticles);
 	this->diffuseVelocities.resize(maxDiffuseParticles);
 	this->diffuseIndices.resize(maxDiffuseParticles);
@@ -176,6 +119,71 @@ void SimBuffers::PostInitialize() {
 	this->restPositions.resize(this->positions.size());
 	for (int i = 0; i < this->positions.size(); ++i)
 		this->restPositions[i] = this->positions[i];
+}
+
+void SimBuffers::Destroy() {
+	isInitialize = false;
+
+	// particles
+	this->positions.destroy();
+	this->restPositions.destroy();
+	this->velocities.destroy();
+	this->phases.destroy();
+	this->densities.destroy();
+	this->activeIndices.destroy();
+
+	// anisotropy
+	this->anisotropy1.destroy();
+	this->anisotropy2.destroy();
+	this->anisotropy3.destroy();
+
+	this->normals.destroy();
+
+	// diffuse
+	this->diffusePositions.destroy();
+	this->diffuseVelocities.destroy();
+	this->diffuseIndices.destroy();
+	this->smoothPositions.destroy();
+
+	// convexes
+	this->shapeGeometry.destroy();
+	this->shapePositions.destroy();
+	this->shapeRotations.destroy();
+	this->shapePrevPositions.destroy();
+	this->shapePrevRotations.destroy();
+	this->shapeFlags.destroy();
+
+	// rigids
+	this->rigidOffsets.destroy();
+	this->rigidIndices.destroy();
+	this->rigidMeshSize.destroy();
+	this->rigidCoefficients.destroy();
+	this->rigidRotations.destroy();
+	this->rigidTranslations.destroy();
+	this->rigidLocalPositions.destroy();
+	this->rigidLocalNormals.destroy();
+
+	// springs
+	this->springIndices.destroy();
+	this->springLengths.destroy();
+	this->springStiffness.destroy();
+
+	// inflatables
+	this->inflatableTriOffsets.destroy();
+	this->inflatableTriCounts.destroy();
+	this->inflatableVolumes.destroy();
+	this->inflatableCoefficients.destroy();
+	this->inflatablePressures.destroy();
+
+	// triangles
+	this->triangles.destroy();
+	this->triangleNormals.destroy();
+	this->uvs.destroy();
+}
+
+void SimBuffers::Reset(NvFlexLibrary *l) {
+	Destroy();
+	Initialize(l);
 }
 
 // mapping buffers

@@ -4,47 +4,37 @@
 
 SceneCell::SceneCell(const char* name, 
 	FlexController* flexController, 
-	SimBuffers* buffers, 
 	FlexParams* flexParams, 
-	RenderBuffers* renderBuffers, 
 	RenderParam* renderParam) {
 	
 	this->mName = name;
 	this->flexController = flexController;
-	this->buffers = buffers;
 	this->flexParams = flexParams;
-	this->renderBuffers = renderBuffers;
 	this->renderParam = renderParam;
 }
 
 void SceneCell::Initialize(FlexController *flexController,
-	SimBuffers *buffers,
 	FlexParams *flexParams,
-	RenderBuffers *renderBuffers,
 	RenderParam *renderParam) {
 
 	this->flexController = flexController;
-	this->buffers = buffers;
+	this->buffers = &SimBuffers::Get();
 	this->flexParams = flexParams;
 
-	this->renderBuffers = renderBuffers;
 	this->renderParam = renderParam;
 
 	cell = new Cell();
-	cell->Initialize(flexController, buffers, flexParams, renderBuffers, renderParam);
+	cell->Initialize(flexController, flexParams, renderParam);
 }
 
 void SceneCell::InitializeFromFile(FlexController *flexController,
-	SimBuffers *buffers,
 	FlexParams *flexParams,
-	RenderBuffers *renderBuffers,
 	RenderParam *renderParam) {
 
 	this->flexController = flexController;
 	this->buffers = buffers;
 	this->flexParams = flexParams;
 
-	this->renderBuffers = renderBuffers;
 	this->renderParam = renderParam;
 }
 

@@ -1,5 +1,5 @@
 #include "SDLController.h"
-#include "../Serializer.h"
+#include "../utilits/Serializer.h"
 
 // methods of control keys
 ///////////////////////////////////////////////////////////////////

@@ -44,7 +44,7 @@ public:
 	}
 
 	~FruitNvFlexVector() {
-		destroy();
+		//destroy();
 	}
 
 	FruitBuffer GetBuffer() override {

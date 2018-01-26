@@ -4,14 +4,7 @@
 
 #include "../../controller/compute_controller/FlexParams.h"
 
-Cytoplasm::Cytoplasm() {
-	numberOfParticles = 0;
-	group = 0;
-}
-
-Cytoplasm::Cytoplasm(int group, SimBuffers *buffers) {
-	this->group = group;
-	this->buffers = buffers;
+Cytoplasm::Cytoplasm() : Component() {
 	numberOfParticles = 0;
 }
 
@@ -40,10 +33,10 @@ void Cytoplasm::Initialize(FlexParams *flexParams) {
 	//printf("%d, %d - %f %f %f\n", vertStart, vertEnd, center.x, center.y, center.z);
 
 	for (size_t i = 0; i < n; ++i) {
-		buffers->positions.push_back(Vec4(center + positions[i], 1.0f));
-		buffers->restPositions.push_back(Vec4());
-		buffers->velocities.push_back(0.0f);
-		buffers->phases.push_back(phase);
+		buffers.positions.push_back(Vec4(center + positions[i], 1.0f));
+		buffers.restPositions.push_back(Vec4());
+		buffers.velocities.push_back(0.0f);
+		buffers.phases.push_back(phase);
 	}
 
 	numberOfParticles = n;

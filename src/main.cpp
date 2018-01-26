@@ -33,8 +33,8 @@
 #include "controller/compute_controller/FlexParams.h"
 #include "controller/compute_controller/ComputeController.h"
 
-#include "Timer.h"
-#include "Video.h"
+#include "utilits/Timer.h"
+#include "utilits/Video.h"
 
 // my core
 #include "../fruit_core/platform.h"
@@ -108,7 +108,7 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	if (flexController.GetSolver())
 	{
 		if (g_buffers)
-			delete g_buffers;
+			g_buffers->Reset(flexController.GetLib());
 
 		DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
 
@@ -136,11 +136,11 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	}
 
 	// create compute buffer
-	g_buffers = new SimBuffers(flexController.GetLib());
+	g_buffers = &SimBuffers::Instance(flexController.GetLib());
 	renderController.SetComputeBuffers(g_buffers);
 	
 	// create render buffer
-	renderBuffers = new RenderBuffers();
+	renderBuffers = &RenderBuffers::Get();
 	renderBuffers->meshSkinIndices.resize(0);
 	renderBuffers->meshSkinWeights.resize(0);
 	renderController.SetRenderBuffers(renderBuffers);
@@ -160,12 +160,10 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	// initialize buffers of particles and scene
 	//////////////////////////////////////////////////////////////////
 	if (!g_state) {
-		g_buffers->Initialize();
-		scene->Initialize(&flexController, g_buffers, &flexParams, renderBuffers, renderParam);
+		scene->Initialize(&flexController, &flexParams, renderParam);
 	}
 	else {
-		scene->InitializeFromFile(&flexController, g_buffers, &flexParams, renderBuffers, renderParam);
-
+		scene->InitializeFromFile(&flexController, &flexParams, renderParam);
 		serializer.LoadStateBinary("123");
 		scene->PostInitialize();
 	}
@@ -177,8 +175,6 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	// calculate particle bounds
 	Vec3 particleLower, particleUpper;
 	GetParticleBounds(g_buffers, particleLower, particleUpper);
-
-	//TODO: refactoring
 
 	// accommodate shapes
 	Vec3 shapeLower, shapeUpper;
@@ -237,8 +233,8 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	// create render buffers
 	renderBuffers->fluidRenderBuffers = CreateFluidRenderBuffers(g_buffers->maxParticles, flexParams.interop);
 
-	imguiController.Initialize(scene, &flexController, &flexParams, g_buffers, &renderController, renderParam, &sdlController);
-	computeController.Initialize(&flexController, &flexParams, g_buffers, renderParam, scene);
+	imguiController.Initialize(scene, &flexController, &flexParams, &renderController, renderParam, &sdlController);
+	computeController.Initialize(&flexController, &flexParams, renderParam, scene);
 }
 
 void Reset() {
@@ -247,9 +243,6 @@ void Reset() {
 
 void Shutdown()
 {
-	// free buffers
-	delete g_buffers;
-
 	for (auto& iter : renderBuffers->meshes)
 	{
 		NvFlexDestroyTriangleMesh(flexController.GetLib(), iter.first);
@@ -303,8 +296,6 @@ float Render() {
 	return float(renderEndTime - renderBeginTime);
 }
 
-bool temp = true;
-
 void UpdateFrame()
 {
 	static double lastTime;
@@ -326,8 +317,6 @@ void UpdateFrame()
 
 	if (!g_pause || g_step)
 		UpdateScene();
-
-	//g_buffers->BuildConstraints();
 
 	float newSimLatency = timer.GetDeviceLatency();
 

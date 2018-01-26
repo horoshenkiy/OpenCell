@@ -270,7 +270,6 @@ void IMGUIController::Draw()
 void IMGUIController::Initialize(Scene *scene,
 								 FlexController *flexController, 
 								 FlexParams *flexParams, 
-								 SimBuffers *buffers,
 								 RenderController *renderController, 
 								 RenderParam *renderParam,
 								 SDLController *sdlController) {
@@ -279,7 +278,7 @@ void IMGUIController::Initialize(Scene *scene,
 
 	this->flexController = flexController;
 	this->flexParams = flexParams;
-	this->buffers = buffers;
+	this->buffers = &SimBuffers::Get();
 
 	this->renderController = renderController;
 	this->renderParam = renderParam;

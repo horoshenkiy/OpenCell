@@ -7,26 +7,14 @@ class Cell;
 
 class Cytoskeleton : public Component {
 
-	std::vector<Shape> shapes;
-
-	std::vector<Branch*> branches;
-
-	Vec3 start = Vec3(2.9f, 0.2f, 1.85f);
-	
-	int group = -1;
-
-	Vec3 ratePointGrow = Vec3(0.003f, 0.0f, 0.0f);
-	const int rateGrow = 0;
-	int itGrow = 0;
-
 public:
 
 	// need incapsulation
 	Cell *cell = nullptr;
 
-	Cytoskeleton() {};
+	Cytoskeleton() : Component() {};
 
-	Cytoskeleton(Cell *cell, SimBuffers *buffers, int group, Vec3 start);
+	Cytoskeleton(Cell *cell, Vec3 start);
 
 	// getters
 	Vec3 GetRatePointGrow() const {
@@ -44,5 +32,21 @@ public:
 	void Update(Vec3 rateKernelCenter);
 
 	int indexUpdateCapsule = 0;
+
+private:
+
+	std::vector<Shape> shapes;
+
+	std::vector<Branch*> branches;
+
+	Vec3 start = Vec3(2.9f, 0.2f, 1.85f);
+	
+	int group = -1;
+
+	Vec3 ratePointGrow = Vec3(0.003f, 0.0f, 0.0f);
+	const int rateGrow = 0;
+	int itGrow = 0;
+
+
 
 };

@@ -3,6 +3,7 @@
 struct FlexParams;
 
 #include "controller/render_controller/RenderParam.h"
+#include "controller/render_controller/RenderBuffer.h"
 
 #include "controller/compute_controller/FlexController.h"
 #include "controller/compute_controller/FlexParams.h"
@@ -19,7 +20,7 @@ protected:
 	FlexParams *flexParams = nullptr;
 	SimBuffers *buffers = nullptr;
 
-	RenderBuffers *renderBuffers = nullptr;
+	RenderBuffers &renderBuffers;
 	RenderParam *renderParam = nullptr;
 
 	const char* mName;
@@ -42,20 +43,16 @@ public:
 		this->sceneUpper = sceneUpper;
 	}
 
-	Scene() = default;
+	Scene() : renderBuffers(RenderBuffers::Get()) {}
 
-	Scene(const char* name) : mName(name) {}
+	Scene(const char* name) : mName(name), renderBuffers(RenderBuffers::Get()) {}
 	 
 	virtual void Initialize(FlexController *flexController,
-							SimBuffers *buffers,
 							FlexParams *flexParams,
-							RenderBuffers *renderBuffers,
 							RenderParam *renderParam) = 0;
 
 	virtual void InitializeFromFile(FlexController *flexController,
-									SimBuffers *buffers,
 									FlexParams *flexParams,
-									RenderBuffers *renderBuffers,
 									RenderParam *renderParam) = 0;
 
 	virtual void PostInitialize() = 0;

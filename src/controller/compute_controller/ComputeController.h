@@ -6,7 +6,7 @@
 
 #include "../../scenes.h"
 
-#include "../../Timer.h"
+#include "../../utilits/Timer.h"
 
 extern bool g_pause;
 extern bool g_step;
@@ -29,7 +29,7 @@ private:
 
 public:
 
-	void Initialize(FlexController *flexController, FlexParams *flexParams, SimBuffers *buffers, RenderParam *renderParam, Scene *scene);
+	void Initialize(FlexController *flexController, FlexParams *flexParams, RenderParam *renderParam, Scene *scene);
 
 	int GetActiveCount() const {
 		return NvFlexGetActiveCount(flexController->GetSolver());

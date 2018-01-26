@@ -3,16 +3,12 @@
 
 // initialize
 void Cell::Initialize(FlexController *flexController,
-	SimBuffers *buffers,
-	FlexParams *flexParams,
-	RenderBuffers *renderBuffers,
-	RenderParam *renderParam) {
+					  FlexParams *flexParams,
+					  RenderParam *renderParam) {
 
 	this->flexController = flexController;
-	this->buffers = buffers;
 	this->flexParams = flexParams;
 
-	this->renderBuffers = renderBuffers;
 	this->renderParam = renderParam;
 
 	float minSize = 0.25f;
@@ -21,7 +17,7 @@ void Cell::Initialize(FlexController *flexController,
 
 	float radius = 0.1f;
 
-	buffers->numExtraParticles = 20000;
+	buffers.numExtraParticles = 20000;
 	flexParams->numSubsteps = 3;
 
 	flexParams->params.solidRestDistance = 0.070f;
@@ -49,13 +45,13 @@ void Cell::Initialize(FlexController *flexController,
 
 	clearBuffers();
 
-	shell = new Shell(group++, buffers);
+	shell = std::make_unique<Shell>();
 	shell->Initialize();
 
-	kernel = new Kernel(group++, buffers, renderBuffers);
+	kernel = std::make_unique<Kernel>();
 	kernel->Initialize();
 
-	cytoplasm = new Cytoplasm(group++, buffers);
+	cytoplasm = std::make_unique<Cytoplasm>();
 	cytoplasm->Initialize(flexParams);
 
 	mNumFluidParticles = cytoplasm->GetNumberOfParticles();
@@ -67,15 +63,11 @@ void Cell::Initialize(FlexController *flexController,
 }
 
 void Cell::InitializeFromFile(FlexController *flexController,
-							SimBuffers *buffers,
 							FlexParams *flexParams,
-							RenderBuffers *renderBuffers,
 							RenderParam *renderParam) 
 {
 	this->flexController = flexController;
-	this->buffers = buffers;
 	this->flexParams = flexParams;
-	this->renderBuffers = renderBuffers;
 	this->renderParam = renderParam;
 }
 
@@ -86,7 +78,7 @@ void Cell::PostInitialize() {
 
 	float radius = 0.1f;
 
-	buffers->numExtraParticles = 20000;
+	buffers.numExtraParticles = 20000;
 	flexParams->numSubsteps = 10;
 
 	flexParams->params.solidRestDistance = 0.100f;
@@ -120,23 +112,18 @@ void Cell::PostInitialize() {
 	renderParam->drawMesh = true;
 }
 
-// destroy
-Cell::~Cell() {
-	delete shell;
-}
-
 void Cell::clearBuffers() {
-	buffers->triangles.resize(0);
-	buffers->springIndices.resize(0);
-	buffers->springStiffness.resize(0);
-	buffers->springLengths.resize(0);
+	buffers.triangles.resize(0);
+	buffers.springIndices.resize(0);
+	buffers.springStiffness.resize(0);
+	buffers.springLengths.resize(0);
 }
 
 // main update
 void Cell::Update() {
 
 	// need to refactoring
-	static int j = 0;
+	static int j = 1;
 
 	cytoplasm->Update();
 	shell->Update();
@@ -146,9 +133,9 @@ void Cell::Update() {
 	startGrow += kernel->GetPositionCenter();
 
 	//CreateRigidCapsule(*buffers, *renderBuffers, 0.2f, 1.0f, 10, 20, startGrow, Vec3(0.096f), 0.0f, 0.0016f, Vec3(0.0f), 0.25f, group++);
-	j++;
+//	j++;
 	if (j % 100 == 0) {
-		CreateRigidCapsule(*buffers, *renderBuffers, 0.1f, 1.0f, 10, 20, startGrow, Vec3(0.05f), 0.0f, 0.0016f, Vec3(0.0f), 0.05f, 5);
+		CreateRigidCapsule(buffers, renderBuffers, 0.1f, 1.0f, 10, 20, startGrow, Vec3(0.05f), 0.0f, 0.0016f, Vec3(0.0f), 0.05f, 5);
 		//j++;
 
 		return;
@@ -176,21 +163,21 @@ void Cell::Sync()
 	fruitSolver.SetSolver(flexController->GetSolver());
 
 	// send new particle data to the GPU
-	fruit->SetRestParticles(fruitSolver, buffers->restPositions.GetBuffer(), buffers->restPositions.size());
+	fruit->SetRestParticles(fruitSolver, SimBuffers::Get().restPositions.GetBuffer(), SimBuffers::Get().restPositions.size());
 
 	// update solver
 	fruit->SetSprings(
 		fruitSolver,
-		buffers->springIndices.GetBuffer(),
-		buffers->springLengths.GetBuffer(),
-		buffers->springStiffness.GetBuffer(),
-		buffers->springLengths.size());
+		buffers.springIndices.GetBuffer(),
+		buffers.springLengths.GetBuffer(),
+		buffers.springStiffness.GetBuffer(),
+		buffers.springLengths.size());
 
 	fruit->SetDynamicTriangles(
 		fruitSolver,
-		buffers->triangles.GetBuffer(),
-		buffers->triangleNormals.GetBuffer(),
-		buffers->triangles.size() / 3);
+		buffers.triangles.GetBuffer(),
+		buffers.triangleNormals.GetBuffer(),
+		buffers.triangles.size() / 3);
 }
 
 void Cell::Draw() {

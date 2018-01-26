@@ -8,13 +8,7 @@ class Kernel : public Component {
 public:
 
 	// constructors and initialize
-	Kernel() = default;
-
-	Kernel(SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {}
-
-	Kernel(int group, SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {
-		this->group = group;
-	}																	  
+	Kernel() : Component() {}
 
 	void Initialize() override;
 
@@ -53,4 +47,4 @@ private:
 
 };
 
-#include "../../Serializer.h"
+#include "../../utilits/Serializer.h"

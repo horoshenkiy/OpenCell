@@ -8,28 +8,20 @@
 #include "shell.h"
 
 class Receptors : public Component {
-private:
-	int group;
-
-	std::vector<int> indParticlesShell;
-
-	std::random_device gen;
-	std::uniform_int_distribution<> urd;
 
 public:
 
-	Receptors() {}
-	Receptors(int _group) : group(_group) {}
+	Receptors() : Component() {}
 
-	void Initialize(SimBuffers *buffers, Shell *shell) {
-		this->buffers = buffers;
+	void Initialize(Shell *shell) {
+		//		this->buffers = buffers;
 
 		size_t indBeginBufferShell = shell->GetIndBeginPosition();
 		size_t indEndBufferShell = shell->GetIndEndPosition();
 
 		// TODO: add exception
 		if (indEndBufferShell < indBeginBufferShell)
-			printf("error!");
+			std::cerr << "error!" << std::endl;
 
 		urd = std::uniform_int_distribution<>(indBeginBufferShell, indEndBufferShell);
 
@@ -41,4 +33,14 @@ public:
 
 		indParticlesShell = std::vector<int>(setInd.begin(), setInd.end());
 	}
+
+private:
+	int group;
+
+	std::vector<int> indParticlesShell;
+
+	std::random_device gen;
+	std::uniform_int_distribution<> urd;
+
+
 };

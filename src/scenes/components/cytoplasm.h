@@ -11,10 +11,6 @@ public:
 
 	// constructors and initialize
 	Cytoplasm();
-	
-	explicit Cytoplasm(SimBuffers *buffers) : Component(buffers, nullptr) {}
-	
-	explicit Cytoplasm(int group, SimBuffers *buffers);
 
 	void Initialize(FlexParams *flexParams);
 

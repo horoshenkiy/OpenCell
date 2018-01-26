@@ -12,11 +12,9 @@ public:
 
 	//constructors and initialize
 
-	explicit Shell(SimBuffers *buffers) : Component(buffers, nullptr) {}
+	Shell() : Component() {}
 
-	explicit Shell(int group, SimBuffers *buffers) : Component(buffers ,nullptr), group(group) {}
-
-	explicit Shell(const Shell& other) : Component(other.buffers, nullptr), group(other.group) {}
+	Shell(const Shell& other) : Component(), group(other.group) {}
 
 	void Initialize() override;
 

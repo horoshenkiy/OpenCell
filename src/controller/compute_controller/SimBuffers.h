@@ -2,8 +2,8 @@
 
 #include <NvFlexImplFruitExt.h>
 
-#include "../../Logger.h"
-#include "../../Utilits.h"
+#include "../../utilits/Logger.h"
+#include "../../utilits/Utilits.h"
 
 #include "FruitSimBuffers.h"
 
@@ -19,14 +19,22 @@ struct Shape {
 	int flag;
 };
 
-struct SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Loggable {
+class SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Loggable {
+
+public:
+
 	//construtors, destructors and in initialize
 	////////////////////////////////////////
-	SimBuffers(NvFlexLibrary* l);
+	static SimBuffers& Instance(NvFlexLibrary *l);
+	static SimBuffers& Get();
+
+	SimBuffers(SimBuffers &&other) = default;
 	~SimBuffers();
 
-	void Initialize();
+	void Initialize(NvFlexLibrary *l);
 	void PostInitialize();
+
+	void Reset(NvFlexLibrary *l);
 
 	//mapping and unmapping buffers with inner buffers in Flex
 	//////////////////////////////////////////////////////////
@@ -40,6 +48,7 @@ struct SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Loggable {
 
 	// methods for clearing
 	///////////////////////////////////////////////////////////////
+	void Destroy();
 	void ClearShapes();
 
 	// methods for logging
@@ -101,4 +110,15 @@ struct SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Loggable {
 		// dynamic triangles
 		archive(triangles, triangleNormals, uvs);
 	}
+
+private:
+
+	static bool isInitialize;
+
+	SimBuffers(NvFlexLibrary* l);
+	SimBuffers() = default;
+
+	SimBuffers(const SimBuffers &other) = delete;
+	SimBuffers operator=(const SimBuffers &other) = delete;
+
 };

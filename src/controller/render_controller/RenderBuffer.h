@@ -8,7 +8,14 @@
 
 #include "../../shaders.h"
 
-struct RenderBuffers {
+class RenderBuffers {
+
+public:
+
+	static RenderBuffers& Get() {
+		static RenderBuffers instance;
+		return instance;
+	}
 
 	// mesh used for deformable object rendering
 	Mesh* mesh = new Mesh();
@@ -30,5 +37,12 @@ struct RenderBuffers {
 		archive(*mesh);
 		archive(meshSkinIndices, meshSkinWeights, meshRestPositions);
 	}
+
+private:
+
+	RenderBuffers() = default;
+
+	RenderBuffers(const RenderBuffers &other) = delete;
+	RenderBuffers operator=(const RenderBuffers &other) = delete;
 };
 
