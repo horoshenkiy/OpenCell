@@ -4,6 +4,15 @@
 
 struct RenderParam {
 
+	static RenderParam& Instance() {
+		static RenderParam renderParam;
+		return renderParam;
+	}
+
+	static RenderParam& Get() {
+		return Instance();
+	}
+
 	/////////////////////////////////////////////////////////////
 	// MSAA
 	//////////////////////////////////////////////////////////
@@ -68,4 +77,11 @@ struct RenderParam {
 
 	// synchronize compute and render with realtime
 	bool vsync = false;
+
+private:
+
+	RenderParam() = default;
+
+	RenderParam(const RenderParam &other) = delete;
+	RenderParam operator=(const RenderParam &other) = delete;
 };

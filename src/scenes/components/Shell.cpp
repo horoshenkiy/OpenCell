@@ -36,10 +36,8 @@ void Shell::AddInflatable(const Mesh* mesh, float overPressure, float invMass, i
 		buffers.triangles.push_back(asset->triangleIndices[i * 3 + 2]);
 	}
 
-	for (size_t i = 0; i < asset->numSprings * 2; ++i) {
-		//std::cout << asset->springIndices[i] << std::endl;
+	for (size_t i = 0; i < asset->numSprings * 2; ++i) 
 		buffers.springIndices.push_back(asset->springIndices[i] + indBeginPosition);
-	}
 
 	for (size_t i = 0; i < asset->numSprings; ++i)
 	{
@@ -49,7 +47,7 @@ void Shell::AddInflatable(const Mesh* mesh, float overPressure, float invMass, i
 }
 
 void Shell::Initialize() {
-	Mesh* mesh = ImportMesh(GetFilePathByPlatform("../../data/sphere_high.ply").c_str());
+	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
 	Vec3 lower = Vec3(2.0f + 0 * 2.0f, 0.4f + 0 * 1.2f, 1.0f);
 
 	mesh->Normalize();

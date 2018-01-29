@@ -21,18 +21,10 @@ public:
 	
 	SceneCell(const char* name) : Scene(name) {}
 
-	SceneCell(const char* name, 
-		FlexController *flexController,
-		FlexParams *flexParams,
-		RenderParam *renderParam);
+	SceneCell(const char* name, FlexController *flexController,FlexParams *flexParams);
 
-	void Initialize(FlexController *flexController,
-					FlexParams *flexParams,
-					RenderParam *renderParam) override;
-
-	void InitializeFromFile(FlexController *flexController,
-							FlexParams *flexParams,
-							RenderParam *renderParam) override;
+	void Initialize(FlexController *flexController, FlexParams *flexParams) override;
+	void InitializeFromFile(FlexController *flexController, FlexParams *flexParams) override;
 
 	void PostInitialize() override;
 
@@ -60,7 +52,7 @@ public:
 	void load(Archive &archive) {
 		if (cell == nullptr) {
 			cell = new Cell();
-			cell->InitializeFromFile(flexController, flexParams, renderParam);
+			cell->InitializeFromFile();
 		}
 
 		archive(*cell, sceneLower, sceneUpper);

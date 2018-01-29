@@ -12,9 +12,19 @@ class RenderBuffers {
 
 public:
 
-	static RenderBuffers& Get() {
+	static RenderBuffers& Instance() {
 		static RenderBuffers instance;
 		return instance;
+	}
+
+	static RenderBuffers& Get() {
+		return Instance();
+	}
+
+	void Destroy() {
+		meshSkinIndices.clear();
+		meshSkinWeights.clear();
+		meshRestPositions.clear();
 	}
 
 	// mesh used for deformable object rendering

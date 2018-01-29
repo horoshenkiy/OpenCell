@@ -18,7 +18,7 @@ void Kernel::Initialize() {
 	
 	CreateParticleShape(&buffers, 
 						&renderBuffers, 
-						GetFilePathByPlatform("../../data/sphere.ply").c_str(), 
+						"../../data/sphere.ply", 
 						Vec3(2.2f, 0.7f, 1.0f), 
 						size, 0.0f, sampling, 
 						Vec3(0.0f, 0.0f, 0.0f), 

@@ -5,12 +5,11 @@
 #include <stdio.h>
 #include "../../../include/NvFlexDevice.h"
 
-// необходимо объ€вить вне класса, иначе Flex не может выполнить преобразование во внутреннюю ErrorCallback функцию
 void ErrorCallback(NvFlexErrorSeverity, const char* msg, const char* file, int line) {
 	printf("Flex: %s - %s:%d\n", msg, file, line);
 }
 
-void FlexController::InitFlex() {
+FlexController::FlexController() {
 	// use the PhysX GPU selected from the NVIDIA control panel
 	if (device == -1)
 		device = NvFlexDeviceGetSuggestedOrdinal();

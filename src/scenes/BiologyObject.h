@@ -10,24 +10,25 @@
 class BiologyObject
 {
 protected:
-	FlexController *flexController;
-	FlexParams *flexParams;
+	FlexController &flexController;
+	FlexParams &flexParams;
 	SimBuffers &buffers;
 
 	RenderBuffers &renderBuffers;
-	RenderParam *renderParam;
+	RenderParam &renderParam;
 
 public:
 
-	BiologyObject() : buffers(SimBuffers::Get()), renderBuffers(RenderBuffers::Get()) {}
+	BiologyObject() : 
+		flexController(FlexController::Instance()),
+		flexParams(FlexParams::Get()),
+		buffers(SimBuffers::Get()), 
+		renderBuffers(RenderBuffers::Get()),
+		renderParam(RenderParam::Get()) {}
 
-	virtual void Initialize(FlexController *flexController, 
-							FlexParams *flexParams, 
-							RenderParam *renderParam) = 0;
+	virtual void Initialize() = 0;
 
-	virtual void InitializeFromFile(FlexController *flexController,
-									FlexParams *flexParams,
-									RenderParam *renderParam) = 0;
+	virtual void InitializeFromFile() = 0;
 
 	virtual void PostInitialize() = 0;
 

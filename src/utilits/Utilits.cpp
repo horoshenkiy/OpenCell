@@ -91,6 +91,8 @@ NvFlexDistanceFieldId CreateSDF(RenderBuffers *renderBuffers, const char* meshFi
 	for (int i = 0; i < numVoxels; ++i)
 		pfm.m_data[i] += expand;
 
+	FlexController &flexController = FlexController::Instance();
+
 	NvFlexVector<float> field(flexController.GetLib());
 	field.assign(pfm.m_data, pfm.m_width*pfm.m_height*pfm.m_depth);
 	field.unmap();
@@ -242,6 +244,7 @@ float CalculateRadius(const Vec3* particles, Vec3 center, const int* indices, in
 void GetShapeBounds(SimBuffers *buffers, Vec3& totalLower, Vec3& totalUpper)
 {
 	Bounds totalBounds;
+	FlexController &flexController = FlexController::Instance();
 
 	for (int i = 0; i < buffers->shapeFlags.size(); ++i)
 	{
@@ -807,6 +810,8 @@ void CreateRandomBody(SimBuffers *buffers,
 NvFlexTriangleMeshId CreateTriangleMesh(Mesh* m, RenderBuffers *renderBuffers) {
 	if (!m)
 		return 0;
+
+	FlexController &flexController = FlexController::Instance();
 
 	Vec3 lower, upper;
 	m->GetBounds(lower, upper);
@@ -1456,7 +1461,7 @@ void AddPlinth(SimBuffers *buffers)
 void AddTriangleMesh(SimBuffers *buffers, NvFlexTriangleMeshId mesh, Vec3 translation, Quat rotation, Vec3 scale)
 {
 	Vec3 lower, upper;
-	NvFlexGetTriangleMeshBounds(flexController.GetLib(), mesh, lower, upper);
+	NvFlexGetTriangleMeshBounds(FlexController::Instance().GetLib(), mesh, lower, upper);
 
 	NvFlexCollisionGeometry geo;
 	geo.triMesh.mesh = mesh;

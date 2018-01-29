@@ -12,11 +12,11 @@
 #include <gtest\gtest.h>
 #include "platform.h"
 
+#include "TestBuffers.h"
+
 #include <FruitExt.h>
 
 bool g_extensions = true;
-
-FlexController flexController;
 
 RenderBuffers *renderBuffers;
 RenderParam *renderParam;
@@ -138,143 +138,140 @@ TEST(StateCase, StateFruitNvFlexVector) {
 
 TEST(StateCase, StateRenderBuffers) {
 	SceneCell *scene = new SceneCell();
-	flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	buffers.MapBuffers();
 
 	FlexParams *flexParams = new FlexParams();
 	flexParams->InitFlexParams(scene);
 
-	RenderBuffers *oRenderBuffers = new RenderBuffers();
-	oRenderBuffers->meshSkinIndices.resize(0);
-	oRenderBuffers->meshSkinWeights.resize(0);
-	oRenderBuffers->meshRestPositions.resize(0);
-
-	RenderBuffers *iRenderBuffers = new RenderBuffers();
-	//iRenderBuffers->mesh = new Mesh();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
 
 	renderParam = new RenderParam();
 
-	scene->Initialize(&flexController, buffers, flexParams, oRenderBuffers, renderParam);
+	scene->Initialize(&flexController, flexParams, renderParam);
+
+	buffers.UnmapBuffers();
+	
+	// save state
+	Mesh mesh = *renderBuffers.mesh;
+	std::vector<size_t> meshSkinIndices = renderBuffers.meshSkinIndices;
+	std::vector<float> meshSkinWeights = renderBuffers.meshSkinWeights;
+	std::vector<Point3> meshRestPositions = renderBuffers.meshRestPositions;
 
 	cereal::BinaryOutputArchive out(ss);
-	serializer.Save(out, *oRenderBuffers);
+	serializer.Save(out, renderBuffers);
+
+	renderBuffers.Destroy();
+
+	////////////////////////////////
 
 	cereal::BinaryInputArchive in(ss);
-	serializer.Load(in, *iRenderBuffers);
+	serializer.Load(in, renderBuffers);
 
-	ASSERT_EQ(*oRenderBuffers, *iRenderBuffers);
+	ASSERT_EQ(meshSkinIndices, renderBuffers.meshSkinIndices);
+	ASSERT_EQ(meshSkinWeights, renderBuffers.meshSkinWeights);
+	ASSERT_EQ(meshRestPositions, renderBuffers.meshRestPositions);
+	ASSERT_EQ(mesh, *renderBuffers.mesh);
+
+	buffers.Destroy();
+	renderBuffers.Destroy();
 }
  
 TEST(StateCase, StateSimBuffers) {
+	
 	SceneCell *scene = new SceneCell();
-	flexController.InitFlex();
 
-	//input
-	SimBuffers *oBuffers = new SimBuffers(flexController.GetLib());
-	oBuffers->MapBuffers();
-	oBuffers->Initialize();
-
-	//output
-	SimBuffers *iBuffers = new SimBuffers(flexController.GetLib());
-	iBuffers->MapBuffers();
-	iBuffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
+	
+	// mapping
+	buffers.MapBuffers();
 
 	FlexParams *flexParams = new FlexParams();
 	flexParams->InitFlexParams(scene);
 
-	renderBuffers = new RenderBuffers();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderBuffers->meshRestPositions.resize(0);
-
 	renderParam = new RenderParam();
 
-	scene->Initialize(&flexController, oBuffers, flexParams, renderBuffers, renderParam);
+	scene->Initialize(&flexController, flexParams, renderParam);
+
+	TestSimBuffers oldBuffers(flexController.GetLib());
+	oldBuffers.SaveState(buffers);
 
 	cereal::BinaryOutputArchive out(ss);
-	oBuffers->serialize(out);
-	//out(*oBuffers);
-	//serializer.Save(out, *oBuffers);
+	buffers.serialize(out);
+	buffers.Destroy();
 
 	cereal::BinaryInputArchive in(ss);
-	iBuffers->serialize(in);
-	//in(*iBuffers);
-	//serializer.Load(in, *iBuffers);
+	buffers.serialize(in);
 
-	ASSERT_EQ(*iBuffers, *oBuffers);
+	ASSERT_EQ(buffers, (SimBuffers&)oldBuffers);
+
+	buffers.UnmapBuffers();
+
+	buffers.Destroy();
+	renderBuffers.Destroy();
 
 	delete scene;
-	delete oBuffers;
-	delete iBuffers;
 	delete flexParams;
-	delete renderBuffers;
 	delete renderParam;
 }
 
 TEST(StateCase, StateScene) {
 	SceneCell *oScene = new SceneCell();
 
-	flexController.InitFlex();
+	//flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
+
+	buffers.MapBuffers();
 
 	FlexParams *flexParams = new FlexParams();
 	flexParams->InitFlexParams(oScene);
 
-	renderBuffers = new RenderBuffers();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderBuffers->meshRestPositions.resize(0);
-
 	renderParam = new RenderParam();
 
 	FlexController *temp = &flexController;
-	oScene->Initialize(temp, buffers, flexParams, renderBuffers, renderParam);
+	oScene->Initialize(temp, flexParams, renderParam);
 
 	cereal::BinaryOutputArchive out(ss);
 	serializer.Save(out, *oScene);
 
-	SceneCell *iScene = new SceneCell("cell", temp, buffers, flexParams, renderBuffers, renderParam);
+	SceneCell *iScene = new SceneCell("cell", temp, flexParams, renderParam);
 
 	cereal::BinaryInputArchive in(ss);
 	serializer.Load(in, *iScene);
 
 	ASSERT_EQ(*oScene, *iScene);
+
+	buffers.UnmapBuffers();
+	
+	buffers.Destroy();
+	renderBuffers.Destroy();
 	
 	delete oScene;
 	delete iScene;
-	delete buffers;
 	delete flexParams;
-	delete renderBuffers;
-	delete renderParam;
 }
 
 TEST(StateCase, StateCell) {
 	Scene *scene = new SceneCell();
 
-	flexController.InitFlex();
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	////////////////////////////////////////////////////////////
+	// Mapping buffers
+	buffers.MapBuffers();
 
 	FlexParams *flexParams = new FlexParams();
 	flexParams->InitFlexParams(scene);
 
-	renderBuffers = new RenderBuffers();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderBuffers->meshRestPositions.resize(0);
-
 	renderParam = new RenderParam();
 
-	Cell &oCell = Cell(), &iCell = Cell(buffers, renderBuffers);
-	oCell.Initialize(&flexController, buffers, flexParams, renderBuffers, renderParam);
+	Cell oCell, iCell;
+	oCell.Initialize(&flexController, flexParams, renderParam);
 
 	cereal::BinaryOutputArchive out(ss);
 	serializer.Save(out, oCell);
@@ -284,42 +281,49 @@ TEST(StateCase, StateCell) {
 
 	ASSERT_EQ(iCell, oCell);
 
+	buffers.UnmapBuffers();
+	// Unmap buffers 
+	////////////////////////////////////////////////////////////
+
+	buffers.Destroy();
+	renderBuffers.Destroy();
+
 	delete scene;
-	delete buffers;
 	delete flexParams;
-	delete renderBuffers;
 	delete renderParam;
 }
 
 TEST(StateCase, StateShell) {
-	flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	buffers.MapBuffers();
 
-	Shell oShell(0, buffers);
+	Shell oShell;
 	oShell.Initialize();
 
 	cereal::BinaryOutputArchive out(ss);
 	serializer.Save(out, oShell);
 
-	Shell iShell(buffers);
+	Shell iShell;
 	cereal::BinaryInputArchive in(ss);
 	serializer.Load(in, iShell);
 
 	ASSERT_EQ(iShell, oShell);
+
+	buffers.UnmapBuffers();
+	buffers.Destroy();
 }
 
 TEST(StateCase, StateNvFlexExtAsset) {
-	flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	
+	////////////////////////////////////////////////////////////
+	// Mapping buffers
+	buffers.MapBuffers();
 
-	Mesh* mesh = ImportMesh(GetFilePathByPlatform("../../data/sphere_high.ply").c_str());
-	Vec3 lower = Vec3(2.0f + 0 * 2.0f, 0.4f + 0 * 1.2f, 1.0f);
+	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
+	Vec3 lower = Vec3(2.0f, 0.4f, 1.0f);
 
 	mesh->Normalize();
 	mesh->Transform(TranslationMatrix(Point3(lower)));
@@ -328,98 +332,101 @@ TEST(StateCase, StateNvFlexExtAsset) {
 	float invMass = 0.25f;
 
 	// add particles to system
-	size_t indBeginPosition = buffers->positions.size();
+	size_t indBeginPosition = buffers.positions.size();
 	int phase = NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter);
 
 	for (size_t i = 0; i < mesh->GetNumVertices(); ++i) {
 		const Vec3 p = Vec3(mesh->m_positions[i]);
 
-		buffers->positions.push_back(Vec4(p.x, p.y, p.z, invMass));
-		buffers->restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+		buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
+		buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
 
-		buffers->velocities.push_back(0.0f);
-		buffers->phases.push_back(phase);
+		buffers.velocities.push_back(0.0f);
+		buffers.phases.push_back(phase);
 	}
 
 	// create asset
-	NvFlexExtAsset &oCloth = *(NvFlexExtCreateClothFromMesh((float*)&buffers->positions[indBeginPosition],
-		numParticles,
-		(int*)&mesh->m_indices[0],
-		mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f));
+	NvFlexExtAsset oCloth = *(NvFlexExtCreateClothFromMesh((float*)&buffers.positions[indBeginPosition],
+															numParticles,
+															(int*)&mesh->m_indices[0],
+															mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f));
 
 	cereal::BinaryOutputArchive oArchive(ss);
 	serializer.Save(oArchive, oCloth);
 
-	NvFlexExtAsset &iCloth = NvFlexExtAsset();
+	NvFlexExtAsset iCloth = NvFlexExtAsset();
 	cereal::BinaryInputArchive iArchive(ss);
 	serializer.Load(iArchive, iCloth);
 
 	ASSERT_EQ(iCloth, oCloth);
+
+	buffers.UnmapBuffers();
+	buffers.Destroy();
+	// Unmap buffers 
+	////////////////////////////////////////////////////////////
+	
 }
 
 TEST(StateCase, StateCytoplasm) {
-	flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
 
-	renderBuffers = new RenderBuffers();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderBuffers->meshRestPositions.resize(0);
+	////////////////////////////////////////////////////////////
+	// Mapping buffers
+	buffers.MapBuffers();
 
 	Scene *scene = new SceneCell();
 
 	FlexParams *flexParams = new FlexParams();
 	flexParams->InitFlexParams(scene);
 
-	Cytoplasm oCytoplasm = Cytoplasm(0, buffers);
+	Cytoplasm oCytoplasm = Cytoplasm();
 	oCytoplasm.Initialize(flexParams);
 
 	cereal::BinaryOutputArchive oArchive(ss);
 	serializer.Save(oArchive, oCytoplasm);
 
-	Cytoplasm iCytoplasm = Cytoplasm(buffers);
+	Cytoplasm iCytoplasm = Cytoplasm();
 	cereal::BinaryInputArchive iArchive(ss);
 	serializer.Load(iArchive, iCytoplasm);
 
 	ASSERT_EQ(oCytoplasm, iCytoplasm);
 
-	buffers->UnmapBuffers();
-	delete buffers;
-	delete renderBuffers;
+	buffers.UnmapBuffers();
+	// Unmap buffers 
+	////////////////////////////////////////////////////////////
+
+	buffers.Destroy();
+	renderBuffers.Destroy();
+
 	delete scene;
 	delete flexParams;
 }
 
 TEST(StateCase, StateKernel) {
-	flexController.InitFlex();
 
-	SimBuffers *buffers = new SimBuffers(flexController.GetLib());
-	buffers->MapBuffers();
-	buffers->Initialize();
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
 
-	renderBuffers = new RenderBuffers();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderBuffers->meshRestPositions.resize(0);
+	buffers.MapBuffers();
 
-	Kernel &oKernel = Kernel(0, buffers, renderBuffers);
+	Kernel oKernel = Kernel();
 	oKernel.Initialize();
 
 	cereal::BinaryOutputArchive oarchive(ss);
 	serializer.Save(oarchive, oKernel);
 
-	Kernel &iKernel = Kernel(buffers, renderBuffers);
+	Kernel iKernel = Kernel();
 	cereal::BinaryInputArchive iarchive(ss);
 	serializer.Load(iarchive, iKernel);
 
 	ASSERT_EQ(iKernel, oKernel);
 
-	buffers->UnmapBuffers();
-	delete buffers;
-	delete renderBuffers;
+	buffers.UnmapBuffers();
+	
+	buffers.Destroy();
+	renderBuffers.Destroy();
 }
 
 TEST(StateCase, StatePrimitive) {
@@ -456,7 +463,7 @@ TEST(StateCase, StateVec4) {
 }
 
 TEST(StateCase, StateVec3) {
-	Vec3 &outputVec = Vec3(1.0f, 2.0f, 3.0f);
+	Vec3 outputVec = Vec3(1.0f, 2.0f, 3.0f);
 	cereal::BinaryOutputArchive oarchive(ss);
 	serializer.Save(oarchive, outputVec);
 

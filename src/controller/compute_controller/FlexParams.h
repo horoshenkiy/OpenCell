@@ -1,13 +1,24 @@
 #pragma once
 
 #include "../../../include/NvFlex.h"
+#include <iostream>
 
 class Scene;
 
-struct FlexParams {
+class FlexParams {
 
-	FlexParams() = default;
-	~FlexParams() {}
+public:
+
+	static FlexParams& Instance() {
+		static FlexParams instance;
+		return instance;
+	}
+
+	static FlexParams& Get() {
+		return Instance();
+	}
+
+	~FlexParams() = default;
 
 	unsigned char maxNeighborsPerParticle = 96;
 
@@ -27,6 +38,14 @@ struct FlexParams {
 	// flex params
 	NvFlexParams params;
 
-	void InitFlexParams(Scene *scene);
+	//void InitFlexParams(Scene *scene);
+
+private:
+
+	FlexParams();
+
+	FlexParams(const FlexParams &other) = delete;
+	FlexParams operator=(const FlexParams &other) = delete;
+
 };
 

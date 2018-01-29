@@ -1,7 +1,7 @@
 #include "FlexParams.h"
 #include "../../scenes.h"
 
-void FlexParams::InitFlexParams(Scene *scene) {
+FlexParams::FlexParams() {
 	// sim params
 	params.gravity[0] = 0.0f;
 	params.gravity[1] = -9.8f;
@@ -87,8 +87,8 @@ void FlexParams::InitFlexParams(Scene *scene) {
 	// update collision planes to match flexs
 	Vec3 up = Normalize(Vec3(-0.0f, 1.0f, 0.0f));
 
-	Vec3 sceneLower = scene->GetSceneLower();
-	Vec3 sceneUpper = scene->GetSceneUpper();
+	Vec3 sceneLower = Vec3(FLT_MAX);//scene->GetSceneLower();
+	Vec3 sceneUpper = Vec3(-FLT_MAX);//scene->GetSceneUpper();
 
 	(Vec4&)params.planes[0] = Vec4(up.x, up.y, up.z, 0.0f);
 	(Vec4&)params.planes[1] = Vec4(0.0f, 0.0f, 1.0f, -sceneLower.z);

@@ -111,7 +111,8 @@ public:
 		archive(triangles, triangleNormals, uvs);
 	}
 
-private:
+// for testing
+protected:
 
 	static bool isInitialize;
 

@@ -48,7 +48,7 @@ extern RenderController renderController;
 extern RenderBuffers *renderBuffers;
 
 #include "../controller/compute_controller/FlexController.h"
-extern FlexController flexController;
+//extern FlexController flexController;
 
 //extern GLuint g_msaaFbo;
 #include "../controller/render_controller/RenderParam.h"

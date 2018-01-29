@@ -14,8 +14,10 @@ SimBuffers& SimBuffers::Get() {
 }
 
 SimBuffers::SimBuffers(NvFlexLibrary* l) {
-	if (l == nullptr)
+	if (l == nullptr) {
+		std::cerr << "SimBuffers: Flex Library did n't initialize!" << std::endl;
 		throw std::runtime_error("SimBuffers: Flex Library did n't initialize!\n");
+	}
 
 	Initialize(l);
 }
@@ -80,6 +82,10 @@ void SimBuffers::PostInitialize() {
 	if (isInitialize) 
 		return;
 	isInitialize = true;
+
+	// update num particles
+	numParticles = positions.size();
+	maxParticles = numParticles + numExtraParticles * numExtraMultiplier;
 
 	// resize diffuse
 	this->diffusePositions.resize(maxDiffuseParticles);

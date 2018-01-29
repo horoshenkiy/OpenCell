@@ -4,7 +4,7 @@
 
 #include "../controller/compute_controller/FlexController.h"
 
-extern FlexController flexController;
+//#include "../fruit_core/platform.h"
 
 struct Timer {
 	
@@ -21,6 +21,15 @@ struct Timer {
 	float simLatency;     // the time the GPU spent between the first and last NvFlexUpdateSolver() operation. Because some GPUs context switch, this can include graphics time.
 
 	static float GetDeviceLatency() {
-		return NvFlexGetDeviceLatency(flexController.GetSolver());
+		return NvFlexGetDeviceLatency(FlexController::Instance().GetSolver());
 	}
+
+	/*void UpdateRealdt() {
+		static double lastTime = 0;
+
+		// real elapsed frame time
+		double frameBeginTime = FruitGetSeconds();
+		realdt = float(frameBeginTime - lastTime);
+		lastTime = frameBeginTime;
+	}*/
 };

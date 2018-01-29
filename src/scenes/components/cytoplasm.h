@@ -12,7 +12,7 @@ public:
 	// constructors and initialize
 	Cytoplasm();
 
-	void Initialize(FlexParams *flexParams);
+	void Initialize();
 
 	// getters and setters
 	int GetNumberOfParticles() const { return numberOfParticles; }
@@ -26,6 +26,6 @@ private:
 
 	friend bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
 
-	int group = -1;
+	//int group = -1;
 	int numberOfParticles = 0;
 };

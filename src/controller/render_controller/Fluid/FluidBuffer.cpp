@@ -26,6 +26,9 @@ FluidRenderBuffers CreateFluidRenderBuffers(int numFluidParticles, bool enableIn
 	glVerify(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.mIndices));
 	glVerify(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*numFluidParticles, 0, GL_DYNAMIC_DRAW));
 
+	FlexController &flexController = FlexController::Instance();
+
+	// delete it
 	if (enableInterop)
 	{
 		buffers.mPositionBuf = NvFlexRegisterOGLBuffer(flexController.GetLib(), buffers.mPositionVBO, numFluidParticles, sizeof(Vec4));

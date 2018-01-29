@@ -8,7 +8,11 @@ class Fruit {
 
 public:
 
-	virtual ~Fruit() {}
+	// get count particles 
+	//virtual int GetActiveCount() = 0;
+
+	// load params
+	//virtual void SetParams(FruitSolver solver, FruitParams params) = 0;
 
 	// functions for particles 
 	virtual void SetParticles(FruitSolver solver, FruitBuffer p, int n) = 0;

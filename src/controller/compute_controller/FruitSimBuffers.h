@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include "../../../fruit_extensions/NvFlexImplFruit.h"
+#include "../../../src/utilits/Property.h"
 
 template <template<class> class TypeVector>
 struct FruitSimBuffers 

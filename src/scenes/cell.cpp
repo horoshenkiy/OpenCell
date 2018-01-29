@@ -2,14 +2,7 @@
 #include <memory>
 
 // initialize
-void Cell::Initialize(FlexController *flexController,
-					  FlexParams *flexParams,
-					  RenderParam *renderParam) {
-
-	this->flexController = flexController;
-	this->flexParams = flexParams;
-
-	this->renderParam = renderParam;
+void Cell::Initialize() {
 
 	float minSize = 0.25f;
 	float maxSize = 0.5f;
@@ -18,30 +11,30 @@ void Cell::Initialize(FlexController *flexController,
 	float radius = 0.1f;
 
 	buffers.numExtraParticles = 20000;
-	flexParams->numSubsteps = 3;
+	flexParams.numSubsteps = 3;
 
-	flexParams->params.solidRestDistance = 0.070f;
+	flexParams.params.solidRestDistance = 0.070f;
 
-	flexParams->params.radius = radius;
-	flexParams->params.dynamicFriction = 0.125f;
-	flexParams->params.dissipation = 0.0f;
-	flexParams->params.numIterations = 5;
-	flexParams->params.particleCollisionMargin = flexParams->params.radius*0.05f;
-	flexParams->params.relaxationFactor = 1.0f;
-	flexParams->params.drag = 0.0f;
-	flexParams->params.anisotropyScale = 25.0f;
-	flexParams->params.smoothing = 1.f;
-	flexParams->params.maxSpeed = 0.5f * flexParams->numSubsteps * radius * 60.0f;
-	flexParams->params.gravity[1] *= 1.0f;
-	flexParams->params.collisionDistance = 0.040f;
-	flexParams->params.solidPressure = 0.0f;
+	flexParams.params.radius = radius;
+	flexParams.params.dynamicFriction = 0.125f;
+	flexParams.params.dissipation = 0.0f;
+	flexParams.params.numIterations = 5;
+	flexParams.params.particleCollisionMargin = flexParams.params.radius*0.05f;
+	flexParams.params.relaxationFactor = 1.0f;
+	flexParams.params.drag = 0.0f;
+	flexParams.params.anisotropyScale = 25.0f;
+	flexParams.params.smoothing = 1.f;
+	flexParams.params.maxSpeed = 0.5f * flexParams.numSubsteps * radius * 60.0f;
+	flexParams.params.gravity[1] *= 1.0f;
+	flexParams.params.collisionDistance = 0.040f;
+	flexParams.params.solidPressure = 0.0f;
 
-	flexParams->params.fluid = true;
+	flexParams.params.fluid = true;
 
-	flexParams->params.fluidRestDistance = radius*0.65f;
-	flexParams->params.viscosity = 0.0;
-	flexParams->params.adhesion = 0.0f;
-	flexParams->params.cohesion = 0.02f;
+	flexParams.params.fluidRestDistance = radius*0.65f;
+	flexParams.params.viscosity = 0.0;
+	flexParams.params.adhesion = 0.0f;
+	flexParams.params.cohesion = 0.02f;
 
 	clearBuffers();
 
@@ -52,24 +45,17 @@ void Cell::Initialize(FlexController *flexController,
 	kernel->Initialize();
 
 	cytoplasm = std::make_unique<Cytoplasm>();
-	cytoplasm->Initialize(flexParams);
+	cytoplasm->Initialize();
 
 	mNumFluidParticles = cytoplasm->GetNumberOfParticles();
 
-	renderParam->drawCloth = false;
-	flexParams->warmup = true;
+	renderParam.drawCloth = false;
+	flexParams.warmup = true;
 
-	renderParam->drawMesh = true;
+	renderParam.drawMesh = true;
 }
 
-void Cell::InitializeFromFile(FlexController *flexController,
-							FlexParams *flexParams,
-							RenderParam *renderParam) 
-{
-	this->flexController = flexController;
-	this->flexParams = flexParams;
-	this->renderParam = renderParam;
-}
+void Cell::InitializeFromFile() {}
 
 void Cell::PostInitialize() {
 	float minSize = 0.25f;
@@ -79,37 +65,37 @@ void Cell::PostInitialize() {
 	float radius = 0.1f;
 
 	buffers.numExtraParticles = 20000;
-	flexParams->numSubsteps = 10;
+	flexParams.numSubsteps = 10;
 
-	flexParams->params.solidRestDistance = 0.100f;
+	flexParams.params.solidRestDistance = 0.100f;
 
-	flexParams->params.radius = radius;
-	flexParams->params.dynamicFriction = 0.125f;
-	flexParams->params.dissipation = 0.0f;
-	flexParams->params.numIterations = 5;
-	flexParams->params.particleCollisionMargin = flexParams->params.radius*0.05f;
-	flexParams->params.relaxationFactor = 1.0f;
-	flexParams->params.drag = 0.0f;
-	flexParams->params.anisotropyScale = 25.0f;
-	flexParams->params.smoothing = 1.f;
-	flexParams->params.maxSpeed = 0.5f * flexParams->numSubsteps * radius * 60.0f;
-	flexParams->params.gravity[1] *= 1.0f;
-	flexParams->params.collisionDistance = 0.040f;
-	flexParams->params.solidPressure = 0.0f;
+	flexParams.params.radius = radius;
+	flexParams.params.dynamicFriction = 0.125f;
+	flexParams.params.dissipation = 0.0f;
+	flexParams.params.numIterations = 5;
+	flexParams.params.particleCollisionMargin = flexParams.params.radius*0.05f;
+	flexParams.params.relaxationFactor = 1.0f;
+	flexParams.params.drag = 0.0f;
+	flexParams.params.anisotropyScale = 25.0f;
+	flexParams.params.smoothing = 1.f;
+	flexParams.params.maxSpeed = 0.5f * flexParams.numSubsteps * radius * 60.0f;
+	flexParams.params.gravity[1] *= 1.0f;
+	flexParams.params.collisionDistance = 0.040f;
+	flexParams.params.solidPressure = 0.0f;
 
-	flexParams->params.fluid = true;
+	flexParams.params.fluid = true;
 
-	flexParams->params.fluidRestDistance = radius*0.65f;
-	flexParams->params.viscosity = 0.0;
-	flexParams->params.adhesion = 0.0f;
-	flexParams->params.cohesion = 0.02f;
+	flexParams.params.fluidRestDistance = radius*0.65f;
+	flexParams.params.viscosity = 0.0;
+	flexParams.params.adhesion = 0.0f;
+	flexParams.params.cohesion = 0.02f;
 
 	mNumFluidParticles = cytoplasm->GetNumberOfParticles();
 
-	renderParam->drawCloth = false;
-	flexParams->warmup = true;
+	renderParam.drawCloth = false;
+	flexParams.warmup = true;
 
-	renderParam->drawMesh = true;
+	renderParam.drawMesh = true;
 }
 
 void Cell::clearBuffers() {
@@ -160,7 +146,7 @@ void Cell::Sync()
 	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
 
 	FruitSolver fruitSolver;
-	fruitSolver.SetSolver(flexController->GetSolver());
+	fruitSolver.SetSolver(flexController.GetSolver());
 
 	// send new particle data to the GPU
 	fruit->SetRestParticles(fruitSolver, SimBuffers::Get().restPositions.GetBuffer(), SimBuffers::Get().restPositions.size());

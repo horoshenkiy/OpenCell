@@ -24,13 +24,9 @@ public:
 	// constructors and initialize
 	Cell() : BiologyObject() {}
 
-	void Initialize(FlexController *flexController,
-					FlexParams *flexParams,
-					RenderParam *renderParam) override;
+	void Initialize() override;
 
-	virtual void InitializeFromFile(FlexController *flexController,
-									FlexParams *flexParams,
-									RenderParam *renderParam) override;
+	virtual void InitializeFromFile() override;
 
 	virtual void PostInitialize() override;
 

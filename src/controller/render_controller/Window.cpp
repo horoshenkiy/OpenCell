@@ -2,16 +2,18 @@
 #include "../../opengl/imguiRenderGL.h"
 #include "platform.h"
 
-SDL_Window* RenderController::InitRender(Camera *camera, 
-										RenderParam *renderParam, 
-										FlexController *flexController,
-										FlexParams *flexParams)
-{
-	this->camera = camera;
-	this->renderParam = renderParam;
+void RenderController::InitRender(Camera *camera) {
 
-	this->flexController = flexController;
-	this->flexParams = flexParams;
+	// TODO: control for initialize
+	
+	this->camera = camera;
+	
+	this->renderBuffers = &RenderBuffers::Get();
+	this->renderParam = &RenderParam::Get();
+
+	this->flexController = &FlexController::Get();
+	this->flexParams = &FlexParams::Get();
+	this->buffers = &SimBuffers::Get();
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -30,10 +32,8 @@ SDL_Window* RenderController::InitRender(Camera *camera,
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	imguiRenderGLInit(GetFilePathByPlatform("../../data/DroidSans.ttf").c_str());
+	imguiRenderGLInit("../../data/DroidSans.ttf");
 	ReshapeWindow();
-
-	return window;
 }
 
 void RenderController::ReshapeWindow(int width, int height)

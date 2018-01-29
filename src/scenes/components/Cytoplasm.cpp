@@ -8,16 +8,15 @@ Cytoplasm::Cytoplasm() : Component() {
 	numberOfParticles = 0;
 }
 
-void Cytoplasm::Initialize(FlexParams *flexParams) {
-	Mesh* mesh = ImportMesh(GetFilePathByPlatform("../../data/sphere_high.ply").c_str());
-	Vec3 lower = Vec3(2.0f + 0 * 2.0f, 0.4f + 0 * 1.2f, 1.0f);
+void Cytoplasm::Initialize() {
+	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
+	Vec3 lower = Vec3(2.0f, 0.4f, 1.0f);
 
 	mesh->Normalize();
 	mesh->Transform(TranslationMatrix(Point3(lower)));
 
 	std::vector<Vec3> positions(10000);
-	RandInit();
-	int n = PoissonSample3D(0.45f, flexParams->params.radius*0.42f, &positions[0], positions.size(), 10000);
+	int n = PoissonSample3D(0.45f, FlexParams::Get().params.radius*0.42f, &positions[0], positions.size(), 10000);
 
 	const int vertStart = 0 * mesh->GetNumVertices();
 	const int vertEnd = vertStart + mesh->GetNumVertices();

@@ -14,8 +14,6 @@ public:
 
 	Shell() : Component() {}
 
-	Shell(const Shell& other) : Component(), group(other.group) {}
-
 	void Initialize() override;
 
 	// destructor
@@ -52,8 +50,6 @@ public:
 private:
 
 	friend bool operator==(const Shell&, const Shell&);
-
-	int group = -1;
 
 	// position in simbuffer
 	size_t indBeginPosition = -1;

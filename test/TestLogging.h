@@ -6,7 +6,7 @@
 #include <controller/compute_controller/SimBuffers.h>
 
 #include <gtest\gtest.h>
-
+/*
 void foo(SimBuffers &buffers) {
 	printf("ok!\n");
 }
@@ -22,4 +22,4 @@ TEST(LoggingCase, SimpleLogging) {
 	LogArgWithCallFunc(buffers, foo, buffers);
 
 	buffers.UnmapBuffers();
-}
+}*/

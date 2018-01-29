@@ -7,6 +7,8 @@
 
 #include "../external/SDL2-2.0.4/include/SDL.h"
 
+#include "../fruit_core/platform.h"
+
 #include "../include/NvFlex.h"
 
 #include <iomanip>
@@ -37,7 +39,6 @@
 #include "utilits/Video.h"
 
 // my core
-#include "../fruit_core/platform.h"
 #include "../fruit_extensions/NvFlexImplFruitExt.h"
 
 // scene
@@ -62,17 +63,17 @@ Video video;
 // controllers
 RenderController renderController;
 SDLController sdlController;
-FlexController flexController;
+FlexController *flexController;
 IMGUIController imguiController;
 ComputeController computeController;
 
 // buffers
-SimBuffers* g_buffers;
-RenderBuffers* renderBuffers;
+SimBuffers *g_buffers;
+RenderBuffers *renderBuffers;
 
 // parameters
 RenderParam *renderParam;
-FlexParams flexParams;
+FlexParams *flexParams;
 
 // param of main control //////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,11 +101,137 @@ bool g_state = false;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void InitScene(Scene *scene, bool centerCamera = true)
-{
+void InitCompute() {
+	
 	RandInit();
 
-	// rewrite
+	// init flex
+	flexController = &FlexController::Instance();
+
+	// initialize params
+	flexParams = &FlexParams::Instance();
+
+	// init benchmark 
+	if (g_benchmark)
+		std::cout << "Compute Device: " << flexController->GetDeviceName() << std::endl;
+
+	// create compute buffer
+	g_buffers = &SimBuffers::Instance(flexController->GetLib());
+}
+
+void InitRender() {
+	// create render buffer
+	renderBuffers = &RenderBuffers::Instance();
+
+	// init render param
+	renderParam = &RenderParam::Instance();
+
+	// init controller
+	sdlController.SDLInit(&renderController, &camera, "Open Cell");
+	if (renderController.GetFullscreen())
+		SDL_SetWindowFullscreen(renderController.GetWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+	// init gl
+	renderController.InitRender(&camera);
+}
+
+void InitSceneCompute(Scene *&scene) {
+	
+	scene = new SceneCell("Cell motility!");
+
+	// initialize scene
+	/////////////////////////////////////////////////////////////////
+	g_buffers->MapBuffers();
+	
+	if (!g_state) {
+		scene->Initialize(flexController, flexParams);
+	}
+	else {
+		// create serializer
+		serializer = Serializer((SceneCell*)scene, g_buffers, renderBuffers);
+
+		scene->InitializeFromFile(flexController, flexParams);
+		serializer.LoadStateBinary("123");
+		
+	}
+	
+	scene->PostInitialize();
+	//////////////////////////////////////////////////////////////////
+
+	g_buffers->PostInitialize();
+
+	// main create method for the Flex solver
+	NvFlexSolver *solver = NvFlexCreateSolver(flexController->GetLib(),
+		g_buffers->maxParticles,
+		g_buffers->maxDiffuseParticles,
+		flexParams->maxNeighborsPerParticle);
+	flexController->SetSolver(solver);
+
+	// build constraints
+	g_buffers->BuildConstraints();
+
+	// unmap so we can start transferring data to GPU
+	g_buffers->UnmapBuffers();
+
+	// params of Flex
+	NvFlexSetParams(solver, &(flexParams->params));
+
+	// send buffers
+	g_buffers->SendBuffers(solver);
+
+	// 	initialise compute controller
+	computeController.Initialize(flexController, flexParams, renderParam, scene);
+}
+
+void InitSceneRender(Scene *scene, bool centerCamera = true) {
+	// save mesh positions for skinning
+	if (renderBuffers->mesh)
+		renderBuffers->meshRestPositions = renderBuffers->mesh->m_positions;
+	else
+		renderBuffers->meshRestPositions.resize(0);
+
+	// center camera on particles
+	if (centerCamera)
+	{
+		Vec3 sceneLower = scene->GetSceneLower();
+		Vec3 sceneUpper = scene->GetSceneUpper();
+
+		camera.SetCamPos(Vec3((sceneLower.x + sceneUpper.x)*0.5f,
+			std::min(sceneUpper.y*1.25f, 6.0f),
+			sceneUpper.z + std::min(sceneUpper.y, 6.0f)*2.0f));
+
+		camera.SetCamAngle(Vec3(0.0f, -DegToRad(15.0f), 0.0f));
+
+		// give scene a chance to modify camera position
+		scene->CenterCamera();
+	}
+
+	// create render buffers
+	renderBuffers->fluidRenderBuffers = CreateFluidRenderBuffers(g_buffers->maxParticles, flexParams->interop);
+	imguiController.Initialize(scene, flexController, flexParams, &renderController, renderParam, &sdlController);
+
+	sdlController.SDLPostInit(&serializer);
+	renderController.SetScene(scene);
+
+	// create shadow maps
+	renderController.SetShadowMap(renderController.shadows.ShadowCreate());
+}
+
+void Initialize() {
+	// init compute
+	InitCompute();
+
+	// init render 
+	InitRender();
+
+	// init default scene
+	InitSceneCompute(scene);
+	InitSceneRender(scene);
+}
+
+void Reset() {
+	FlexController &flexController = FlexController::Instance();
+
 	if (flexController.GetSolver())
 	{
 		if (g_buffers)
@@ -131,145 +258,60 @@ void InitScene(Scene *scene, bool centerCamera = true)
 		renderBuffers->meshes.clear();
 		renderBuffers->convexes.clear();
 
+		delete renderBuffers->mesh;
+		renderBuffers->mesh = new Mesh();
+
 		NvFlexDestroySolver(flexController.GetSolver());
 		flexController.SetSolver(NULL);
+
+		delete scene;
 	}
 
-	// create compute buffer
-	g_buffers = &SimBuffers::Instance(flexController.GetLib());
-	renderController.SetComputeBuffers(g_buffers);
-	
-	// create render buffer
-	renderBuffers = &RenderBuffers::Get();
-	renderBuffers->meshSkinIndices.resize(0);
-	renderBuffers->meshSkinWeights.resize(0);
-	renderController.SetRenderBuffers(renderBuffers);
-
-	// create serializer
-	serializer = Serializer((SceneCell*)scene, g_buffers, renderBuffers);
-	
-	// post initialization SDL Controller
-	sdlController.SDLPostInit(&serializer);
-	
-	// initialize params
-	flexParams.InitFlexParams(scene);
-
-	// map during initialization
-	g_buffers->MapBuffers();
-	
-	// initialize buffers of particles and scene
-	//////////////////////////////////////////////////////////////////
-	if (!g_state) {
-		scene->Initialize(&flexController, &flexParams, renderParam);
-	}
-	else {
-		scene->InitializeFromFile(&flexController, &flexParams, renderParam);
-		serializer.LoadStateBinary("123");
-		scene->PostInitialize();
-	}
-	//////////////////////////////////////////////////////////////////
-
-	g_buffers->numParticles = g_buffers->positions.size();
-	g_buffers->maxParticles = g_buffers->numParticles + g_buffers->numExtraParticles * g_buffers->numExtraMultiplier;
-
-	// calculate particle bounds
-	Vec3 particleLower, particleUpper;
-	GetParticleBounds(g_buffers, particleLower, particleUpper);
-
-	// accommodate shapes
-	Vec3 shapeLower, shapeUpper;
-	GetShapeBounds(g_buffers, shapeLower, shapeUpper);
-
-	// update bounds
-	scene->SetSceneLower(Min(Min(scene->GetSceneLower(), particleLower), shapeLower));
-	scene->SetSceneUpper(Max(Max(scene->GetSceneUpper(), particleUpper), shapeUpper)); 
-
-	scene->SetSceneLower(scene->GetSceneLower() - Vec3(flexParams.params.collisionDistance));
-	scene->SetSceneUpper(scene->GetSceneUpper() + Vec3(flexParams.params.collisionDistance));
-
-	g_buffers->PostInitialize();
-
-	// save mesh positions for skinning
-	if (renderBuffers->mesh) 
-		renderBuffers->meshRestPositions = renderBuffers->mesh->m_positions;
-	else
-		renderBuffers->meshRestPositions.resize(0);
-
-	// main create method for the Flex solver
-	NvFlexSolver *solver = NvFlexCreateSolver(flexController.GetLib(), g_buffers->maxParticles, g_buffers->maxDiffuseParticles, flexParams.maxNeighborsPerParticle);
-	flexController.SetSolver(solver);
-
-	// center camera on particles
-	if (centerCamera)
-	{
-		Vec3 sceneLower = scene->GetSceneLower();
-		Vec3 sceneUpper = scene->GetSceneUpper();
-
-		camera.SetCamPos(Vec3((sceneLower.x + sceneUpper.x)*0.5f, 
-							   std::min(sceneUpper.y*1.25f, 6.0f), 
-							   sceneUpper.z + std::min(sceneUpper.y, 6.0f)*2.0f));
-		
-		camera.SetCamAngle(Vec3(0.0f, -DegToRad(15.0f), 0.0f));
-
-		// give scene a chance to modify camera position
-		scene->CenterCamera();
-	}
-
-	// build constraints
-	g_buffers->BuildConstraints();
-
-	// unmap so we can start transferring data to GPU
-	g_buffers->UnmapBuffers();
-
-	//-----------------------------
-	// Send data to Flex
-
-	// params of Flex
-	NvFlexSetParams(solver, &flexParams.params);
-
-	// send buffers
-	g_buffers->SendBuffers(solver);
-
-	// create render buffers
-	renderBuffers->fluidRenderBuffers = CreateFluidRenderBuffers(g_buffers->maxParticles, flexParams.interop);
-
-	imguiController.Initialize(scene, &flexController, &flexParams, &renderController, renderParam, &sdlController);
-	computeController.Initialize(&flexController, &flexParams, renderParam, scene);
-}
-
-void Reset() {
-	InitScene(scene, false);
+	InitSceneCompute(scene);
+	InitSceneRender(scene, false);
 }
 
 void Shutdown()
 {
+	FlexController *flexController = &FlexController::Instance();
+
 	for (auto& iter : renderBuffers->meshes)
 	{
-		NvFlexDestroyTriangleMesh(flexController.GetLib(), iter.first);
+		NvFlexDestroyTriangleMesh(flexController->GetLib(), iter.first);
 		DestroyGpuMesh(iter.second);
 	}
 
 	for (auto& iter : renderBuffers->fields)
 	{
-		NvFlexDestroyDistanceField(flexController.GetLib(), iter.first);
+		NvFlexDestroyDistanceField(flexController->GetLib(), iter.first);
 		DestroyGpuMesh(iter.second);
 	}
 
 	for (auto& iter : renderBuffers->convexes)
 	{
-		NvFlexDestroyConvexMesh(flexController.GetLib(), iter.first);
+		NvFlexDestroyConvexMesh(flexController->GetLib(), iter.first);
 		DestroyGpuMesh(iter.second);
 	}
 
 	renderBuffers->fields.clear();
 	renderBuffers->meshes.clear();
 
-	NvFlexDestroySolver(flexController.GetSolver());
-	NvFlexShutdown(flexController.GetLib());
+	NvFlexDestroySolver(flexController->GetSolver());
+	NvFlexShutdown(flexController->GetLib());
+
+	if (renderController.GetFluidRenderer())
+		DestroyFluidRenderer(renderController.GetFluidRenderer());
+
+	DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
+
+	ShadowDestroy(renderController.GetShadowMap());
+	DestroyRender();
+
+	SDL_DestroyWindow(renderController.GetWindow());
+	SDL_Quit();
 }
 
-void UpdateScene()
-{
+void UpdateScene() {
 	// give scene a chance to make changes to particle buffers
 	scene->Update();
 }
@@ -296,13 +338,12 @@ float Render() {
 	return float(renderEndTime - renderBeginTime);
 }
 
-void UpdateFrame()
-{
-	static double lastTime;
+void UpdateFrame() {
+
+	static double lastTime = 0;
 
 	// real elapsed frame time
 	double frameBeginTime = FruitGetSeconds();
-
 	timer.realdt = float(frameBeginTime - lastTime);
 	lastTime = frameBeginTime;
 
@@ -352,7 +393,7 @@ void UpdateFrame()
 	// Update the on-screen timers
 
 	float newUpdateTime = float(updateEndTime - updateBeginTime);
-	float newWaitTime = float(waitBeginTime - waitEndTime);
+	float newWaitTime = float(waitEndTime - waitBeginTime);
 
 	// Exponential filter to make the display easier to read
 	const float timerSmoothing = 0.05f;
@@ -374,53 +415,13 @@ void MainLoop()
 	}
 }
 
-int main(int argc, char* argv[])
-{
-	// потом переделать
-	renderParam = new RenderParam();
-
+int main(int argc, char* argv[]) {
 	// Read argument from console
 	ConsoleController(argc, argv);
 
-	// init controller
-	sdlController.SDLInit(&renderController, &camera, &flexParams, "Flex Demo (CUDA)");
-	if (renderController.GetFullscreen())
-		SDL_SetWindowFullscreen(renderController.GetWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-	// init gl
-	renderController.InitRender(&camera, renderParam, &flexController, &flexParams);
-
-	// init flex
-	flexController.InitFlex();
-	
-	// init benchmark (возможно стоит выпилить)
-	if (g_benchmark) 
-		std::cout << "Compute Device: " << flexController.GetDeviceName() << std::endl;
-	
-		
-	// init default scene
-	scene = new SceneCell("Water Balloons");
-	InitScene(scene);
-
-	renderController.SetScene(scene);
-
-	// create shadow maps
-	renderController.SetShadowMap(renderController.shadows.ShadowCreate());
-
+	Initialize();
 	MainLoop();
-		
-	if (renderController.GetFluidRenderer())
-		DestroyFluidRenderer(renderController.GetFluidRenderer());
-
-	DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
-
-	ShadowDestroy(renderController.GetShadowMap());
-	DestroyRender();
-
 	Shutdown();
-
-	SDL_DestroyWindow(renderController.GetWindow());
-	SDL_Quit();
 
 	return 0;
 }

@@ -64,7 +64,6 @@ public:
 
 	void SDLInit(RenderController *renderController, 
 				 Camera *camera, 
-				 FlexParams *flexParams,  
 				 const char* title);
 
 	void SDLPostInit(Serializer *serializer);

@@ -4,42 +4,42 @@
 
 SceneCell::SceneCell(const char* name, 
 	FlexController* flexController, 
-	FlexParams* flexParams, 
-	RenderParam* renderParam) {
+	FlexParams* flexParams) : Scene(name) {
 	
 	this->mName = name;
 	this->flexController = flexController;
 	this->flexParams = flexParams;
-	this->renderParam = renderParam;
 }
 
-void SceneCell::Initialize(FlexController *flexController,
-	FlexParams *flexParams,
-	RenderParam *renderParam) {
+void SceneCell::Initialize(FlexController *flexController, FlexParams *flexParams) {
 
 	this->flexController = flexController;
-	this->buffers = &SimBuffers::Get();
 	this->flexParams = flexParams;
-
-	this->renderParam = renderParam;
 
 	cell = new Cell();
-	cell->Initialize(flexController, flexParams, renderParam);
+	cell->Initialize();
 }
 
-void SceneCell::InitializeFromFile(FlexController *flexController,
-	FlexParams *flexParams,
-	RenderParam *renderParam) {
+void SceneCell::InitializeFromFile(FlexController *flexController, FlexParams *flexParams) {
 
 	this->flexController = flexController;
-	this->buffers = buffers;
 	this->flexParams = flexParams;
-
-	this->renderParam = renderParam;
 }
 
 void SceneCell::PostInitialize() {
 	this->cell->PostInitialize();
+
+	// calculate particle bounds
+	Vec3 particleLower, particleUpper;
+	GetParticleBounds(&buffers, particleLower, particleUpper);
+
+	// accommodate shapes
+	Vec3 shapeLower, shapeUpper;
+	GetShapeBounds(&buffers, shapeLower, shapeUpper);
+
+	// update bounds
+	sceneLower = Min(Min(sceneLower, particleLower), shapeLower) - Vec3(flexParams->params.collisionDistance);
+	sceneUpper = Max(Max(sceneUpper, particleUpper), shapeUpper) + Vec3(flexParams->params.collisionDistance);
 }
 
 // destroy

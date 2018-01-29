@@ -25,7 +25,7 @@ private:
 
 	//Compute params and buffers
 	FlexController *flexController;
-	FlexParams *flexParams;
+
 	SimBuffers *buffers;
 
 	//Render params and buffers
@@ -73,6 +73,8 @@ private:
 
 public:
 
+	FlexParams *flexParams;
+
 	//public fields
 	//////////////////////////////////////////////
 	Shadows shadows = Shadows();
@@ -80,12 +82,9 @@ public:
 	////////////////////////////////////////
 	//Constructors and initialize
 	/////////////////////////////////////////////
-	RenderController() {}
+	RenderController() = default;
 
-	SDL_Window* InitRender(Camera *camera, 
-							RenderParam *renderParam, 
-							FlexController *flexController, 
-							FlexParams *flexParams);
+	void InitRender(Camera *camera);
 
 	//////////////////////////////////////////////
 	// main render
@@ -107,11 +106,6 @@ public:
 
 	ShadowMap* GetShadowMap() const { return shadowMap; }
 	void SetShadowMap(ShadowMap *shadowMap) { this->shadowMap = shadowMap; }
-
-	RenderBuffers* GetRenderBuffers() const { return renderBuffers; }
-	void SetRenderBuffers(RenderBuffers *renderBuffers) { this->renderBuffers = renderBuffers; }
-
-	void SetComputeBuffers(SimBuffers *buffers) { this->buffers = buffers; }
 
 	/////////////////////////////////////////////////////////////////////
 	//public interface for windows

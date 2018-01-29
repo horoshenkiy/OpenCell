@@ -7,7 +7,12 @@ class FruitNvFlex : public Fruit {
 
 public:
 
-	~FruitNvFlex() {}
+	FruitNvFlex() {}// : flexController(FlexController::Instance()) {};
+
+	// get active particles count
+	/*int GetActiveCount() override {
+		return NvFlexGetActiveCount(flexController.GetSolver());
+	}*/
 
 	//particles
 	void SetParticles(FruitSolver solver, FruitBuffer buffer, int n) override {
@@ -184,4 +189,8 @@ public:
 	void GetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) override {
 		NvFlexGetDynamicTriangles(solver.GetSolver(), indices.GetBuffer(), normals.GetBuffer(), numTris);
 	}
+
+private:
+
+	//FlexController &flexController;
 };

@@ -17,7 +17,7 @@ void Cytoskeleton::AddShape(Shape shape) {
 	shapes.push_back(shape);
 }
 
-void Cytoskeleton::Initialize(Cell *cell, SimBuffers *buffers) {
+void Cytoskeleton::Initialize(Cell *cell) {
 	this->cell = cell;
 	//this->buffers = buffers;
 

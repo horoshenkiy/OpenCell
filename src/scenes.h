@@ -18,10 +18,10 @@ protected:
 
 	FlexController *flexController = nullptr;
 	FlexParams *flexParams = nullptr;
-	SimBuffers *buffers = nullptr;
+	SimBuffers &buffers;
 
 	RenderBuffers &renderBuffers;
-	RenderParam *renderParam = nullptr;
+	RenderParam &renderParam;
 
 	const char* mName;
 
@@ -43,17 +43,20 @@ public:
 		this->sceneUpper = sceneUpper;
 	}
 
-	Scene() : renderBuffers(RenderBuffers::Get()) {}
+	Scene() : 
+		buffers(SimBuffers::Get()), 
+		renderBuffers(RenderBuffers::Get()),
+		renderParam(RenderParam::Get()) {}
 
-	Scene(const char* name) : mName(name), renderBuffers(RenderBuffers::Get()) {}
+	Scene(const char* name) : 
+		mName(name), 
+		buffers(SimBuffers::Get()), 
+		renderBuffers(RenderBuffers::Get()),
+		renderParam(RenderParam::Get()) {}
 	 
-	virtual void Initialize(FlexController *flexController,
-							FlexParams *flexParams,
-							RenderParam *renderParam) = 0;
+	virtual void Initialize(FlexController *flexController, FlexParams *flexParams) = 0;
 
-	virtual void InitializeFromFile(FlexController *flexController,
-									FlexParams *flexParams,
-									RenderParam *renderParam) = 0;
+	virtual void InitializeFromFile(FlexController *flexController, FlexParams *flexParams) = 0;
 
 	virtual void PostInitialize() = 0;
 	

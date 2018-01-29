@@ -27,7 +27,7 @@ public:
 
 	void AddShape(Shape shape);
 
-	void Initialize(Cell *cell, SimBuffers *buffers);
+	void Initialize(Cell *cell);
 
 	void Update(Vec3 rateKernelCenter);
 
