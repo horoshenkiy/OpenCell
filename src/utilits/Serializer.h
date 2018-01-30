@@ -27,11 +27,10 @@ public:
 	///////////////////////////////////////////////////////////
 	Serializer() = default;
 
-	Serializer(SceneCell *sceneCell, SimBuffers *buffers, RenderBuffers *renderBuffers) {
-		this->sceneCell = sceneCell;
-		this->buffers = buffers;
-		this->renderBuffers = renderBuffers;
-	}
+	Serializer(SceneCell *sceneCell) :
+		buffers(&SimBuffers::Get()),
+		renderBuffers(&RenderBuffers::Get()),
+		sceneCell(sceneCell) {}
 
 	////// getters and setters
 	////////////////////////////////////////////////////////////

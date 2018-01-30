@@ -4,6 +4,7 @@
 #include "FruitExtTypes.h"
 
 // write documentation of this class
+// Loader data to GPU
 class Fruit {
 
 public:
@@ -15,34 +16,30 @@ public:
 	//virtual void SetParams(FruitSolver solver, FruitParams params) = 0;
 
 	// functions for particles 
-	virtual void SetParticles(FruitSolver solver, FruitBuffer p, int n) = 0;
-	virtual void GetParticles(FruitSolver solver, FruitBuffer p, int n) = 0;
+	virtual void SetParticles() = 0;
+	virtual void GetParticles() = 0;
 
-	virtual void SetRestParticles(FruitSolver solver, FruitBuffer p, int n) = 0;
-	virtual void GetRestParticles(FruitSolver solver, FruitBuffer p, int n) = 0;
+	virtual void SetRestParticles() = 0;
+	virtual void GetRestParticles() = 0;
 
-	virtual void SetVelocities(FruitSolver solver, FruitBuffer p, int n) = 0;
-	virtual void GetVelocities(FruitSolver solver, FruitBuffer p, int n) = 0;
+	virtual void SetVelocities() = 0;
+	virtual void GetVelocities() = 0;
 
-	virtual void SetPhases(FruitSolver solver, FruitBuffer p, int n) = 0;
-	virtual void GetPhases(FruitSolver solver, FruitBuffer p, int n) = 0;
+	virtual void SetPhases() = 0;
+	virtual void GetPhases() = 0;
 
-	virtual void SetDensities(FruitSolver solver, FruitBuffer p, int n) = 0;
-	virtual void GetDensities(FruitSolver sovler, FruitBuffer p, int n) = 0;
+	virtual void GetDensities() = 0;
 
-	virtual void SetActiveIndices(FruitSolver solver, FruitBuffer buffer, int num) = 0;
-	virtual void GetActiveIndices(FruitSolver solver, FruitBuffer buffer, int num) = 0;
+	virtual void SetActiveIndices() = 0;
 
 	// functions for data of graphics
-	virtual void SetAnisotropy(FruitSolver solver, FruitBuffer anisotropy1, FruitBuffer anisotropy2, FruitBuffer anisotropy3) = 0;
-	virtual void GetAnisotropy(FruitSolver solver, FruitBuffer anisotropy1, FruitBuffer anisotropy2, FruitBuffer anisotropy3) = 0;
+	virtual void GetAnisotropy() = 0;
 
-	virtual void SetNormals(FruitSolver solver, FruitBuffer normals, int n) = 0;
-	virtual void GetNormals(FruitSolver solver, FruitBuffer normals, int n) = 0;
+	virtual void SetNormals() = 0;
+	virtual void GetNormals() = 0;
 
 	// functions for smooth and diffuse particles
-	virtual void SetSmoothParticles(FruitSolver solver, FruitBuffer particles, int numParticles) = 0;
-	virtual void GetSmoothParticles(FruitSolver solver, FruitBuffer particles, int numParticles) = 0;
+	virtual void GetSmoothParticles() = 0;
 
 	//virtual void SetDiffusePositions(FruitSolver solver, FruitBuffer buffer, int num) = 0;
 	//virtual void GetDiffusePositions(FruitSolver solver, FruitBuffer buffer, int num) = 0;
@@ -54,60 +51,19 @@ public:
 	//virtual void GetDiffuseIndices(FruitSolver solver, FruitBuffer buffer, int num) = 0;
 
 	// function for shapes 
-	virtual void SetShapes(
-		FruitSolver solver,
-		FruitBuffer geometry,
-		FruitBuffer positions,
-		FruitBuffer rotations,
-		FruitBuffer prevPositions,
-		FruitBuffer prevRotations,
-		FruitBuffer flags,
-		int numShapes) = 0;
-	//вряд ли пригодится
-	virtual void GetShapes(
-		FruitSolver solver,
-		FruitBuffer geometry,
-		FruitBuffer positions,
-		FruitBuffer rotations,
-		FruitBuffer prevPositions,
-		FruitBuffer prevRotations,
-		FruitBuffer flags,
-		int numShapes) = 0;
+	virtual void SetShapes() = 0;
 
 	// functions for rigids
-	virtual void SetRigids(
-		FruitSolver solver,
-		FruitBuffer offsets,
-		FruitBuffer indices,
-		FruitBuffer localPositions,
-		FruitBuffer localNormals,
-		FruitBuffer coefficients,
-		FruitBuffer rotations,
-		FruitBuffer translations,
-		int numRigids,
-		int numIndices) = 0;
-
-	virtual void GetRigidTransforms(FruitSolver solver, FruitBuffer rotations, FruitBuffer translations) = 0;
+	virtual void SetRigids() = 0;
+	virtual void GetRigidTransforms() = 0;
 
 	// functions for inflatables
-	virtual void SetInflatables(
-		FruitSolver solver,
-		FruitBuffer startTris,
-		FruitBuffer numTris,
-		FruitBuffer volumes,
-		FruitBuffer pressures,
-		FruitBuffer constraints,
-		int numInflatables) = 0;
+	virtual void SetInflatables() = 0;
 
 	// functions for springs
-	virtual void SetSprings(
-		FruitSolver solver,
-		FruitBuffer indices,
-		FruitBuffer lengths,
-		FruitBuffer stiffness,
-		int numSprings) = 0;
+	virtual void SetSprings() = 0;
 
 	// functions for dynamic triangles
-	virtual void SetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) = 0;
-	virtual void GetDynamicTriangles(FruitSolver solver, FruitBuffer indices, FruitBuffer normals, int numTris) = 0;
+	virtual void SetDynamicTriangles() = 0;
+	virtual void GetDynamicTriangles() = 0;
 };

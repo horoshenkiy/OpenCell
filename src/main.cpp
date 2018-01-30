@@ -65,7 +65,7 @@ RenderController renderController;
 SDLController sdlController;
 FlexController *flexController;
 IMGUIController imguiController;
-ComputeController computeController;
+AbstComputeController &computeController = FruitNvFlex();
 
 // buffers
 SimBuffers *g_buffers;
@@ -103,20 +103,13 @@ bool g_state = false;
 
 void InitCompute() {
 	
-	RandInit();
+	// initialize compute controller
+	computeController.Initialize(true);
 
-	// init flex
-	flexController = &FlexController::Instance();
-
-	// initialize params
-	flexParams = &FlexParams::Instance();
-
-	// init benchmark 
-	if (g_benchmark)
-		std::cout << "Compute Device: " << flexController->GetDeviceName() << std::endl;
-
-	// create compute buffer
-	g_buffers = &SimBuffers::Instance(flexController->GetLib());
+	// it's temp
+	flexController = &FlexController::Get();
+	flexParams = &FlexParams::Get();
+	g_buffers = &SimBuffers::Get();
 }
 
 void InitRender() {
@@ -137,50 +130,35 @@ void InitRender() {
 
 void InitSceneCompute(Scene *&scene) {
 	
-	scene = new SceneCell("Cell motility!");
+	// mapping buffers
+	computeController.MapBuffers();
 
 	// initialize scene
 	/////////////////////////////////////////////////////////////////
-	g_buffers->MapBuffers();
+	scene = new SceneCell("Cell motility!");
 	
 	if (!g_state) {
 		scene->Initialize(flexController, flexParams);
 	}
 	else {
 		// create serializer
-		serializer = Serializer((SceneCell*)scene, g_buffers, renderBuffers);
+		serializer = Serializer((SceneCell*)scene);
 
 		scene->InitializeFromFile(flexController, flexParams);
 		serializer.LoadStateBinary("123");
-		
 	}
 	
 	scene->PostInitialize();
-	//////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////
 
-	g_buffers->PostInitialize();
-
-	// main create method for the Flex solver
-	NvFlexSolver *solver = NvFlexCreateSolver(flexController->GetLib(),
-		g_buffers->maxParticles,
-		g_buffers->maxDiffuseParticles,
-		flexParams->maxNeighborsPerParticle);
-	flexController->SetSolver(solver);
-
-	// build constraints
-	g_buffers->BuildConstraints();
+	// build constaints
+	computeController.PostInitialize();
 
 	// unmap so we can start transferring data to GPU
-	g_buffers->UnmapBuffers();
+	computeController.UnmapBuffers();
 
-	// params of Flex
-	NvFlexSetParams(solver, &(flexParams->params));
-
-	// send buffers
-	g_buffers->SendBuffers(solver);
-
-	// 	initialise compute controller
-	computeController.Initialize(flexController, flexParams, renderParam, scene);
+	// initialize solver, set params andsend data to GPU
+	computeController.InitializeGPU();
 }
 
 void InitSceneRender(Scene *scene, bool centerCamera = true) {
@@ -351,7 +329,7 @@ void UpdateFrame() {
 	// Scene Update
 
 	double waitBeginTime = FruitGetSeconds();
-	g_buffers->MapBuffers();
+	computeController.MapBuffers();
 	double waitEndTime = FruitGetSeconds();
 
 	camera.UpdateCamera();
@@ -374,7 +352,7 @@ void UpdateFrame() {
 		serializer.SetIsNeedSave(false);
 	}
 
-	g_buffers->UnmapBuffers();
+	computeController.UnmapBuffers();
 
 	// if user requested a scene reset process it now
 	if (g_reset) {

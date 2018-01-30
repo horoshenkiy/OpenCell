@@ -44,5 +44,4 @@ FlexController::FlexController() {
 
 	// store device name
 	strcpy(deviceName, NvFlexGetDeviceName(lib));
-	printf("Compute Device: %s\n\n", deviceName);
 }

@@ -8,6 +8,8 @@
 
 #include "../../utilits/Timer.h"
 
+#include "../../../fruit_extensions/NvFlexImplFruit.h"
+
 extern bool g_pause;
 extern bool g_step;
 extern int  g_frame;
@@ -20,20 +22,29 @@ private:
 	FlexParams *flexParams = nullptr;
 	SimBuffers *buffers = nullptr;
 
-	// need to compute diffuse particles
-	RenderParam *renderParam = nullptr;
-
 	Scene *scene = nullptr;
 
-	Fruit *fruit = new FruitNvFlex();
+	FruitNvFlex *fruit = new FruitNvFlex();
 
 public:
 
-	void Initialize(FlexController *flexController, FlexParams *flexParams, RenderParam *renderParam, Scene *scene);
+	void Initialize();
+
+	void PostInitialize(Scene *scene);
+
+	void InitializeGPU();
+
+	void MapBuffers();
+
+	void UnmapBuffers();
 
 	int GetActiveCount() const;
 
 	int GetDiffuseParticles() const;
 
 	void Update();
+
+	void SendBuffers(NvFlexSolver *flex);
+
+	void Sync();
 };

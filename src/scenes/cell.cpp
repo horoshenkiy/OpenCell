@@ -1,6 +1,8 @@
 #include "cell.h"
 #include <memory>
 
+#include "../../../fruit_extensions/NvFlexImplFruit.h"
+
 // initialize
 void Cell::Initialize() {
 
@@ -143,27 +145,9 @@ void Cell::Update() {
 
 void Cell::Sync()
 {
-	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
+	//std::unique_ptr<Fruit> fruit(new FruitNvFlex());
 
-	FruitSolver fruitSolver;
-	fruitSolver.SetSolver(flexController.GetSolver());
 
-	// send new particle data to the GPU
-	fruit->SetRestParticles(fruitSolver, SimBuffers::Get().restPositions.GetBuffer(), SimBuffers::Get().restPositions.size());
-
-	// update solver
-	fruit->SetSprings(
-		fruitSolver,
-		buffers.springIndices.GetBuffer(),
-		buffers.springLengths.GetBuffer(),
-		buffers.springStiffness.GetBuffer(),
-		buffers.springLengths.size());
-
-	fruit->SetDynamicTriangles(
-		fruitSolver,
-		buffers.triangles.GetBuffer(),
-		buffers.triangleNormals.GetBuffer(),
-		buffers.triangles.size() / 3);
 }
 
 void Cell::Draw() {

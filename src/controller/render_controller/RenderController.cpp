@@ -1,6 +1,8 @@
 #include "RenderController.h"
 #include <memory>
 
+#include "../../../fruit_extensions/NvFlexImplFruit.h"
+
 void RenderController::SkinMesh() {
 	if (renderBuffers->mesh)
 	{
@@ -370,8 +372,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 
 }
 
-void RenderController::RenderDebug()
-{
+void RenderController::RenderDebug() {
 	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
 	FruitSolver fruitSolver;
 	fruitSolver.SetSolver(flexController->GetSolver());
@@ -476,7 +477,7 @@ void RenderController::RenderDebug()
 
 	if (renderParam->drawNormals) {
 		// rewrite сильная связность модулей
-		fruit->GetNormals(fruitSolver, buffers->normals.GetBuffer(), buffers->normals.size());
+		fruit->GetNormals();
 
 		BeginLines();
 

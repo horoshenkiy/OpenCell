@@ -18,7 +18,7 @@ private:
 public:
 
 	FruitNvFlexVector() {}
-	
+
 	FruitNvFlexVector(NvFlexLibrary* l, size_t size = 0) : lib(l) {
 		this->mappedPtr = NULL;
 		this->buffer = NULL;
@@ -45,6 +45,10 @@ public:
 
 	~FruitNvFlexVector() {
 		//destroy();
+	}
+
+	NvFlexBuffer* GetNvBuffer() {
+		return buffer;
 	}
 
 	FruitBuffer GetBuffer() override {

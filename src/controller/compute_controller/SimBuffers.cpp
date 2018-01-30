@@ -1,5 +1,7 @@
 #include "SimBuffers.h"
 
+#include "../../../fruit_extensions/NvFlexImplFruit.h"
+
 bool SimBuffers::isInitialize = false;
 
 //constructors, destructors and initialize
@@ -320,11 +322,11 @@ void SimBuffers::BuildConstraints() {
 void SimBuffers::SendBuffers(NvFlexSolver *flex) {
 	
 	////////////////////////////////////////////////////////
-	FruitSolver fruitSolver;
+	/*FruitSolver fruitSolver;
 	fruitSolver.SetSolver(flex);
 
-	fruit->SetParticles(fruitSolver, positions.GetBuffer(), numParticles);
-	fruit->SetRestParticles(fruitSolver, restPositions.GetBuffer(), restPositions.size());
+	fruit->SetParticles();
+	fruit->SetRestParticles();
 	fruit->SetVelocities(fruitSolver, velocities.GetBuffer(), velocities.size());
 	fruit->SetPhases(fruitSolver, phases.GetBuffer(), phases.size());
 	fruit->SetNormals(fruitSolver, normals.GetBuffer(), numParticles);
@@ -385,7 +387,7 @@ void SimBuffers::SendBuffers(NvFlexSolver *flex) {
 			shapePrevRotations.GetBuffer(),
 			shapeFlags.GetBuffer(),
 			int(shapeFlags.size()));
-	}
+	}*/
 }
 
 // methods for clearing
