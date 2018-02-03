@@ -96,4 +96,6 @@ void FlexParams::InitFlexParams(Scene *scene) {
 	(Vec4&)params.planes[3] = Vec4(-1.0f, 0.0f, 0.0f, sceneUpper.x);
 	(Vec4&)params.planes[4] = Vec4(0.0f, 0.0f, -1.0f, sceneUpper.z);
 	(Vec4&)params.planes[5] = Vec4(0.0f, -1.0f, 0.0f, sceneUpper.y);
+
+
 }

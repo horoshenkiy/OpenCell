@@ -16,6 +16,12 @@ struct FlexParams {
 
 	bool warmup = false;
 
+	//actin tree parameters
+	float p_sow = 0.02f;
+	float p_grow = 0.05f;
+	float p_break = 0.052f;
+	float p_ARP = 0.0005f;
+
 	// enable timers
 	bool profile = false;
 

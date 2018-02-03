@@ -27,8 +27,7 @@ struct Protein
 	{
 		auto half_len = halfSectionLength*length;
 		auto center = begin + Normalize(direction)*half_len;
-		//Quat rotation = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -angleBtwVectors(Vec3(1.0,0.0,0.0), direction));
-		auto dirShape = AddCapsule(radius, half_len, center, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -M_PI / 4) * rotation);
+		auto dirShape = AddCapsule(radius, half_len, center, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -M_PI / 4) * rotation); //angle M_PI/4 is not constant - nedeed to calculate angle btw your direction vector and (1,0,0);
 		return dirShape;
 	}
 
@@ -45,7 +44,7 @@ struct Protein
 	Protein* angle_protein;
 
 	int length;
-	float halfSectionLength = 0.003f;
+	float halfSectionLength = 0.002f; // variable parameter
 	float radius = 0.005f;
 	
 };

@@ -3,6 +3,9 @@
 #include "protein.h"
 #include "kernel.h"
 #include "shell.h"
+#include "../../controller/compute_controller/FlexParams.h"
+
+extern FlexParams flexParams;
 
 class Cytoskeleton2
 {
@@ -20,7 +23,7 @@ public:
 		Vec3 y_ax(0.0, 1.0, 0.0);
 
 		auto p = (double)(rand()) / RAND_MAX;
-		if (p < p_sow)
+		if (p < flexParams.p_sow )
 		{
 			Vec3 kerPos = kernel->GetPositionCenter();
 			indBeginPositionShell = shell->GetIndBeginPosition();
@@ -45,8 +48,6 @@ public:
 			Protein* protein = new Protein(randPoint, randDir, q_dir);
 			tree.push_back(protein);
 		}
-
-		//testFunc();
 	}
 
 	void tryToGrow()
@@ -56,12 +57,12 @@ public:
 			if (it->end_type == Actin)
 			{
 				auto p = (double)(rand()) / RAND_MAX;
-				if (p < p_grow)
+				if (p <flexParams.p_grow)
 				{
 					auto end_of_protein = it->begin + Normalize(it->direction)*it->halfSectionLength*it->length*2;
 					auto dist = FindMinDistToSetWithAngle(end_of_protein, it->direction, phi / 2, buffers->positions, indBeginPositionShell, indEndPositionShell);
 
-					if (dist > it->halfSectionLength*2)
+					if (dist > it->halfSectionLength * 2)
 						it->length++;
 				}
 			}
@@ -76,36 +77,42 @@ public:
 		{
 			if (tree[i]->end_type == Actin)
 			{
-				auto p = (double)(rand()) / RAND_MAX;
-				if (p < p_ARP)
+				auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*tree[i]->halfSectionLength*tree[i]->length * 2;
+				auto dist = FindMinDistToSetWithAngle(end_of_protein, tree[i]->direction, phi / 2, buffers->positions, indBeginPositionShell, indEndPositionShell);
+
+				if (dist > tree[i]->halfSectionLength * 2)
 				{
-					tree[i]->end_type = ARP;
+					auto p = (double)(rand()) / RAND_MAX;
+					if (p < flexParams.p_ARP)
+					{
+						tree[i]->end_type = ARP;
 
-					Vec3 forward_dir = tree[i]->direction;
+						Vec3 forward_dir = tree[i]->direction;
 
-					auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*tree[i]->halfSectionLength*tree[i]->length*2;
+						auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*tree[i]->halfSectionLength*tree[i]->length * 2;
 
-					auto new_forward_pos = end_of_protein;
-					Protein* forward_protein1 = new Protein(new_forward_pos, forward_dir, tree[i]->rotation);
-					forward_protein1->begin_type = ARP;
-					tree[i]->forward_protein = forward_protein1;
-					tree.push_back(forward_protein1);
+						auto new_forward_pos = end_of_protein;
+						Protein* forward_protein1 = new Protein(new_forward_pos, forward_dir, tree[i]->rotation);
+						forward_protein1->begin_type = ARP;
+						tree[i]->forward_protein = forward_protein1;
+						tree.push_back(forward_protein1);
 
-					auto p_angle = (double)(rand()) / RAND_MAX;
-					float teta;
+						auto p_angle = (double)(rand()) / RAND_MAX;
+						float teta;
 
-					p_angle > 0.5f ? teta = branchin_angle / 2 : teta = -branchin_angle/2;
+						p_angle > 0.5f ? teta = branchin_angle / 2 : teta = -branchin_angle / 2;
 
-					Quat q = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), teta);
-					Vec3 new_direction = Rotate(q, forward_dir);
-					new_direction = Normalize(new_direction);
+						Quat q = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), teta);
+						Vec3 new_direction = Rotate(q, forward_dir);
+						new_direction = Normalize(new_direction);
 
-					auto new_angle_pos = end_of_protein;
-					Protein* angle_protein1 = new Protein(new_angle_pos, new_direction, tree[i]->rotation*q);
-					angle_protein1->begin_type = ARP;
-					tree[i]->angle_protein = angle_protein1;
-					tree.push_back(angle_protein1);
-				}
+						auto new_angle_pos = end_of_protein;
+						Protein* angle_protein1 = new Protein(new_angle_pos, new_direction, tree[i]->rotation*q);
+						angle_protein1->begin_type = ARP;
+						tree[i]->angle_protein = angle_protein1;
+						tree.push_back(angle_protein1);
+					}
+				}		
 			}
 		}
 	}
@@ -117,7 +124,7 @@ public:
 			if ((*it)->begin_type == Actin)
 			{
 				auto p = (double)(rand()) / RAND_MAX;
-				if (p < p_break)
+				if (p < flexParams.p_break)
 				{
 					(*it)->length--;
 					if (!(*it)->length)
@@ -140,41 +147,6 @@ public:
 			}
 			else
 				it++;
-		}
-	}
-
-	void testFunc()
-	{ 
-		{
-			Vec3 b(0, 0, 0);
-			Vec3 x_ax(1.0, 0.0, 0.0);
-			Vec3 z_ax(0.0, 0.0, 1.0);
-			Vec3 y_ax(0.0, 1.0, 0.0);
-			Vec3 dir(1.0, 0.0, 0.0);
-
-			Vec3 defDir(1.0, 0.0, 1.0);
-
-			Vec3 kerPos = kernel->GetPositionCenter();
-			kerPos.y = 0;
-
-			Shape shp;
-			Vec3 center;
-			Quat q,q1,q2;
-			float length = 1;
-
-
-			Protein* protein = new Protein(b, main_direction, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), 0));
-			tree.push_back(protein);
-
-			q = QuatFromAxisAngle(y_ax, M_PI/4);
-			dir = Rotate(q, main_direction); // direction of new protein
-			protein = new Protein(b, dir, q);
-			tree.push_back(protein);
-
-			q = QuatFromAxisAngle(y_ax, -M_PI / 4);
-			dir = Rotate(q, main_direction); // direction of new protein
-			protein = new Protein(b, dir, q);
-			tree.push_back(protein);
 		}
 	}
 
@@ -218,14 +190,10 @@ public:
 
 	void Update()
 	{
-		static int time = 0;
-
 		clearShapes();
 
 		tryToSow();
-
 		tryToAddArp();
-
 		tryToGrow();
 		tryToBreak();
 
@@ -245,10 +213,11 @@ private:
 	std::vector<Protein*> tree;
 	std::vector<Shape> shapes;
 
-	float p_sow   = 0.01f;  // variable parameter
-	float p_grow  = 0.05f;  // variable parameter
-	float p_break = 0.055f;  // variable parameter
-	float p_ARP	  = 0.0005f;  // variable parameter
+	 ////probabilistic parameters
+	//float p_sow   = 0.02f;  // variable parameter
+	//float p_grow  = 0.05f;  // variable parameter
+	//float p_break = 0.052f;  // variable parameter
+	//float p_ARP	  = 0.0005f;  // variable parameter
 
 	float phi = M_PI/4;
 	float branchin_angle  = 1.256f;
