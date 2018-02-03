@@ -66,6 +66,7 @@ void UpdateFluidRenderBuffers(FluidRenderBuffers buffers, NvFlexSolver* solver, 
 	// Flex will take care of any CUDA interop mapping/unmapping during the get() operations
 	if (!anisotropy)
 	{
+		std::cerr << "Draw elements\n";
 		// regular particles
 		NvFlexGetParticles(solver, buffers.mPositionBuf, buffers.mNumFluidParticles);
 	}

@@ -38,7 +38,7 @@ public:
 		this->isNeedSave = isNeedSave;
 	}
 	
-	bool GetIsNeedSave() {
+	bool GetIsNeedSave() const {
 		return isNeedSave;
 	}
 
@@ -72,17 +72,27 @@ public:
 	}
 
 	bool LoadStateBinary(std::string nameState) {
-		if (!DirExists("../../data/states/" + nameState))
-			return false;
+		if (!DirExists("../../data/states/" + nameState)) {
+			std::cerr << "State not found!" << std::endl;
+			exit(1);
+		}
 
-		std::ifstream in("../../data/states/" + nameState + "/StateBinary.bin", std::ofstream::binary);
+		std::ifstream in;
+		in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-		cereal::BinaryInputArchive archive(in);
-		Load(archive, *(this->sceneCell));
-		Load(archive, *(this->buffers));
-		Load(archive, *(this->renderBuffers));
-		
-		in.close();
+		try {
+			in.open("../../data/states/" + nameState + "/StateBinary.bin", std::ofstream::binary);
+
+			cereal::BinaryInputArchive archive(in);
+			Load(archive, *(this->sceneCell));
+			Load(archive, *(this->buffers));
+			Load(archive, *(this->renderBuffers));
+
+			in.close();
+		} catch (std::ifstream::failure &ex) {
+			std::cerr << "Exception opening/reading/closing state file" << std::endl;
+			exit(1);
+		}
 
 		return true;
 	}

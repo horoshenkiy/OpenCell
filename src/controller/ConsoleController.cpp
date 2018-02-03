@@ -2,7 +2,7 @@
 
 // add a few method for initialize classes
 
-void ConsoleController(int argc, char* argv[]) {
+/*void ConsoleFun(int argc, char* argv[]) {
 	// process command line args
 	//FlexParams &flexParams = FlexParams::Get();
 
@@ -47,7 +47,7 @@ void ConsoleController(int argc, char* argv[]) {
 			//flexParams.interop = false;
 		}
 
-		if (strstr(argv[i], "-state"))
-			g_state = true;
+		if (strstr(argv[i], "-state")) {
+		}//g_state = true;
 	}
-}
+}*/

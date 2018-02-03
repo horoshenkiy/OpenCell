@@ -17,22 +17,16 @@ void RenderController::SkinMesh() {
 			{
 				Vec3 skinPos;
 
-				for (size_t w = 0; w < 4; ++w)
-				{
-					// small shapes can have < 4 particles
-					//if (renderBuffers->meshSkinIndices[i * 4 + w] > -1)
-					//{
-						assert(renderBuffers->meshSkinWeights[i * 4 + w] < FLT_MAX);
+				for (size_t w = 0; w < 4; ++w) {
+					assert(renderBuffers->meshSkinWeights[i * 4 + w] < FLT_MAX);
 
-						size_t index = renderBuffers->meshSkinIndices[i * 4 + w];
-						float weight = renderBuffers->meshSkinWeights[i * 4 + w];
+					size_t index = renderBuffers->meshSkinIndices[i * 4 + w];
+					float weight = renderBuffers->meshSkinWeights[i * 4 + w];
 
-						Point3(buffers->restPositions[index]);
-						//renderBuffers->meshRestPositions[i] = (renderBuffers->meshRestPositions[i].x > 2.0) ? 0.0 : renderBuffers->meshRestPositions[i];
-						Vec3(buffers->positions[index]);
+					Point3(buffers->restPositions[index]);
+					Vec3(buffers->positions[index]);
 
-						skinPos += (rotation*(renderBuffers->meshRestPositions[i] - Point3(buffers->restPositions[index])) + Vec3(buffers->positions[index]))*weight;
-					//}
+					skinPos += (rotation*(renderBuffers->meshRestPositions[i] - Point3(buffers->restPositions[index])) + Vec3(buffers->positions[index]))*weight;
 				}
 				
 				renderBuffers->mesh->m_positions[i] = Point3(skinPos);
@@ -155,20 +149,17 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 
 	if (numParticles)
 	{
-		if (flexParams->interop)
-		{
+		if (flexParams->interop) {
 			// copy data directly from solver to the renderer buffers
 			UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers, 
 									flexController->GetSolver(), 
 									renderParam->drawEllipsoids, 
 									renderParam->drawDensity);
 		}
-		else
-		{
+		else {
 			// copy particle data to GPU render device
 
-			if (renderParam->drawEllipsoids)
-			{
+			if (renderParam->drawEllipsoids) {
 				// if fluid surface rendering then update with smooth positions and anisotropy
 				UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers,
 					&buffers->smoothPositions[0],

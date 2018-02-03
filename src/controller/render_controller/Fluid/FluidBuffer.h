@@ -18,7 +18,7 @@ struct FluidRenderBuffers
 
 	VertexBuffer mFluidVBO; // to be removed
 
-							// wrapper buffers that allow Flex to write directly to VBOs
+	// wrapper buffers that allow Flex to write directly to VBOs
 	NvFlexBuffer* mPositionBuf;
 	NvFlexBuffer* mDensitiesBuf;
 	NvFlexBuffer* mAnisotropyBuf[3];

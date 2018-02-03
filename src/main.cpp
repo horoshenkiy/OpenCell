@@ -12,7 +12,6 @@
 #include "../include/NvFlex.h"
 
 #include <iomanip>
-#include <iostream>
 #include <map>
 #include <ctime>
 
@@ -38,9 +37,6 @@
 #include "utilits/Timer.h"
 #include "utilits/Video.h"
 
-// my core
-#include "../fruit_extensions/NvFlexImplFruitExt.h"
-
 // scene
 #include "scenes.h"
 #include "scenes\SceneCell.h"
@@ -61,11 +57,12 @@ Timer timer;
 Video video;
 
 // controllers
+ConsoleController consoleController;
+IMGUIController imguiController;
 RenderController renderController;
 SDLController sdlController;
 FlexController *flexController;
-IMGUIController imguiController;
-AbstComputeController &computeController = FruitNvFlex();
+AbstComputeController &computeController{ FruitNvFlex() };
 
 // buffers
 SimBuffers *g_buffers;
@@ -94,9 +91,6 @@ bool g_extensions = true;
 
 // logging
 bool g_teamCity = false;
-
-// download state
-bool g_state = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,15 +131,16 @@ void InitSceneCompute(Scene *&scene) {
 	/////////////////////////////////////////////////////////////////
 	scene = new SceneCell("Cell motility!");
 	
-	if (!g_state) {
+	std::string state = consoleController.GetState();
+	if (state == "") {
 		scene->Initialize(flexController, flexParams);
 	}
 	else {
 		// create serializer
-		serializer = Serializer((SceneCell*)scene);
+		serializer = Serializer(reinterpret_cast<SceneCell*>(scene));
 
 		scene->InitializeFromFile(flexController, flexParams);
-		serializer.LoadStateBinary("123");
+		serializer.LoadStateBinary(state);
 	}
 	
 	scene->PostInitialize();
@@ -395,11 +390,12 @@ void MainLoop()
 
 int main(int argc, char* argv[]) {
 	// Read argument from console
-	ConsoleController(argc, argv);
-
+	//ConsoleFun(argc, argv);
+	consoleController.Parse(argc, argv);
+	
 	Initialize();
 	MainLoop();
 	Shutdown();
 
-	return 0;
+	exit(0);
 }
