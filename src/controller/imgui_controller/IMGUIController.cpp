@@ -89,12 +89,16 @@ void IMGUIController::DoMenu() {
 			g_pause = !g_pause;
 
 		imguiSeparatorLine();
+
 		imguiLabel("Actin Tree Parameters");
 		imguiSlider("Branch Probability", &flexParams->p_sow, 0.0f, 1.0f, 0.01f);
 		imguiSlider("Grow Probability", &flexParams->p_grow, 0.0f, 1.0f, 0.01f);
 		imguiSlider("Break Probability", &flexParams->p_break, 0.0f, 1.0f, 0.01f);
 		imguiSlider("ARP Probality", &flexParams->p_ARP, 0.0f, 1.0f, 0.0001f);
 
+		imguiSeparatorLine();
+		imguiSlider("Protein Length", &flexParams->sectionLength, 0.0f, 0.005f, 0.0001f);
+		imguiSlider("Protein Radius", &flexParams->radius, 0.0f, 0.01f, 0.001f);
 		imguiSeparatorLine();
 
 		if (imguiCheck("Wireframe", renderParam->wireframe))

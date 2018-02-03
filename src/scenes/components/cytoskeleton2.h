@@ -57,12 +57,12 @@ public:
 			if (it->end_type == Actin)
 			{
 				auto p = (double)(rand()) / RAND_MAX;
-				if (p <flexParams.p_grow)
+				if (p < flexParams.p_grow)
 				{
-					auto end_of_protein = it->begin + Normalize(it->direction)*it->halfSectionLength*it->length*2;
+					auto end_of_protein = it->begin + Normalize(it->direction)*flexParams.sectionLength*it->length;
 					auto dist = FindMinDistToSetWithAngle(end_of_protein, it->direction, phi / 2, buffers->positions, indBeginPositionShell, indEndPositionShell);
 
-					if (dist > it->halfSectionLength * 2)
+					if (dist > flexParams.sectionLength)
 						it->length++;
 				}
 			}
@@ -77,10 +77,10 @@ public:
 		{
 			if (tree[i]->end_type == Actin)
 			{
-				auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*tree[i]->halfSectionLength*tree[i]->length * 2;
+				auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*flexParams.sectionLength*tree[i]->length;
 				auto dist = FindMinDistToSetWithAngle(end_of_protein, tree[i]->direction, phi / 2, buffers->positions, indBeginPositionShell, indEndPositionShell);
 
-				if (dist > tree[i]->halfSectionLength * 2)
+				if (dist > flexParams.sectionLength)
 				{
 					auto p = (double)(rand()) / RAND_MAX;
 					if (p < flexParams.p_ARP)
@@ -89,7 +89,7 @@ public:
 
 						Vec3 forward_dir = tree[i]->direction;
 
-						auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*tree[i]->halfSectionLength*tree[i]->length * 2;
+						auto end_of_protein = tree[i]->begin + Normalize(tree[i]->direction)*flexParams.sectionLength*tree[i]->length;
 
 						auto new_forward_pos = end_of_protein;
 						Protein* forward_protein1 = new Protein(new_forward_pos, forward_dir, tree[i]->rotation);
@@ -138,7 +138,7 @@ public:
 					}
 					else
 					{
-						(*it)->begin += Normalize((*it)->direction)*(*it)->halfSectionLength * 2; 
+						(*it)->begin += Normalize((*it)->direction)*flexParams.sectionLength;
 						it++;
 					}
 				}

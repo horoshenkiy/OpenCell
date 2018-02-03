@@ -21,6 +21,9 @@ struct FlexParams {
 	float p_grow = 0.05f;
 	float p_break = 0.052f;
 	float p_ARP = 0.0005f;
+	
+	float sectionLength = 0.002f;
+	float radius = 0.005f;
 
 	// enable timers
 	bool profile = false;

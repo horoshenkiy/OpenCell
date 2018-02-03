@@ -1,5 +1,8 @@
 #pragma once
 #include "component.h"
+#include "../../controller/compute_controller/FlexParams.h"
+
+extern FlexParams flexParams;
 
 enum ProteinType
 {
@@ -25,9 +28,9 @@ struct Protein
 	
 	Shape makeShape()
 	{
-		auto half_len = halfSectionLength*length;
+		auto half_len = flexParams.sectionLength*0.5*length;
 		auto center = begin + Normalize(direction)*half_len;
-		auto dirShape = AddCapsule(radius, half_len, center, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -M_PI / 4) * rotation); //angle M_PI/4 is not constant - nedeed to calculate angle btw your direction vector and (1,0,0);
+		auto dirShape = AddCapsule(flexParams.radius, half_len, center, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -M_PI / 4) * rotation); //angle M_PI/4 is not constant - nedeed to calculate angle btw your direction vector and (1,0,0);
 		return dirShape;
 	}
 
@@ -44,7 +47,6 @@ struct Protein
 	Protein* angle_protein;
 
 	int length;
-	float halfSectionLength = 0.002f; // variable parameter
-	float radius = 0.005f;
+
 	
 };
