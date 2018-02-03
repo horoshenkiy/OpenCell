@@ -2,26 +2,32 @@
 
 #include "component.h"
 
-class Serializer;
-
 class Kernel : public Component {
+private:
+
+	int group;
+
+	//fields of center
+	int indexCenter;
+	
+	Vec4 positionCenter, prevPositionCenter;
+	Vec3 rateCenter;
+
+	float trueRadius;
+
 public:
 
 	// constructors and initialize
-	Kernel() = default;
+	Kernel() {}
+	Kernel(int group) { this->group = group; }
 
-	Kernel(SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {}
-
-	Kernel(int group, SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {
-		this->group = group;
-	}																	  
-
-	void Initialize() override;
+	void Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers);
+	void PostInitialize() {}
 
 	// getters and setters
-	Vec3 GetRateCenter() const { return rateCenter; }
+	Vec3 GetRateCenter() { return rateCenter; }
 
-	Vec3 GetPositionCenter() const {
+	Vec3 GetPositionCenter() {
 		Vec3 result;
 		result.x = positionCenter.x;
 		result.y = positionCenter.y;
@@ -30,21 +36,15 @@ public:
 		return result;
 	}
 
+	float getRadius()
+	{
+		return trueRadius;
+	}
+
 	// update
-	void Update() override;
+	void Update();
 
-private:
-	
-	friend Serializer;
-	friend bool operator==(const Kernel &lKernel, const Kernel &rKernel);
+	void Sync() {}
 
-	int group = -1;
-
-	//fields of center
-	int indexCenter = -1;
-
-	Vec4 positionCenter, prevPositionCenter;
-	Vec3 rateCenter;
+	void Draw() {}
 };
-
-#include "../../Serializer.h"

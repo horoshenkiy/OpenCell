@@ -17,7 +17,8 @@ struct Shape {
 	int flag;
 };
 
-struct SimBuffers : public FruitSimBuffers<FruitNvFlexVector> {
+struct SimBuffers : public FruitSimBuffers<FruitNvFlexVector>
+{
 	//construtors, destructors and in initialize
 	////////////////////////////////////////
 	SimBuffers(NvFlexLibrary* l);

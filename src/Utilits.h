@@ -33,10 +33,12 @@ void GetParticleBounds(SimBuffers *buffers, Vec3& lower, Vec3& upper);
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // calculates local space positions given a set of particles and rigid indices
-void CalculateRigidLocalPositions(const Vec4* restPositions, size_t numRestPositions, const int* offsets, const int* indices, int numRigids, Vec3* localPositions);
+void CalculateRigidLocalPositions(const Vec4* restPositions, int numRestPositions, const int* offsets, const int* indices, int numRigids, Vec3* localPositions);
 
 // for position with mass
 float FindMinDistToSet(Vec3 point, FruitVector<Vec4> &bufferOfSet, int startSet, int endSet);
+float FindMinDistToSetWithAngle(Vec3 point, Vec3 direction, float angle, FruitVector<Vec4> &bufferOfSet, int startSet, int endSet);
+float angleBtwVectors(const Vec3& a, const Vec3& b);
 
 Vec3 CalculateMean(const Vec3* particles, const int* indices, int numIndices);
 
@@ -253,17 +255,4 @@ void AddSDF(SimBuffers *buffers, NvFlexDistanceFieldId sdf, Vec3 translation, Qu
 Shape AddCapsule(float radius, float halfHeight, Vec3 position, Quat rotation);
 
 Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, Quat rotation);
-
-/////////////////////////////////////////////////////////////////////////////////////
-// functions for save state
-/////////////////////////////////////////////////////////////////////////////////////
-
-#ifdef _WINDOWS
-
-bool SaveState(SimBuffers *buffers, std::string nameState);
-
-#endif 
-
-
-
 

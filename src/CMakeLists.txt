@@ -4,7 +4,7 @@ link_directories("../external/glew/lib/x64")
 
 file(GLOB CORE "../core/*.h" "../core/*.cpp")
 
-file(GLOB SRC "./*.cpp" "./*.h")
+file(GLOB SRC			"./*.cpp" "./*.h")
 
 file(GLOB SCENES		"scenes/*.cpp" "scenes/*.h")
 file(GLOB COMPONENTS 	"scenes/components/*.cpp" "scenes/components/*.h")
@@ -38,15 +38,9 @@ add_executable(OpenCell main.cpp 	${CORE}
 									${INCLUDE} 
 									${OPEN_GL})
 									
-target_link_libraries(OpenCell optimized NvFlexReleaseCUDA_x64)
-target_link_libraries(OpenCell optimized NvFlexDeviceRelease_x64)
-target_link_libraries(OpenCell optimized NvFlexExtReleaseCUDA_x64)
-	
-target_link_libraries(OpenCell debug NvFlexDebugCUDA_x64)
-target_link_libraries(OpenCell debug NvFlexDeviceDebug_x64)
-target_link_libraries(OpenCell debug NvFlexExtDebugCUDA_x64)
-
-
+target_link_libraries(OpenCell NvFlexReleaseCUDA_x64)
+target_link_libraries(OpenCell NvFlexDeviceRelease_x64)
+target_link_libraries(OpenCell NvFlexExtReleaseCUDA_x64)
 target_link_libraries(OpenCell SDL2)
 target_link_libraries(OpenCell SDL2main)
 target_link_libraries(OpenCell glew32)

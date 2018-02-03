@@ -2,7 +2,9 @@
 
 #include "../../../core/platform.h"
 
-void Kernel::Initialize() {
+void Kernel::Initialize(SimBuffers *buffers, RenderBuffers *renderBuffers) {
+	this->buffers = buffers;
+	this->renderBuffers = renderBuffers;
 
 	float radius = 0.05f;
 	float restDistance = radius*0.5f;
@@ -14,7 +16,7 @@ void Kernel::Initialize() {
 
 	const float mass[] = { 1.0f, 0.25f, 0.005f };
 
-	size_t startBuffers = buffers->positions.size();
+	int startBuffers = buffers->positions.size();
 	
 	CreateParticleShape(buffers, 
 						renderBuffers, 
@@ -25,18 +27,18 @@ void Kernel::Initialize() {
 						mass[0],
 						true, 
 						1.0, 
-						NvFlexMakePhase(group, 0), 
+						NvFlexMakePhase(group++, 0), 
 						true, 
 						0.0001f);
 
-	size_t endBuffers = buffers->positions.size();
+	int endBuffers = buffers->positions.size();
 
 	Vec3 startVec = buffers->positions[startBuffers];
 	float minX = startVec.x, maxX = startVec.x;
 	float minY = startVec.y, maxY = startVec.y;
 	float minZ = startVec.z, maxZ = startVec.z;
 
-	for (size_t i = startBuffers; i < endBuffers; i++) {
+	for (int i = startBuffers; i < endBuffers; i++) {
 		minX = (minX > buffers->positions[i].x) ? buffers->positions[i].x : minX;
 		maxX = (maxX < buffers->positions[i].x) ? buffers->positions[i].x : maxX;
 
@@ -47,14 +49,17 @@ void Kernel::Initialize() {
 		maxZ = (maxZ < buffers->positions[i].z) ? buffers->positions[i].z : maxZ;
 	}
 
-	float xCenter = (maxX - minX) / 2;
-	float yCenter = (maxY - minY) / 2;
-	float zCenter = (maxZ - minZ) / 2;
+	float xCenter = minX + (maxX - minX) / 2;
+	float yCenter = minY + (maxY - minY) / 2;
+	float zCenter = minZ + (maxZ - minZ) / 2;
+
+	trueRadius = (maxX - minX) / 2;
 
 	indexCenter = startBuffers;
 	float distMin = maxX - minX;
-	for (size_t i = startBuffers; i < endBuffers; i++) {
-		float dist = sqrt(sqr(buffers->positions[i].x - xCenter) +
+	for (int i = startBuffers; i < endBuffers; i++) {
+		float dist = sqrt(
+			sqr(buffers->positions[i].x - xCenter) +
 			sqr(buffers->positions[i].y - yCenter) +
 			sqr(buffers->positions[i].z - zCenter));
 

@@ -129,7 +129,7 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	}
 
 	// create compute buffer
-	g_buffers = new SimBuffers(flexController.GetLib());
+	g_buffers	  = new SimBuffers(flexController.GetLib());
 	renderController.SetComputeBuffers(g_buffers);
 	
 	// create render buffer
@@ -167,8 +167,8 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	scene->SetSceneLower(Min(Min(scene->GetSceneLower(), particleLower), shapeLower));
 	scene->SetSceneUpper(Max(Max(scene->GetSceneUpper(), particleUpper), shapeUpper)); 
 
-	scene->SetSceneLower(scene->GetSceneLower() - Vec3(flexParams.params.collisionDistance));
-	scene->SetSceneUpper(scene->GetSceneUpper() + Vec3(flexParams.params.collisionDistance));
+	scene->SetSceneLower(scene->GetSceneLower() - flexParams.params.collisionDistance);
+	scene->SetSceneUpper(scene->GetSceneUpper() + flexParams.params.collisionDistance);
 
 	g_buffers->PostInitialize();
 
@@ -181,6 +181,9 @@ void InitScene(Scene *scene, bool centerCamera = true)
 	// main create method for the Flex solver
 	NvFlexSolver *solver = NvFlexCreateSolver(flexController.GetLib(), g_buffers->maxParticles, g_buffers->maxDiffuseParticles, flexParams.maxNeighborsPerParticle);
 	flexController.SetSolver(solver);
+
+	// give scene a chance to do some post solver initialization
+	scene->PostInitialize();
 
 	// center camera on particles
 	if (centerCamera)
@@ -261,7 +264,7 @@ void UpdateScene()
 	scene->Update();
 }
 
-float Render() {
+double Render() {
 	double renderBeginTime = GetSeconds();
 
 	// main render scene //////////////////
@@ -273,7 +276,7 @@ float Render() {
 	EndFrame();
 	///////////////////////////////////////
 
-	imguiController.DoUI(computeController.GetActiveCount(), computeController.GetDiffuseParticles());
+	const int newScene = imguiController.DoUI(computeController.GetActiveCount(), computeController.GetDiffuseParticles());
 
 	if (video.GetCapture())
 		video.CreateFrame();
@@ -314,9 +317,6 @@ void UpdateFrame()
 	//-------------------------------------------------------------------
 	// Render
 	float newRenderTime = Render();
-
-
-	SaveState(g_buffers, std::string("123"));
 
 	g_buffers->UnmapBuffers();
 

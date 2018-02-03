@@ -12,7 +12,7 @@ class Shadows {
 
 private:
 
-	ShadowMap *shadowMap = nullptr;
+	ShadowMap *shadowMap;
 
 	// параметры теней
 	const int kShadowResolution = 2048;

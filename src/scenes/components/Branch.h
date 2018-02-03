@@ -1,9 +1,13 @@
 #pragma once
 
 #include "component.h"
-#include "../../../core/maths.h"
-#include <random>
 
+#include "../../../core/maths.h"
+
+#include <random>
+#include <ctime>
+
+//#include "Cytoskeleton.h"
 class Cytoskeleton;
 
 class Branch : public Component {
@@ -23,7 +27,7 @@ private:
 
 	float halfLength = 0.005f;
 	float radius = 0.005f;
-	float fi = 1.256f;
+	float fi = 1.256;
 
 	bool root;
 	bool isLeft;
@@ -53,11 +57,16 @@ private:
 
 public:
 
+	//constructors
+	Branch(int initRand) {
+		//gen = std::mt19937(initRand);
+	};
+
 	//getter
-	float GetHalfLength() const {
+	float GetHalfLength() {
 		return halfLength;
 	}
-	float GetLengthCapsule() const {
+	float GetLengthCapsule() {
 		return lengthCapsule;
 	}
 

@@ -12,19 +12,18 @@ extern bool g_step;
 class SDLController {
 private:
 	// for control of window and camera
+	unsigned int windowId;
 
-	RenderController *renderController = nullptr;
-	Camera *camera = nullptr;
+	RenderController *renderController;
+	Camera *camera;
 
 	// for control of parameters for flex
-	FlexParams *flexParams = nullptr;
+	FlexParams *flexParams;
 
 	// mouse
-	int lastx = -1;
-	int lasty = -1;
+	int lastx;
+	int lasty;
 	int lastb = -1;
-
-	unsigned int windowId = -1;
 
 	// methods of control keys
 	///////////////////////////////////////////////////////////////////
@@ -43,15 +42,15 @@ private:
 
 public:
 	// инкапсул€ци€
-	unsigned int GetWindowId() const { return windowId; }
+	unsigned int GetWindowId() { return windowId; }
 
-	int GetLastX() const { return lastx; }
+	int GetLastX() { return lastx; }
 	void SetLastX(int lastx) { this->lastx = lastx; }
 
-	int GetLastY() const { return lasty; }
+	int GetLastY() { return lasty; }
 	void SetLastY(int lasty) { this->lasty = lasty; }
 
-	int GetLastB() const { return lastb; }
+	int GetLastB() { return lastb; }
 	void SetLastB(int lastb) { this->lastb = lastb; }
 
 	//конструктор и инициализаци€

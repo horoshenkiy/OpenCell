@@ -2,6 +2,7 @@
 
 #include "component.h"
 #include "Branch.h"
+#include "Kernel.h"
 
 class Cell;
 
@@ -12,24 +13,24 @@ class Cytoskeleton : public Component {
 	std::vector<Branch*> branches;
 
 	Vec3 start = Vec3(2.9f, 0.2f, 1.85f);
-	
-	int group = -1;
 
-	Vec3 ratePointGrow = Vec3(0.003f, 0.0f, 0.0f);
+	int group;
+
+	Vec3 ratePointGrow = Vec3(0.003, 0.0, 0.0);
 	const int rateGrow = 0;
 	int itGrow = 0;
 
 public:
 
 	// need incapsulation
-	Cell *cell = nullptr;
+	Cell *cell;
 
 	Cytoskeleton() {};
 
-	Cytoskeleton(Cell *cell, SimBuffers *buffers, int group, Vec3 start);
+	Cytoskeleton(SimBuffers *buffers, int group, Vec3 start);
 
 	// getters
-	Vec3 GetRatePointGrow() const {
+	Vec3 GetRatePointGrow() {
 		return ratePointGrow;
 	}
 
@@ -43,6 +44,6 @@ public:
 
 	void Update(Vec3 rateKernelCenter);
 
-	int indexUpdateCapsule = 0;
+	int indexUpdateCapsule;
 
 };

@@ -1,6 +1,4 @@
 #include "RenderController.h"
-#include "../../opengl/imguiRenderGL.h"
-#include "platform.h"
 
 SDL_Window* RenderController::InitRender(Camera *camera, 
 										RenderParam *renderParam, 
@@ -60,9 +58,12 @@ void RenderController::ReshapeWindow() {
 
 	ReshapeRender(window);
 
-	if (fluidRenderer)
-		DestroyFluidRenderer(fluidRenderer);
-	fluidRenderer = CreateFluidRenderer(screenWidth, screenHeight);
+	if (!fluidRenderer)
+	{
+		if (fluidRenderer)
+			DestroyFluidRenderer(fluidRenderer);
+		fluidRenderer = CreateFluidRenderer(screenWidth, screenHeight);
+	}
 }
 
 void RenderController::ReshapeRender(SDL_Window* window)

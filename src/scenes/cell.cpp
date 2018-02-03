@@ -1,5 +1,4 @@
 #include "cell.h"
-#include <memory>
 
 // initialize
 void Cell::Initialize(FlexController *flexController,
@@ -24,7 +23,7 @@ void Cell::Initialize(FlexController *flexController,
 	buffers->numExtraParticles = 20000;
 	flexParams->numSubsteps = 3;
 
-	flexParams->params.solidRestDistance = 0.070f;
+	flexParams->params.solidRestDistance = 0.070;
 
 	flexParams->params.radius = radius;
 	flexParams->params.dynamicFriction = 0.125f;
@@ -35,7 +34,7 @@ void Cell::Initialize(FlexController *flexController,
 	flexParams->params.drag = 0.0f;
 	flexParams->params.anisotropyScale = 25.0f;
 	flexParams->params.smoothing = 1.f;
-	flexParams->params.maxSpeed = 0.5f * flexParams->numSubsteps * radius * 60.0f;
+	flexParams->params.maxSpeed = 0.5f * flexParams->numSubsteps * radius * 60.0;
 	flexParams->params.gravity[1] *= 1.0f;
 	flexParams->params.collisionDistance = 0.040f;
 	flexParams->params.solidPressure = 0.0f;
@@ -49,14 +48,17 @@ void Cell::Initialize(FlexController *flexController,
 
 	clearBuffers();
 
-	shell = new Shell(group++, buffers);
-	shell->Initialize();
+	shell = new Shell(group++);
+	shell->Initialize(buffers);
 
-	kernel = new Kernel(group++, buffers, renderBuffers);
-	kernel->Initialize();
+	receptors = new Receptors(group++);
+	receptors->Initialize(buffers, shell);
 
-	cytoplasm = new Cytoplasm(group++, buffers);
-	cytoplasm->Initialize(flexParams);
+	kernel = new Kernel(group++);
+	kernel->Initialize(buffers, renderBuffers);
+
+	cytoplasm = new Cytoplasm(group++);
+	cytoplasm->Initialize(flexParams, buffers);
 
 	mNumFluidParticles = cytoplasm->GetNumberOfParticles();
 
@@ -64,6 +66,7 @@ void Cell::Initialize(FlexController *flexController,
 	flexParams->warmup = true;
 
 	renderParam->drawMesh = true;
+
 }
 
 // destroy
@@ -94,22 +97,17 @@ void Cell::Update() {
 	}
 
 	if (j == 400) {
-		Vec3 startGrow = Vec3(0.4f, -0.1f, 0.0f);
-		startGrow += kernel->GetPositionCenter();
-
-		cytoskeleton = new Cytoskeleton(this, buffers, group++, startGrow);
-		cytoskeleton->Initialize(this, buffers);
-
 		j++;
+		cytoskeleton2 = new Cytoskeleton2(buffers, kernel, shell);
 		return;
 	}
 
-	cytoskeleton->Update(kernel->GetRateCenter());
+	cytoskeleton2->Update();
 }
 
 void Cell::Sync()
 {
-	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
+	Fruit *fruit = new FruitNvFlex();
 
 	FruitSolver fruitSolver;
 	fruitSolver.SetSolver(flexController->GetSolver());

@@ -10,16 +10,8 @@ protected:
 
 public:
 
-	Component() = default;
-
-	Component(SimBuffers *buffers, RenderBuffers *renderBuffers) {
-		this->buffers = buffers; 
-		this->renderBuffers = renderBuffers;
-	}
-
-	virtual ~Component() {}
-
 	virtual void Initialize() {}
+	virtual void PostInitialize() {}
 
 	virtual void Update() {}
 

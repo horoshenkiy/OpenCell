@@ -8,9 +8,9 @@ struct RenderParam {
 	// MSAA
 	//////////////////////////////////////////////////////////
 	int msaaSamples = 8;
-	GLuint msaaFbo = 0;
-	GLuint msaaColorBuf = 0;
-	GLuint msaaDepthBuf = 0;
+	GLuint msaaFbo;
+	GLuint msaaColorBuf;
+	GLuint msaaDepthBuf;
 
 	//////////////////////////////////////////////////////////
 	// param of type render
@@ -22,7 +22,7 @@ struct RenderParam {
 	bool drawEllipsoids = true;
 	bool drawOpaque = false;
 	bool drawPoints = false;
-	bool drawCloth = true;
+	bool drawCloth;
 	bool drawBases = false;
 	bool drawContacts = false;
 	bool drawNormals = false;
@@ -50,7 +50,7 @@ struct RenderParam {
 	float diffuseScale = 0.5f;
 	float diffuseMotionScale = 1.0f;
 	bool diffuseShadow = false;
-	float diffuseInscatter = 0.8f;
+	float diffuseInscatter = 0.8;
 	float diffuseOutscatter = 0.53f;
 
 	// colors
@@ -64,7 +64,7 @@ struct RenderParam {
 	bool wireframe = false;
 
 	//for cloth?
-	float expandCloth = 0.0f;
+	float expandCloth = 0.0;
 
 	// synchronize compute and render with realtime
 	bool vsync = false;

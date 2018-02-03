@@ -1,28 +1,28 @@
 #include "RenderController.h"
-#include <memory>
 
-void RenderController::SkinMesh() {
+void RenderController::SkinMesh()
+{
 	if (renderBuffers->mesh)
 	{
-		size_t startVertex = 0;
+		int startVertex = 0;
 
-		for (size_t r = 0; r < buffers->rigidRotations.size(); ++r)
+		for (int r = 0; r < buffers->rigidRotations.size(); ++r)
 		{
 			const Matrix33 rotation = buffers->rigidRotations[r];
-			const size_t numVertices = buffers->rigidMeshSize[r];
+			const int numVertices = buffers->rigidMeshSize[r];
 
-			for (size_t i = startVertex; i < numVertices + startVertex; ++i)
+			for (int i = startVertex; i < numVertices + startVertex; ++i)
 			{
 				Vec3 skinPos;
 
-				for (size_t w = 0; w < 4; ++w)
+				for (int w = 0; w < 4; ++w)
 				{
 					// small shapes can have < 4 particles
-					//if (renderBuffers->meshSkinIndices[i * 4 + w] > -1)
-					//{
+					if (renderBuffers->meshSkinIndices[i * 4 + w] > -1)
+					{
 						assert(renderBuffers->meshSkinWeights[i * 4 + w] < FLT_MAX);
 
-						size_t index = renderBuffers->meshSkinIndices[i * 4 + w];
+						int index = renderBuffers->meshSkinIndices[i * 4 + w];
 						float weight = renderBuffers->meshSkinWeights[i * 4 + w];
 
 						Point3(buffers->restPositions[index]);
@@ -30,7 +30,7 @@ void RenderController::SkinMesh() {
 						Vec3(buffers->positions[index]);
 
 						skinPos += (rotation*(renderBuffers->meshRestPositions[i] - Point3(buffers->restPositions[index])) + Vec3(buffers->positions[index]))*weight;
-					//}
+					}
 				}
 				
 				renderBuffers->mesh->m_positions[i] = Point3(skinPos);
@@ -43,8 +43,10 @@ void RenderController::SkinMesh() {
 	}
 }
 
-void RenderController::DrawShapes() const {
-	for (size_t i = 0; i < buffers->shapeFlags.size(); ++i) {
+void RenderController::DrawShapes()
+{
+	for (int i = 0; i < buffers->shapeFlags.size(); ++i)
+	{
 		const int flags = buffers->shapeFlags[i];
 
 		// unpack flags
@@ -254,7 +256,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 	SetCullMode(false);
 
 	// give scene a chance to do custom drawing
-	scene->Draw();
+	scene->Draw(1);
 
 	if (renderParam->drawMesh)
 		DrawMesh(renderBuffers->mesh, renderParam->meshColor);
@@ -271,8 +273,8 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 			renderParam->expandCloth);
 	}
 
-	size_t shadowParticles = numParticles;
-	size_t shadowParticlesOffset = 0;
+	int shadowParticles = numParticles;
+	int shadowParticlesOffset = 0;
 
 	if (!renderParam->drawPoints)
 	{
@@ -286,7 +288,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 	}
 	else
 	{
-		size_t offset = renderParam->drawMesh ? buffers->numSolidParticles : 0;
+		int offset = renderParam->drawMesh ? buffers->numSolidParticles : 0;
 
 		shadowParticles = numParticles - offset;
 		shadowParticlesOffset = offset;
@@ -328,7 +330,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 				  renderParam->expandCloth);
 
 	// give scene a chance to do custom drawing
-	scene->Draw();
+	scene->Draw(0);
 
 	UnbindSolidShader();
 
@@ -372,7 +374,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 
 void RenderController::RenderDebug()
 {
-	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
+	Fruit *fruit = new FruitNvFlex();
 	FruitSolver fruitSolver;
 	fruitSolver.SetSolver(flexController->GetSolver());
 
@@ -394,15 +396,17 @@ void RenderController::RenderDebug()
 
 		BeginLines();
 
-		for (size_t i = 0; i < buffers->springLengths.size(); ++i)
+		int start = 0;
+
+		for (int i = start; i < buffers->springLengths.size(); ++i)
 		{
 			if (renderParam->drawSprings == 1 && buffers->springStiffness[i] < 0.0f)
 				continue;
 			if (renderParam->drawSprings == 2 && buffers->springStiffness[i] > 0.0f)
 				continue;
 
-			size_t a = buffers->springIndices[i * 2];
-			size_t b = buffers->springIndices[i * 2 + 1];
+			int a = buffers->springIndices[i * 2];
+			int b = buffers->springIndices[i * 2 + 1];
 
 			DrawLine(Vec3(buffers->positions[a]), Vec3(buffers->positions[b]), color);
 		}

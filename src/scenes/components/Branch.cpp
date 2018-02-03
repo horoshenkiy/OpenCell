@@ -60,7 +60,7 @@ void Branch::Update(bool isGrowAktin) {
 
 	///////////////////////////////////////////////////////
 	// break of branch
-	double ksi;
+	float ksi;
 	for (int j = 0; j < positionCapsules.size(); j++) {
 		ksi = urd(gen);
 
@@ -123,8 +123,8 @@ void Branch::BreakBranch(int indexOfCapsule) {
 
 void Branch::DestroyChildes(int indexCapsule) {
 
-	size_t index = childBranches.size();
-	for (size_t i = 0; i < childBranches.size(); i++) {
+	int index = childBranches.size();
+	for (int i = 0; i < childBranches.size(); i++) {
 		if (indexCapsule <= indexChildBranches[i]) {
 			index = i;
 			break;
@@ -148,7 +148,7 @@ void Branch::DestroyStraightCapsule() {
 void Branch::NewRotationBranch() {
 	Vec3 pos = position;
 
-	float ksi = rand() % 100 + 1.0f;
+	float ksi = rand() % 100 + 1;
 	if (ksi <= 50) {
 		isLeft = true;
 	}
@@ -159,7 +159,9 @@ void Branch::NewRotationBranch() {
 		isLeft = false;
 	}
 
-	Branch *branch = new Branch();
+	Quat rot = QuatFromAxisAngle(axesRotation, fi * (countFi + 1));
+
+	Branch *branch = new Branch(0);
 	branch->Initialize(buffers, cytoskeleton, pos, 1, false, isLeft);
 
 	childBranches.push_back(branch);
@@ -169,7 +171,11 @@ void Branch::NewRotationBranch() {
 
 void Branch::NewRootBranch() {
 
-	Branch *branch = new Branch();
+	float newFi = (!isLeft) ? fi : -fi;
+
+	Quat rot = QuatFromAxisAngle(axesRotation, newFi * (countFi + 1));
+
+	Branch *branch = new Branch(0);
 	branch->Initialize(buffers, cytoskeleton, position, 0, true, isLeft);
 
 	childBranches.push_back(branch);

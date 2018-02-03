@@ -15,34 +15,30 @@ protected:
 	Vec3 sceneLower = Vec3(FLT_MAX);
 	Vec3 sceneUpper = Vec3(-FLT_MAX);
 
-	FlexController *flexController = nullptr;
-	FlexParams *flexParams = nullptr;
-	SimBuffers *buffers = nullptr;
+	FlexController *flexController;
+	FlexParams *flexParams;
+	SimBuffers *buffers;
 
-	RenderBuffers *renderBuffers = nullptr;
-	RenderParam *renderParam = nullptr;
-
-	const char* mName;
+	RenderBuffers *renderBuffers;
+	RenderParam *renderParam;
 
 public:
-
-	virtual ~Scene() {}
 	
-	Vec3 GetSceneLower() const {
+	Vec3 GetSceneLower() {
 		return sceneLower;
 	}
-	void SetSceneLower(const Vec3 &sceneLower) {
+	void SetSceneLower(Vec3 sceneLower) {
 		this->sceneLower = sceneLower;
 	}
 
-	Vec3 GetSceneUpper() const {
+	Vec3 GetSceneUpper() {
 		return sceneUpper;
 	}
-	void SetSceneUpper(const Vec3 &sceneUpper) {
+	void SetSceneUpper(Vec3 sceneUpper) {
 		this->sceneUpper = sceneUpper;
 	}
 
-	Scene() = default;
+	Scene() {}
 
 	Scene(const char* name) : mName(name) {}
 	 
@@ -51,6 +47,8 @@ public:
 							FlexParams *flexParams,
 							RenderBuffers *renderBuffers,
 							RenderParam *renderParam) = 0;
+
+	virtual void PostInitialize() {}
 	
 	// update any buffers (all guaranteed to be mapped here)
 	virtual void Update() {}	
@@ -58,7 +56,7 @@ public:
 	// send any changes to flex (all buffers guaranteed to be unmapped here)
 	virtual void Sync() {}
 	
-	virtual void Draw() {}
+	virtual void Draw(int pass) {}
 	//virtual void KeyDown(int key) {}
 	virtual void DoGui() {}
 	virtual void CenterCamera() {}
@@ -67,4 +65,5 @@ public:
 
 	virtual const char* GetName() { return mName; }
 
+	const char* mName;
 };

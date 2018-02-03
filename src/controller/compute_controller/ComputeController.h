@@ -16,14 +16,14 @@ extern Timer timer;
 
 class ComputeController {
 private:
-	FlexController *flexController = nullptr;
-	FlexParams *flexParams = nullptr;
-	SimBuffers *buffers = nullptr;
+	FlexController *flexController;
+	FlexParams *flexParams;
+	SimBuffers *buffers;
 
 	// need to compute diffuse particles
-	RenderParam *renderParam = nullptr;
+	RenderParam *renderParam;
 
-	Scene *scene = nullptr;
+	Scene *scene;
 
 	Fruit *fruit = new FruitNvFlex();
 
@@ -31,12 +31,12 @@ public:
 
 	void Initialize(FlexController *flexController, FlexParams *flexParams, SimBuffers *buffers, RenderParam *renderParam, Scene *scene);
 
-	int GetActiveCount() const {
+	int GetActiveCount() {
 		return NvFlexGetActiveCount(flexController->GetSolver());
 	}
 
-	int GetDiffuseParticles() const {
-		return NvFlexGetDiffuseParticles(flexController->GetSolver(), nullptr, nullptr, nullptr);
+	int GetDiffuseParticles() {
+		return NvFlexGetDiffuseParticles(flexController->GetSolver(), NULL, NULL, NULL);
 	}
 
 	void Update() {

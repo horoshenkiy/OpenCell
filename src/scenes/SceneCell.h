@@ -1,54 +1,57 @@
 #pragma once
 
+#include <vector>
 #include "../scenes.h"
-
-class Serializer;
-class Cell;
+#include "cell.h"
 
 class SceneCell : public Scene {
 
 private:
-	friend Serializer;
-	friend bool operator==(const SceneCell &lScene, const SceneCell &rScene);
-
-	Cell *cell = nullptr;
+	Cell cell;
 
 public:
 
 	// constructors and initialize
 	//////////////////////////////////////////////////////
 	SceneCell() {}
-	
 	SceneCell(const char* name) : Scene(name) {}
-
-	SceneCell(const char* name, 
-		FlexController *flexController,
-		SimBuffers *buffers,
-		FlexParams *flexParams,
-		RenderBuffers *renderBuffers,
-		RenderParam *renderParam);
 
 	void Initialize(FlexController *flexController,
 		SimBuffers *buffers,
 		FlexParams *flexParams,
 		RenderBuffers *renderBuffers,
-		RenderParam *renderParam) override;
+		RenderParam *renderParam);
 
 	// destroy
 	//////////////////////////////////////////////
-	~SceneCell();
+	~SceneCell() {
+		//delete cell;
+	}
 
-	void clearBuffers();
+	void clearBuffers() {
+		cell.clearBuffers();
+	}
 
 	// update
 	/////////////////////////////////////////////////////
-	void Sync() override;
+	void Sync() {
+		cell.Sync();
+	}
 
-	void Update() override;
+	void Update() {
+		Vec3 centerScene = cell.kernel->GetPositionCenter();
 
-	void Draw() override;
+		sceneLower.x = centerScene.x - 2.0;
+		sceneLower.z = centerScene.z - 2.0;
+
+		sceneUpper.x = centerScene.x + 2.0;
+		sceneUpper.z = centerScene.z + 2.0;
+
+		cell.Update();
+	}
+
+	void Draw() {
+		cell.Draw();
+	}
 
 };
-
-#include "../Serializer.h"
-

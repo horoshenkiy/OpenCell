@@ -150,8 +150,8 @@ void SimBuffers::PostInitialize() {
 	this->normals.resize(maxParticles);
 
 	// initialize normals (just for rendering before simulation starts)
-	size_t numTris = this->triangles.size() / 3;
-	for (size_t i = 0; i < numTris; ++i)
+	int numTris = this->triangles.size() / 3;
+	for (int i = 0; i < numTris; ++i)
 	{
 		Vec3 v0 = Vec3(this->positions.get(this->triangles[i * 3 + 0]));
 		Vec3 v1 = Vec3(this->positions.get(this->triangles[i * 3 + 1]));
@@ -164,12 +164,12 @@ void SimBuffers::PostInitialize() {
 		this->normals[this->triangles[i * 3 + 2]] += Vec4(n, 0.0f);
 	}
 
-	for (size_t i = 0; i < int(maxParticles); ++i)
+	for (int i = 0; i < int(maxParticles); ++i)
 		this->normals[i] = Vec4(SafeNormalize(Vec3(this->normals[i]), Vec3(0.0f, 1.0f, 0.0f)), 0.0f);
 
 	// create active indices (just a contiguous block for the demo)
 	this->activeIndices.resize(this->positions.size());
-	for (size_t i = 0; i < this->activeIndices.size(); ++i)
+	for (int i = 0; i < this->activeIndices.size(); ++i)
 		this->activeIndices[i] = i;
 
 	// save rest positions
