@@ -1,4 +1,4 @@
-include_directories(../include ../core ../fruit_core ../fruit_extensions ../external/cereal/include ../external/googletest/include)
+include_directories(../core ../fruit_core ../fruit_extensions ../external/cereal/include ../external/googletest/include)
 
 link_directories(../lib/win64 
 				 ../bin/Debug 
@@ -26,7 +26,7 @@ endforeach()
 
 file(GLOB CORE "../core/*.h" "../core/*.cpp")
 
-set(SRC ../src/Utilits.cpp main.cpp)
+set(SRC ../src/Utilits.cpp)
 set(OPENGL ../src/opengl/shader.cpp ../src/opengl/shadersGL.cpp)
 
 set(COMPONENT ../src/scenes/cell.cpp
@@ -66,10 +66,3 @@ target_link_libraries(OpenCellTest optimized NvFlexExtReleaseCUDA_x64)
 target_link_libraries(OpenCellTest debug NvFlexDebugCUDA_x64)
 target_link_libraries(OpenCellTest debug NvFlexDeviceDebug_x64)
 target_link_libraries(OpenCellTest debug NvFlexExtDebugCUDA_x64)
-
-source_group(core FILES ${CORE})
-source_group(src FILES ${SRC})
-source_group(src\\opengl FILES ${OPENGL})
-source_group(src\\component FILES ${COMPONENT})
-source_group(src\\controller\\compute_controller FILES ${COMPUTE_CONTROLLER})
-source_group(src\\controller\\render_controller FILES ${RENDER_CONTROLLER})

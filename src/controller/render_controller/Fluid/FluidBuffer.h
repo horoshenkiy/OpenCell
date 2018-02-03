@@ -4,7 +4,7 @@
 #include "../../../../include/NvFlex.h"
 
 #include "../../compute_controller/FlexController.h"
-//extern FlexController flexController;
+extern FlexController flexController;
 
 typedef unsigned int VertexBuffer;
 typedef unsigned int IndexBuffer;

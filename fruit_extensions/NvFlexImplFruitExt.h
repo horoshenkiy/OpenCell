@@ -5,9 +5,6 @@
 
 #include "../include/FruitExt.h"
 
-#include <cereal/access.hpp>
-#include "../include/serialize_types.h"
-
 template <typename T>
 class FruitNvFlexVector : public FruitVector<T> {
 
@@ -18,7 +15,7 @@ private:
 public:
 
 	FruitNvFlexVector() {}
-
+	
 	FruitNvFlexVector(NvFlexLibrary* l, size_t size = 0) : lib(l) {
 		this->mappedPtr = NULL;
 		this->buffer = NULL;
@@ -44,11 +41,7 @@ public:
 	}
 
 	~FruitNvFlexVector() {
-		//destroy();
-	}
-
-	NvFlexBuffer* GetNvBuffer() {
-		return buffer;
+		destroy();
 	}
 
 	FruitBuffer GetBuffer() override {

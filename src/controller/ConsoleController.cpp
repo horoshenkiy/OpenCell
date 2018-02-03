@@ -1,23 +1,19 @@
 #include "ConsoleController.h"
 
-// add a few method for initialize classes
-
 void ConsoleController(int argc, char* argv[]) {
 	// process command line args
-	//FlexParams &flexParams = FlexParams::Get();
-
 	for (int i = 1; i < argc; ++i)
 	{
 		int d;
-		if (sscanf(argv[i], "-device=%d", &d)) {}
-			//flexController.SetDevice(d);
+		if (sscanf(argv[i], "-device=%d", &d))
+			flexController.SetDevice(d);
 
 		if (sscanf(argv[i], "-extensions=%d", &d))
 			g_extensions = d != 0;
 
 		if (strstr(argv[i], "-benchmark")) {
 			g_benchmark = true;
-			//flexParams.profile = true;
+			flexParams.profile = true;
 		}
 
 		if (strstr(argv[i], "-tc"))
@@ -34,7 +30,7 @@ void ConsoleController(int argc, char* argv[]) {
 
 		if (sscanf(argv[i], "-multiplier=%d", &d) == 1)
 		{
-			//g_buffers->numExtraMultiplier = d;
+			g_buffers->numExtraMultiplier = d;
 		}
 
 		if (strstr(argv[i], "-disabletweak"))
@@ -44,10 +40,7 @@ void ConsoleController(int argc, char* argv[]) {
 
 		if (strstr(argv[i], "-disableinterop"))
 		{
-			//flexParams.interop = false;
+			flexParams.interop = false;
 		}
-
-		if (strstr(argv[i], "-state"))
-			g_state = true;
 	}
 }

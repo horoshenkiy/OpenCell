@@ -1,79 +1,4 @@
 #include "SDLController.h"
-#include "../utilits/Serializer.h"
-
-// initialize and loop
-////////////////////////////////////////////////////////////////////////
-void SDLController::SDLInit(RenderController *renderController, Camera *camera, const char* title) {
-	this->camera = camera;
-	this->renderController = renderController;
-
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
-		printf("Unable to initialize SDL");
-
-	// Create our window centered
-	renderController->SetWindow(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		renderController->GetWidth(), renderController->GetHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE));
-
-	windowId = SDL_GetWindowID(renderController->GetWindow());
-}
-
-void SDLController::SDLPostInit(Serializer *serializer) {
-	this->serializer = serializer;
-}
-
-// return true, if program is running
-bool SDLController::SDLMainLoop() {
-	bool quit = false;
-	SDL_Event e;
-
-	while (SDL_PollEvent(&e))
-	{
-
-		switch (e.type)
-		{
-		case SDL_QUIT:
-			quit = true;
-			break;
-
-		case SDL_KEYDOWN:
-			if (e.key.keysym.sym < 256 && (e.key.keysym.mod == KMOD_NONE || (e.key.keysym.mod & KMOD_NUM)))
-				quit = InputKeyboardDown(e.key.keysym.sym, 0, 0);
-			break;
-
-		case SDL_KEYUP:
-			if (e.key.keysym.sym < 256 && (e.key.keysym.mod == 0 || (e.key.keysym.mod & KMOD_NUM)))
-				InputKeyboardUp(e.key.keysym.sym, 0, 0);
-			break;
-
-		case SDL_MOUSEMOTION:
-			if (e.motion.state)
-				MouseMotionFunc(e.motion.state, e.motion.x, e.motion.y);
-			else
-				MousePassiveMotionFunc(e.motion.x, e.motion.y);
-			break;
-
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			MouseFunc(e.button.button, e.button.state, e.motion.x, e.motion.y);
-			break;
-
-		case SDL_WINDOWEVENT:
-			if (e.window.windowID == windowId)
-			{
-				if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-					renderController->ReshapeWindow(e.window.data1, e.window.data2);
-			}
-			break;
-
-		case SDL_WINDOWEVENT_LEAVE:
-			camera->SetCamVel(Vec3(0.0f, 0.0f, 0.0f));
-			break;
-		}
-	}
-
-	// TODO: swap to running
-	return !quit;
-}
 
 // methods of control keys
 ///////////////////////////////////////////////////////////////////
@@ -195,9 +120,6 @@ bool SDLController::InputKeyboardDown(unsigned char key, int x, int y)
 		g_debug = !g_debug;
 		break;
 	}
-	case 'b':
-		serializer->SetIsNeedSave(true);
-		break;
 	};
 
 	return false;
@@ -274,3 +196,73 @@ void SDLController::MouseMotionFunc(unsigned state, int x, int y) {
 	}
 }
 
+// initialize and loop
+////////////////////////////////////////////////////////////////////////
+void SDLController::SDLInit(RenderController *renderController, Camera *camera, FlexParams *flexParams, const char* title)
+{
+	this->camera = camera;
+	this->renderController = renderController;
+
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
+		printf("Unable to initialize SDL");
+
+	// Create our window centered
+	renderController->SetWindow(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		renderController->GetWidth(), renderController->GetHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE));
+
+	windowId = SDL_GetWindowID(renderController->GetWindow());
+}
+
+// return true, if program is running
+bool SDLController::SDLMainLoop() {
+	bool quit = false;
+	SDL_Event e;
+
+	while (SDL_PollEvent(&e))
+	{
+
+		switch (e.type)
+		{
+		case SDL_QUIT:
+			quit = true;
+			break;
+
+		case SDL_KEYDOWN:
+			if (e.key.keysym.sym < 256 && (e.key.keysym.mod == KMOD_NONE || (e.key.keysym.mod & KMOD_NUM)))
+				quit = InputKeyboardDown(e.key.keysym.sym, 0, 0);
+			break;
+
+		case SDL_KEYUP:
+			if (e.key.keysym.sym < 256 && (e.key.keysym.mod == 0 || (e.key.keysym.mod & KMOD_NUM)))
+				InputKeyboardUp(e.key.keysym.sym, 0, 0);
+			break;
+
+		case SDL_MOUSEMOTION:
+			if (e.motion.state)
+				MouseMotionFunc(e.motion.state, e.motion.x, e.motion.y);
+			else
+				MousePassiveMotionFunc(e.motion.x, e.motion.y);
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			MouseFunc(e.button.button, e.button.state, e.motion.x, e.motion.y);
+			break;
+
+		case SDL_WINDOWEVENT:
+			if (e.window.windowID == windowId)
+			{
+				if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+					renderController->ReshapeWindow(e.window.data1, e.window.data2);
+			}
+			break;
+
+		case SDL_WINDOWEVENT_LEAVE:
+			camera->SetCamVel(Vec3(0.0f, 0.0f, 0.0f));
+			break;
+		}
+	}
+
+	// TODO: swap to running
+	return !quit;
+}

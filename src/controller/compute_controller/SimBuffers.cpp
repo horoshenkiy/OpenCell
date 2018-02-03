@@ -1,34 +1,9 @@
 #include "SimBuffers.h"
 
-#include "../../../fruit_extensions/NvFlexImplFruit.h"
-
-bool SimBuffers::isInitialize = false;
-
 //constructors, destructors and initialize
 ////////////////////////////////////////////////////////////
-SimBuffers& SimBuffers::Instance(NvFlexLibrary *l) {
-	static SimBuffers instance(l);
-	return instance;
-}
-
-SimBuffers& SimBuffers::Get() {
-	return Instance(nullptr);
-}
-
-SimBuffers::SimBuffers(NvFlexLibrary* l) {
-	if (l == nullptr) {
-		std::cerr << "SimBuffers: Flex Library did n't initialize!" << std::endl;
-		throw std::runtime_error("SimBuffers: Flex Library did n't initialize!\n");
-	}
-
-	Initialize(l);
-}
-
-SimBuffers::~SimBuffers() {
-	Destroy();
-}
-
-void SimBuffers::Initialize(NvFlexLibrary *l) {
+SimBuffers::SimBuffers(NvFlexLibrary* l)
+{
 	positions = FruitNvFlexVector<Vec4>(l);
 	restPositions = FruitNvFlexVector<Vec4>(l);
 	velocities = FruitNvFlexVector<Vec3>(l);
@@ -78,80 +53,23 @@ void SimBuffers::Initialize(NvFlexLibrary *l) {
 	uvs = FruitNvFlexVector<Vec3>(l);
 }
 
-void SimBuffers::PostInitialize() {
-
-	// for singleton initialize
-	if (isInitialize) 
-		return;
-	isInitialize = true;
-
-	// update num particles
-	numParticles = positions.size();
-	maxParticles = numParticles + numExtraParticles * numExtraMultiplier;
-
-	// resize diffuse
-	this->diffusePositions.resize(maxDiffuseParticles);
-	this->diffuseVelocities.resize(maxDiffuseParticles);
-	this->diffuseIndices.resize(maxDiffuseParticles);
-
-	// for fluid rendering these are the Laplacian smoothed positions
-	this->smoothPositions.resize(maxParticles);
-
-	this->normals.resize(0);
-	this->normals.resize(maxParticles);
-
-	// initialize normals (just for rendering before simulation starts)
-	size_t numTris = this->triangles.size() / 3;
-	for (size_t i = 0; i < numTris; ++i)
-	{
-		Vec3 v0 = Vec3(this->positions.get(this->triangles[i * 3 + 0]));
-		Vec3 v1 = Vec3(this->positions.get(this->triangles[i * 3 + 1]));
-		Vec3 v2 = Vec3(this->positions.get(this->triangles[i * 3 + 2]));
-
-		Vec3 n = Cross(v1 - v0, v2 - v0);
-
-		this->normals[this->triangles[i * 3 + 0]] += Vec4(n, 0.0f);
-		this->normals[this->triangles[i * 3 + 1]] += Vec4(n, 0.0f);
-		this->normals[this->triangles[i * 3 + 2]] += Vec4(n, 0.0f);
-	}
-
-	for (size_t i = 0; i < int(maxParticles); ++i)
-		this->normals[i] = Vec4(SafeNormalize(Vec3(this->normals[i]), Vec3(0.0f, 1.0f, 0.0f)), 0.0f);
-
-	// create active indices (just a contiguous block for the demo)
-	this->activeIndices.resize(this->positions.size());
-	for (size_t i = 0; i < this->activeIndices.size(); ++i)
-		this->activeIndices[i] = i;
-
-	// save rest positions
-	this->restPositions.resize(this->positions.size());
-	for (int i = 0; i < this->positions.size(); ++i)
-		this->restPositions[i] = this->positions[i];
-}
-
-void SimBuffers::Destroy() {
-	isInitialize = false;
-
+SimBuffers::~SimBuffers()
+{
 	// particles
 	this->positions.destroy();
 	this->restPositions.destroy();
 	this->velocities.destroy();
 	this->phases.destroy();
 	this->densities.destroy();
-	this->activeIndices.destroy();
-
-	// anisotropy
 	this->anisotropy1.destroy();
 	this->anisotropy2.destroy();
 	this->anisotropy3.destroy();
-
 	this->normals.destroy();
-
-	// diffuse
 	this->diffusePositions.destroy();
 	this->diffuseVelocities.destroy();
 	this->diffuseIndices.destroy();
 	this->smoothPositions.destroy();
+	this->activeIndices.destroy();
 
 	// convexes
 	this->shapeGeometry.destroy();
@@ -189,9 +107,75 @@ void SimBuffers::Destroy() {
 	this->uvs.destroy();
 }
 
-void SimBuffers::Reset(NvFlexLibrary *l) {
-	Destroy();
-	Initialize(l);
+void SimBuffers::Initialize() {
+	this->positions.resize(0);
+	this->velocities.resize(0);
+	this->phases.resize(0);
+
+	this->rigidOffsets.resize(0);
+	this->rigidIndices.resize(0);
+	this->rigidMeshSize.resize(0);
+	this->rigidRotations.resize(0);
+	this->rigidTranslations.resize(0);
+	this->rigidCoefficients.resize(0);
+	this->rigidLocalPositions.resize(0);
+	this->rigidLocalNormals.resize(0);
+
+	this->springIndices.resize(0);
+	this->springLengths.resize(0);
+	this->springStiffness.resize(0);
+	this->triangles.resize(0);
+	this->triangleNormals.resize(0);
+	this->uvs.resize(0);
+
+	this->shapeGeometry.resize(0);
+	this->shapePositions.resize(0);
+	this->shapeRotations.resize(0);
+	this->shapePrevPositions.resize(0);
+	this->shapePrevRotations.resize(0);
+	this->shapeFlags.resize(0);
+
+
+}
+
+void SimBuffers::PostInitialize() {
+	this->diffusePositions.resize(maxDiffuseParticles);
+	this->diffuseVelocities.resize(maxDiffuseParticles);
+	this->diffuseIndices.resize(maxDiffuseParticles);
+
+	// for fluid rendering these are the Laplacian smoothed positions
+	this->smoothPositions.resize(maxParticles);
+
+	this->normals.resize(0);
+	this->normals.resize(maxParticles);
+
+	// initialize normals (just for rendering before simulation starts)
+	size_t numTris = this->triangles.size() / 3;
+	for (size_t i = 0; i < numTris; ++i)
+	{
+		Vec3 v0 = Vec3(this->positions.get(this->triangles[i * 3 + 0]));
+		Vec3 v1 = Vec3(this->positions.get(this->triangles[i * 3 + 1]));
+		Vec3 v2 = Vec3(this->positions.get(this->triangles[i * 3 + 2]));
+
+		Vec3 n = Cross(v1 - v0, v2 - v0);
+
+		this->normals[this->triangles[i * 3 + 0]] += Vec4(n, 0.0f);
+		this->normals[this->triangles[i * 3 + 1]] += Vec4(n, 0.0f);
+		this->normals[this->triangles[i * 3 + 2]] += Vec4(n, 0.0f);
+	}
+
+	for (size_t i = 0; i < int(maxParticles); ++i)
+		this->normals[i] = Vec4(SafeNormalize(Vec3(this->normals[i]), Vec3(0.0f, 1.0f, 0.0f)), 0.0f);
+
+	// create active indices (just a contiguous block for the demo)
+	this->activeIndices.resize(this->positions.size());
+	for (size_t i = 0; i < this->activeIndices.size(); ++i)
+		this->activeIndices[i] = i;
+
+	// save rest positions
+	this->restPositions.resize(this->positions.size());
+	for (int i = 0; i < this->positions.size(); ++i)
+		this->restPositions[i] = this->positions[i];
 }
 
 // mapping buffers
@@ -322,11 +306,11 @@ void SimBuffers::BuildConstraints() {
 void SimBuffers::SendBuffers(NvFlexSolver *flex) {
 	
 	////////////////////////////////////////////////////////
-	/*FruitSolver fruitSolver;
+	FruitSolver fruitSolver;
 	fruitSolver.SetSolver(flex);
 
-	fruit->SetParticles();
-	fruit->SetRestParticles();
+	fruit->SetParticles(fruitSolver, positions.GetBuffer(), numParticles);
+	fruit->SetRestParticles(fruitSolver, restPositions.GetBuffer(), restPositions.size());
 	fruit->SetVelocities(fruitSolver, velocities.GetBuffer(), velocities.size());
 	fruit->SetPhases(fruitSolver, phases.GetBuffer(), phases.size());
 	fruit->SetNormals(fruitSolver, normals.GetBuffer(), numParticles);
@@ -387,7 +371,7 @@ void SimBuffers::SendBuffers(NvFlexSolver *flex) {
 			shapePrevRotations.GetBuffer(),
 			shapeFlags.GetBuffer(),
 			int(shapeFlags.size()));
-	}*/
+	}
 }
 
 // methods for clearing
@@ -400,14 +384,3 @@ void SimBuffers::ClearShapes() {
 	this->shapePrevRotations.resize(0);
 	this->shapeFlags.resize(0);
 }
-
-// method for logging
-///////////////////////////////////////////////////////////////
-void SimBuffers::StartLogging() {
-	printf("Start logging...\n");
-}
-
-void SimBuffers::EndLogging() {
-	printf("End logging...\n");
-}
-

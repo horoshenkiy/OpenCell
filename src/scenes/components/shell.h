@@ -12,7 +12,11 @@ public:
 
 	//constructors and initialize
 
-	Shell() : Component() {}
+	explicit Shell(SimBuffers *buffers) : Component(buffers, nullptr) {}
+
+	explicit Shell(int group, SimBuffers *buffers) : Component(buffers ,nullptr), group(group) {}
+
+	explicit Shell(const Shell& other) : Component(other.buffers, nullptr), group(other.group) {}
 
 	void Initialize() override;
 
@@ -33,23 +37,12 @@ public:
 		//DrawCloth(&g_buffers->positions[0], &g_buffers->normals[0], NULL, &g_buffers->triangles[0], asset->numTriangles, g_buffers->positions.size(), (0 + 2) % 6);
 	}
 
-	template<class Archive>
-	void save(Archive &archive) const {
-		archive(group, indBeginPosition, indEndPosition, splitThreshold);
-		archive(*(asset));
-	}
-
-	template<class Archive>
-	void load(Archive &archive) {
-		archive(group, indBeginPosition, indEndPosition, splitThreshold);
-
-		asset = new NvFlexExtAsset();
-		archive(*(asset));
-	}
-
 private:
 
+	friend Serializer;
 	friend bool operator==(const Shell&, const Shell&);
+
+	int group = -1;
 
 	// position in simbuffer
 	size_t indBeginPosition = -1;

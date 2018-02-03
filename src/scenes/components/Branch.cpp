@@ -3,9 +3,11 @@
 #include "../Cell.h"
 
 #include "../../controller/compute_controller/SimBuffers.h"
-#include "../../utilits/Utilits.h"
+#include "../../Utilits.h"
 
-void Branch::Initialize(Cytoskeleton *cytoskeleton, Vec3 position, int countFi, bool root, bool isLeft) {
+void Branch::Initialize(SimBuffers *buffers, Cytoskeleton *cytoskeleton, Vec3 position, int countFi, bool root, bool isLeft) {
+	this->buffers = buffers;
+
 	this->indBeginPositionShell = cytoskeleton->cell->shell->GetIndBeginPosition();
 	this->indEndPositionShell = cytoskeleton->cell->shell->GetIndEndPosition();
 
@@ -74,7 +76,7 @@ void Branch::Update(bool isGrowAktin) {
 	positionEnd.x += halfLength * Cos(-fi * countFi);
 	positionEnd.z += halfLength * Sin(-fi * countFi);
 
-	float minDist = FindMinDistToSet(positionEnd, buffers.positions, indBeginPositionShell, indEndPositionShell);
+	float minDist = FindMinDistToSet(positionEnd, buffers->positions, indBeginPositionShell, indEndPositionShell);
 	if (minDist < 0.05)
 		return;
 
@@ -158,7 +160,7 @@ void Branch::NewRotationBranch() {
 	}
 
 	Branch *branch = new Branch();
-	branch->Initialize(cytoskeleton, pos, 1, false, isLeft);
+	branch->Initialize(buffers, cytoskeleton, pos, 1, false, isLeft);
 
 	childBranches.push_back(branch);
 	indexChildBranches.push_back(positionCapsules.size() - 1);
@@ -168,7 +170,7 @@ void Branch::NewRotationBranch() {
 void Branch::NewRootBranch() {
 
 	Branch *branch = new Branch();
-	branch->Initialize(cytoskeleton, position, 0, true, isLeft);
+	branch->Initialize(buffers, cytoskeleton, position, 0, true, isLeft);
 
 	childBranches.push_back(branch);
 	indexChildBranches.push_back(positionCapsules.size() - 1);

@@ -1,47 +1,16 @@
 #include "ComputeController.h"
 
-void ComputeController::Initialize() {
-	fruit->Initialize(true);
+void ComputeController::Initialize(FlexController *flexController, 
+								  FlexParams *flexParams, 
+								  SimBuffers *buffers, 
+								  RenderParam *renderParam,
+								  Scene *scene) {
+	
+	this->flexController = flexController;
+	this->flexParams = flexParams;
+	this->buffers = buffers;
 
-	this->flexController = &FlexController::Get();
-	this->flexParams = &FlexParams::Get();
-	this->buffers = &SimBuffers::Get();
-}
+	this->renderParam = renderParam;
 
-void ComputeController::PostInitialize(Scene *scene) {
 	this->scene = scene;
-
-	fruit->PostInitialize();
-}
-
-void ComputeController::InitializeGPU() {
-	fruit->InitializeGPU();
-}
-
-void ComputeController::MapBuffers() {
-	fruit->MapBuffers();
-}
-
-void ComputeController::UnmapBuffers() {
-	fruit->UnmapBuffers();
-}
-
-int ComputeController::GetActiveCount() const {
-	return NvFlexGetActiveCount(flexController->GetSolver());
-}
-
-int ComputeController::GetDiffuseParticles() const {
-	return NvFlexGetDiffuseParticles(flexController->GetSolver(), nullptr, nullptr, nullptr);
-}
-
-void ComputeController::Update() {
-	fruit->Update();
-}
-
-void ComputeController::SendBuffers(NvFlexSolver *flex) {
-	fruit->SendBuffers();
-}
-
-void ComputeController::Sync() {
-	fruit->Sync();
 }

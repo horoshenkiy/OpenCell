@@ -11,8 +11,8 @@
 #include "../imgui_controller/imgui.h"
 
 #include "../../scenes.h"
-#include "../../utilits/Timer.h"
-#include "../../utilits/Video.h"
+#include "../../Timer.h"
+#include "../../Video.h"
 
 extern int g_frame;
 
@@ -50,6 +50,7 @@ public:
 	void Initialize(Scene *scene,
 					FlexController *flexController, 
 					FlexParams *flexParams,
+					SimBuffers *buffers,
 					RenderController *renderController, 
 					RenderParam *renderParam, 
 					SDLController *sdlController);

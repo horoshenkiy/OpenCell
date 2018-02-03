@@ -15,23 +15,28 @@ class Cell : public BiologyObject {
 public:
 	
 	// need incapsulation
-	std::unique_ptr<Cytoplasm> cytoplasm;
-	std::unique_ptr<Kernel>	kernel;
-	std::unique_ptr<Shell> shell;
-	std::unique_ptr<Cytoskeleton> cytoskeleton;
+	Cytoplasm*  cytoplasm = nullptr;
+	Kernel*		kernel = nullptr;
+	Shell*		shell = nullptr;
+	Cytoskeleton* cytoskeleton = nullptr;
 	//Receptors*	receptors;
 
 	// constructors and initialize
-	Cell() : BiologyObject() {}
+	Cell() = default;
 
-	void Initialize() override;
+	Cell(SimBuffers* buffers, RenderBuffers* renderBuffers) {
+		this->buffers = buffers;
+		this->renderBuffers = renderBuffers;
+	}
 
-	virtual void InitializeFromFile() override;
-
-	virtual void PostInitialize() override;
+	void Initialize(FlexController *flexController,
+		SimBuffers *buffers,
+		FlexParams *flexParams,
+		RenderBuffers *renderBuffers,
+		RenderParam *renderParam) override;
 
 	// destructors (need add delete)
-	~Cell() = default;
+	~Cell();
 
 	void clearBuffers();
 
@@ -42,31 +47,9 @@ public:
 
 	void Draw();
 
-	//////////////////////////////////////////////////////
-	template<class Archive>
-	void save(Archive &archive) const {
-		archive(group, mNumFluidParticles);
-		archive(*cytoplasm, *kernel, *shell);
-	}
-
-	template<class Archive>
-	void load(Archive &archive) {
-		archive(group, mNumFluidParticles);
-
-		if (cytoplasm == nullptr)
-			cytoplasm = std::make_unique<Cytoplasm>();
-
-		if (kernel == nullptr)
-			kernel = std::make_unique<Kernel>();
-
-		if (shell == nullptr)
-			shell = std::make_unique<Shell>();
-
-		archive(*cytoplasm, *kernel, *shell);
-	}
-
 private:
 
+	friend Serializer;
 	friend bool operator==(const Cell &lCell, const Cell &rCell);
 
 	int group = 0;
@@ -74,4 +57,4 @@ private:
 	int mNumFluidParticles = 0;
 };
 
-#include "../utilits/Serializer.h"
+#include "../Serializer.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mesh.h>
+#include "../../../core/mesh.h"
 #include <vector>
 #include <map>
 
@@ -8,27 +8,10 @@
 
 #include "../../shaders.h"
 
-class RenderBuffers {
-
-public:
-
-	static RenderBuffers& Instance() {
-		static RenderBuffers instance;
-		return instance;
-	}
-
-	static RenderBuffers& Get() {
-		return Instance();
-	}
-
-	void Destroy() {
-		meshSkinIndices.clear();
-		meshSkinWeights.clear();
-		meshRestPositions.clear();
-	}
+struct RenderBuffers {
 
 	// mesh used for deformable object rendering
-	Mesh* mesh = new Mesh();
+	Mesh* mesh;
 	
 	std::vector<size_t> meshSkinIndices;
 	std::vector<float> meshSkinWeights;
@@ -40,19 +23,4 @@ public:
 	std::map<NvFlexDistanceFieldId, GpuMesh*> fields;
 
 	FluidRenderBuffers fluidRenderBuffers;
-
-	// serialize
-	template<class Archive>
-	void serialize(Archive &archive) {
-		archive(*mesh);
-		archive(meshSkinIndices, meshSkinWeights, meshRestPositions);
-	}
-
-private:
-
-	RenderBuffers() = default;
-
-	RenderBuffers(const RenderBuffers &other) = delete;
-	RenderBuffers operator=(const RenderBuffers &other) = delete;
 };
-

@@ -14,11 +14,11 @@ void Kernel::Initialize() {
 
 	const float mass[] = { 1.0f, 0.25f, 0.005f };
 
-	size_t startBuffers = buffers.positions.size();
+	size_t startBuffers = buffers->positions.size();
 	
-	CreateParticleShape(&buffers, 
-						&renderBuffers, 
-						"../../data/sphere.ply", 
+	CreateParticleShape(buffers, 
+						renderBuffers, 
+						GetFilePathByPlatform("../../data/sphere.ply").c_str(), 
 						Vec3(2.2f, 0.7f, 1.0f), 
 						size, 0.0f, sampling, 
 						Vec3(0.0f, 0.0f, 0.0f), 
@@ -29,22 +29,22 @@ void Kernel::Initialize() {
 						true, 
 						0.0001f);
 
-	size_t endBuffers = buffers.positions.size();
+	size_t endBuffers = buffers->positions.size();
 
-	Vec3 startVec = buffers.positions[startBuffers];
+	Vec3 startVec = buffers->positions[startBuffers];
 	float minX = startVec.x, maxX = startVec.x;
 	float minY = startVec.y, maxY = startVec.y;
 	float minZ = startVec.z, maxZ = startVec.z;
 
 	for (size_t i = startBuffers; i < endBuffers; i++) {
-		minX = (minX > buffers.positions[i].x) ? buffers.positions[i].x : minX;
-		maxX = (maxX < buffers.positions[i].x) ? buffers.positions[i].x : maxX;
+		minX = (minX > buffers->positions[i].x) ? buffers->positions[i].x : minX;
+		maxX = (maxX < buffers->positions[i].x) ? buffers->positions[i].x : maxX;
 
-		minY = (minY > buffers.positions[i].y) ? buffers.positions[i].y : minY;
-		maxY = (maxY < buffers.positions[i].y) ? buffers.positions[i].y : maxY;
+		minY = (minY > buffers->positions[i].y) ? buffers->positions[i].y : minY;
+		maxY = (maxY < buffers->positions[i].y) ? buffers->positions[i].y : maxY;
 
-		minZ = (minZ > buffers.positions[i].z) ? buffers.positions[i].z : minZ;
-		maxZ = (maxZ < buffers.positions[i].z) ? buffers.positions[i].z : maxZ;
+		minZ = (minZ > buffers->positions[i].z) ? buffers->positions[i].z : minZ;
+		maxZ = (maxZ < buffers->positions[i].z) ? buffers->positions[i].z : maxZ;
 	}
 
 	float xCenter = (maxX - minX) / 2;
@@ -54,9 +54,9 @@ void Kernel::Initialize() {
 	indexCenter = startBuffers;
 	float distMin = maxX - minX;
 	for (size_t i = startBuffers; i < endBuffers; i++) {
-		float dist = sqrt(sqr(buffers.positions[i].x - xCenter) +
-			sqr(buffers.positions[i].y - yCenter) +
-			sqr(buffers.positions[i].z - zCenter));
+		float dist = sqrt(sqr(buffers->positions[i].x - xCenter) +
+			sqr(buffers->positions[i].y - yCenter) +
+			sqr(buffers->positions[i].z - zCenter));
 
 		if (distMin > dist) {
 			distMin = dist;
@@ -64,14 +64,14 @@ void Kernel::Initialize() {
 		}
 	}
 
-	positionCenter = buffers.positions[indexCenter];
+	positionCenter = buffers->positions[indexCenter];
 	prevPositionCenter = positionCenter;
 
 };
 
 void Kernel::Update() {
 	prevPositionCenter = positionCenter;
-	positionCenter = buffers.positions[indexCenter];
+	positionCenter = buffers->positions[indexCenter];
 
 	rateCenter.x = positionCenter.x - prevPositionCenter.x;
 	rateCenter.y = positionCenter.y - prevPositionCenter.y;

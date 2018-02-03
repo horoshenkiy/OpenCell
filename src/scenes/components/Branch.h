@@ -8,24 +8,6 @@ class Cytoskeleton;
 
 class Branch : public Component {
 
-public:
-
-	Branch() : Component() {}
-
-	//getter
-	float GetHalfLength() const {
-		return halfLength;
-	}
-	float GetLengthCapsule() const {
-		return lengthCapsule;
-	}
-
-	//initialize
-	void Initialize(Cytoskeleton *cytoskeleton, Vec3 position, int countFi, bool root, bool isLeft);
-
-	//update
-	void Update(bool isGrowAktin);
-
 private:
 	Cytoskeleton *cytoskeleton;
 
@@ -68,5 +50,21 @@ private:
 
 	void NewRotationBranch();
 	void NewRootBranch();
+
+public:
+
+	//getter
+	float GetHalfLength() const {
+		return halfLength;
+	}
+	float GetLengthCapsule() const {
+		return lengthCapsule;
+	}
+
+	//initialize
+	void Initialize(SimBuffers *buffers, Cytoskeleton *cytoskeleton, Vec3 position, int countFi, bool root, bool isLeft);
+
+	//update
+	void Update(bool isGrowAktin);
 
 };

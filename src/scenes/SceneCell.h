@@ -17,16 +17,22 @@ public:
 
 	// constructors and initialize
 	//////////////////////////////////////////////////////
-	SceneCell() : Scene() {}
+	SceneCell() {}
 	
 	SceneCell(const char* name) : Scene(name) {}
 
-	SceneCell(const char* name, FlexController *flexController,FlexParams *flexParams);
+	SceneCell(const char* name, 
+		FlexController *flexController,
+		SimBuffers *buffers,
+		FlexParams *flexParams,
+		RenderBuffers *renderBuffers,
+		RenderParam *renderParam);
 
-	void Initialize(FlexController *flexController, FlexParams *flexParams) override;
-	void InitializeFromFile(FlexController *flexController, FlexParams *flexParams) override;
-
-	void PostInitialize() override;
+	void Initialize(FlexController *flexController,
+		SimBuffers *buffers,
+		FlexParams *flexParams,
+		RenderBuffers *renderBuffers,
+		RenderParam *renderParam) override;
 
 	// destroy
 	//////////////////////////////////////////////
@@ -42,23 +48,7 @@ public:
 
 	void Draw() override;
 
-	//////////////////////////////////////////////////////
-	template<class Archive>
-	void save(Archive &archive) const {
-		archive(*cell, sceneLower, sceneUpper);
-	}
-
-	template<class Archive>
-	void load(Archive &archive) {
-		if (cell == nullptr) {
-			cell = new Cell();
-			cell->InitializeFromFile();
-		}
-
-		archive(*cell, sceneLower, sceneUpper);
-	}
-
 };
 
-#include "../utilits/Serializer.h"
+#include "../Serializer.h"
 

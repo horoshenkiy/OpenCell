@@ -5,16 +5,16 @@
 
 class Component {
 protected:
-	SimBuffers &buffers;
-	RenderBuffers &renderBuffers;
-
-	int group;
+	SimBuffers *buffers;
+	RenderBuffers *renderBuffers;
 
 public:
 
-	Component() : buffers(SimBuffers::Get()), renderBuffers(RenderBuffers::Get()) {
-		static int count = 0;
-		group = count++;
+	Component() = default;
+
+	Component(SimBuffers *buffers, RenderBuffers *renderBuffers) {
+		this->buffers = buffers; 
+		this->renderBuffers = renderBuffers;
 	}
 
 	virtual ~Component() {}

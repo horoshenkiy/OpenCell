@@ -77,7 +77,6 @@ public:
 	CUDA_CALLABLE XVector4<T>& operator -=(const XVector4<T>& v) {x -= v.x; y -= v.y; z -= v.z; w -= v.w; VEC4_VALIDATE(); return *this;}
 	CUDA_CALLABLE XVector4<T>& operator *=(const XVector4<T>& v) {x *= v.x; y *= v.y; z *= v.z; w *= v.w; VEC4_VALIDATE(); return *this;}
 
-	CUDA_CALLABLE bool operator == (const XVector4<T>& v) const { return (x == v.x || y == v.y || z == v.z || w == v.w); }
 	CUDA_CALLABLE bool operator != (const XVector4<T>& v) const { return (x != v.x || y != v.y || z != v.z || w != v.w); }
 
 	// negate

@@ -8,7 +8,13 @@ class Kernel : public Component {
 public:
 
 	// constructors and initialize
-	Kernel() : Component() {}
+	Kernel() = default;
+
+	Kernel(SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {}
+
+	Kernel(int group, SimBuffers *buffers, RenderBuffers *renderBuffers) : Component(buffers, renderBuffers) {
+		this->group = group;
+	}																	  
 
 	void Initialize() override;
 
@@ -27,24 +33,18 @@ public:
 	// update
 	void Update() override;
 
-	template<class Archive>
-	void serialize(Archive &archive) {
-		archive(group, indexCenter);
-		archive(positionCenter, prevPositionCenter, rateCenter);
-	}
-
 private:
 	
+	friend Serializer;
 	friend bool operator==(const Kernel &lKernel, const Kernel &rKernel);
 
-	//int group = -1;
+	int group = -1;
 
 	//fields of center
 	int indexCenter = -1;
 
 	Vec4 positionCenter, prevPositionCenter;
 	Vec3 rateCenter;
-
 };
 
-#include "../../utilits/Serializer.h"
+#include "../../Serializer.h"

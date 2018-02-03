@@ -2,7 +2,8 @@
 
 #include <windows.h>
 
-double FruitGetSeconds() {
+double FruitGetSeconds()
+{
 	static LARGE_INTEGER lastTime;
 	static LARGE_INTEGER freq;
 	static bool first = true;

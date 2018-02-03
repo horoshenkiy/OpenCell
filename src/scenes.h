@@ -3,7 +3,6 @@
 struct FlexParams;
 
 #include "controller/render_controller/RenderParam.h"
-#include "controller/render_controller/RenderBuffer.h"
 
 #include "controller/compute_controller/FlexController.h"
 #include "controller/compute_controller/FlexParams.h"
@@ -18,10 +17,10 @@ protected:
 
 	FlexController *flexController = nullptr;
 	FlexParams *flexParams = nullptr;
-	SimBuffers &buffers;
+	SimBuffers *buffers = nullptr;
 
-	RenderBuffers &renderBuffers;
-	RenderParam &renderParam;
+	RenderBuffers *renderBuffers = nullptr;
+	RenderParam *renderParam = nullptr;
 
 	const char* mName;
 
@@ -43,22 +42,15 @@ public:
 		this->sceneUpper = sceneUpper;
 	}
 
-	Scene() : 
-		buffers(SimBuffers::Get()), 
-		renderBuffers(RenderBuffers::Get()),
-		renderParam(RenderParam::Get()) {}
+	Scene() = default;
 
-	Scene(const char* name) : 
-		mName(name), 
-		buffers(SimBuffers::Get()), 
-		renderBuffers(RenderBuffers::Get()),
-		renderParam(RenderParam::Get()) {}
+	Scene(const char* name) : mName(name) {}
 	 
-	virtual void Initialize(FlexController *flexController, FlexParams *flexParams) = 0;
-
-	virtual void InitializeFromFile(FlexController *flexController, FlexParams *flexParams) = 0;
-
-	virtual void PostInitialize() = 0;
+	virtual void Initialize(FlexController *flexController,
+							SimBuffers *buffers,
+							FlexParams *flexParams,
+							RenderBuffers *renderBuffers,
+							RenderParam *renderParam) = 0;
 	
 	// update any buffers (all guaranteed to be mapped here)
 	virtual void Update() {}	
