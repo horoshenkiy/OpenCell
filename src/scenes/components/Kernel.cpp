@@ -47,9 +47,11 @@ void Kernel::Initialize() {
 		maxZ = (maxZ < buffers.positions[i].z) ? buffers.positions[i].z : maxZ;
 	}
 
-	float xCenter = (maxX - minX) / 2;
-	float yCenter = (maxY - minY) / 2;
-	float zCenter = (maxZ - minZ) / 2;
+	float xCenter = minX + (maxX - minX) / 2;
+	float yCenter = minY + (maxY - minY) / 2;
+	float zCenter = minZ + (maxZ - minZ) / 2;
+
+	trueRadius = (maxX - minX) / 2;
 
 	indexCenter = startBuffers;
 	float distMin = maxX - minX;

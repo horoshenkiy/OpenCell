@@ -26,7 +26,7 @@ endforeach()
 
 file(GLOB CORE "../core/*.h" "../core/*.cpp")
 
-set(SRC ../src/Utilits.cpp main.cpp)
+set(SRC ../src/utilits/Utilits.cpp main.cpp)
 set(OPENGL ../src/opengl/shader.cpp ../src/opengl/shadersGL.cpp)
 
 set(COMPONENT ../src/scenes/cell.cpp

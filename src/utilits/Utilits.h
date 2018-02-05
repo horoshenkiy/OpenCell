@@ -38,7 +38,8 @@ void CalculateRigidLocalPositions(const Vec4* restPositions, size_t numRestPosit
 
 // for position with mass
 float FindMinDistToSet(Vec3 point, FruitVector<Vec4> &bufferOfSet, int startSet, int endSet);
-
+float FindMinDistToSetWithAngle(Vec3 point, Vec3 direction, float angle, FruitVector<Vec4> &bufferOfSet, int startSet, int endSet);
+float angleBtwVectors(const Vec3& a, const Vec3& b);
 Vec3 CalculateMean(const Vec3* particles, const int* indices, int numIndices);
 
 float CalculateRadius(const Vec3* particles, Vec3 center, const int* indices, int numIndices);

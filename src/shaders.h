@@ -5,8 +5,8 @@
 
 #define STRINGIFY(A) #A
 
-#include "../core/maths.h"
-#include "../core/mesh.h"
+#include "core/maths.h"
+#include "core/mesh.h"
 
 #include "controller/render_controller/Shadows.h"
 
@@ -15,7 +15,6 @@ typedef unsigned int IndexBuffer;
 typedef unsigned int Texture;
 
 struct SDL_Window;
-
 
 //void InitRender(SDL_Window* window, bool fullscreen, int msaaSamples);
 void DestroyRender();

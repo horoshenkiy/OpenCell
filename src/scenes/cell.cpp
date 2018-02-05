@@ -1,7 +1,7 @@
 #include "cell.h"
 #include <memory>
 
-#include "../../../fruit_extensions/NvFlexImplFruit.h"
+#include "fruit_extensions/NvFlexImplFruit.h"
 
 // initialize
 void Cell::Initialize() {
@@ -111,36 +111,26 @@ void Cell::clearBuffers() {
 void Cell::Update() {
 
 	// need to refactoring
-	static int j = 1;
+	static int j = 0;
 
 	cytoplasm->Update();
 	shell->Update();
 	kernel->Update();
 
-	Vec3 startGrow = Vec3(0.4f, -0.1f, 0.0f);
-	startGrow += kernel->GetPositionCenter();
-
-	//CreateRigidCapsule(*buffers, *renderBuffers, 0.2f, 1.0f, 10, 20, startGrow, Vec3(0.096f), 0.0f, 0.0016f, Vec3(0.0f), 0.25f, group++);
-//	j++;
-	if (j % 100 == 0) {
-		CreateRigidCapsule(buffers, renderBuffers, 0.1f, 1.0f, 10, 20, startGrow, Vec3(0.05f), 0.0f, 0.0016f, Vec3(0.0f), 0.05f, 5);
-		//j++;
-
-		return;
-	}
-
-	/*if (j == 400) {
-		Vec3 startGrow = Vec3(0.4f, -0.1f, 0.0f);
-		startGrow += kernel->GetPositionCenter();
-
-		cytoskeleton = new Cytoskeleton(this, buffers, group++, startGrow);
-		cytoskeleton->Initialize(this, buffers);
-
+	if (j < 400) {
 		j++;
 		return;
 	}
 
-	cytoskeleton->Update(kernel->GetRateCenter());*/
+	if (j == 400) {
+		j++;
+
+		std::clog << "Cytoskeleton create" << std::endl;
+		cytoskeleton2 = new Cytoskeleton2(&buffers, kernel.get(), shell.get());
+		return;
+	}
+
+	cytoskeleton2->Update();
 }
 
 void Cell::Sync()

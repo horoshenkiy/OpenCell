@@ -19,12 +19,14 @@ file(GLOB RENDER_CONTROLLER		"controller/render_controller/*.cpp"
 file(GLOB FLUID 				"controller/render_controller/Fluid/*.cpp"
 								"controller/render_controller/Fluid/*.h")
 
-file(GLOB FRUIT_CORE	  "../fruit_core/*.h")
-file(GLOB FRUIT_EXTENSION "../fruit_extensions/*.h")
+file(GLOB FRUIT_CORE	  "../include/fruit_core/*.h")
+file(GLOB FRUIT_EXTENSION "../include/fruit_extensions/*.h")
 file(GLOB INCLUDE 		  "../include/*.h")
 file(GLOB OPEN_GL 		  "opengl/*.cpp" "opengl/*.h")
+file(GLOB UTILITS		  "utilits/*.h" "utilits/*.cpp")
 
-add_executable(OpenCell main.cpp 	${CORE}
+add_executable(OpenCell main.cpp 
+									${INCLUDE} 
 									${SRC}
 										${SCENES}
 											${COMPONENTS}
@@ -33,9 +35,10 @@ add_executable(OpenCell main.cpp 	${CORE}
 											${IMGUI_CONTROLLER}
 											${RENDER_CONTROLLER}
 												${FLUID}
+										${UTILITS}
+									${CORE}
 									${FRUIT_CORE}
 									${FRUIT_EXTENSION} 
-									${INCLUDE} 
 									${OPEN_GL})
 									
 target_link_libraries(OpenCell optimized NvFlexReleaseCUDA_x64)
@@ -58,6 +61,8 @@ source_group(src						FILES ${SRC})
 source_group(src\\scenes 				FILES ${SCENES})
 source_group(src\\scenes\\components 	FILES ${COMPONENTS})
 
+source_group(src\\utilits 				FILES ${UTILITS})
+
 source_group(src\\controller							FILES ${CONTROLLER})
 source_group(src\\controller\\compute_controller 		FILES ${COMPUTE_CONTROLLER})
 source_group(src\\controller\\imgui_controller			FILES ${IMGUI_CONTROLLER})
@@ -67,4 +72,4 @@ source_group(src\\controller\\render_controller\\Fluid	FILES ${FLUID})
 source_group(fruit_core			FILES ${FRUIT_CORE})
 source_group(fruit_extension	FILES ${FRUIT_EXTENSION})							 
 source_group(include  			FILES ${INCLUDE})
-source_group(opengl 			FILES ${OPEN_GL})
+source_group(src\\opengl 			FILES ${OPEN_GL})

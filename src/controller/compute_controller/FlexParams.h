@@ -1,6 +1,7 @@
-#pragma once
+#ifndef FLEX_PARAMS_H
+#define FLEX_PARAMS_H
 
-#include "../../../include/NvFlex.h"
+#include "NvFlex.h"
 #include <iostream>
 
 class Scene;
@@ -26,6 +27,12 @@ public:
 
 	bool warmup = false;
 
+	//actin tree parameters
+	float p_sow = 0.02f;
+	float p_grow = 0.05f;
+	float p_break = 0.052f;
+	float p_ARP = 0.0005f;
+
 	// enable timers
 	bool profile = false;
 
@@ -48,4 +55,7 @@ private:
 	FlexParams operator=(const FlexParams &other) = delete;
 
 };
+
+#endif // FLEX_PARAMS_H
+
 

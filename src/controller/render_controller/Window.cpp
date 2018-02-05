@@ -1,6 +1,7 @@
 #include "RenderController.h"
 #include "../../opengl/imguiRenderGL.h"
-#include "platform.h"
+
+#include "fruit_core/platform.h"
 
 void RenderController::InitRender(Camera *camera) {
 

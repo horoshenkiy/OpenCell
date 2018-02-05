@@ -1,8 +1,8 @@
 #pragma once
 
-#include <maths.h>
-#include <mesh.h>
-#include <cereal/types/vector.hpp>
+#include "core/maths.h"
+#include "core/mesh.h"
+#include "cereal/types/vector.hpp"
 
 #include "NvFlexExt.h"
 

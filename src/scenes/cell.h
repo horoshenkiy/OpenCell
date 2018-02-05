@@ -4,6 +4,7 @@
 #include "components\kernel.h"
 #include "components\shell.h"
 #include "components\Cytoskeleton.h"
+#include "components\cytoskeleton2.h"
 #include "components\Receptors.h"
 
 #include "BiologyObject.h"
@@ -19,6 +20,7 @@ public:
 	std::unique_ptr<Kernel>	kernel;
 	std::unique_ptr<Shell> shell;
 	std::unique_ptr<Cytoskeleton> cytoskeleton;
+	Cytoskeleton2* cytoskeleton2;
 	//Receptors*	receptors;
 
 	// constructors and initialize

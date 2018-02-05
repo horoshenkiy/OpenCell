@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IMGUI_CONTROLLER_H
+#define IMGUI_CONTROLLER_H
 
 #include "../SDLController.h"
 
@@ -8,7 +9,7 @@
 
 #include "../render_controller/RenderController.h"
 
-#include "../imgui_controller/imgui.h"
+#include "imgui.h"
 
 #include "../../scenes.h"
 #include "../../utilits/Timer.h"
@@ -60,3 +61,5 @@ public:
 	// public method for create menu
 	int DoUI(int numParticles, int numDiffuse);
 };
+
+#endif

@@ -3,6 +3,5 @@
 
 RigidCapsule FactoryRigidCapsule::CreateCapsule() {
 
-
 	return RigidCapsule();
 }

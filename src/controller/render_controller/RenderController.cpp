@@ -1,7 +1,7 @@
 #include "RenderController.h"
 #include <memory>
 
-#include "../../../fruit_extensions/NvFlexImplFruit.h"
+#include "fruit_extensions/NvFlexImplFruit.h"
 
 void RenderController::SkinMesh() {
 	if (renderBuffers->mesh)

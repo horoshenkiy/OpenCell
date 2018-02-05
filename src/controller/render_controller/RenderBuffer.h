@@ -1,6 +1,7 @@
 #pragma once
 
-#include <mesh.h>
+#include "core/mesh.h"
+
 #include <vector>
 #include <map>
 

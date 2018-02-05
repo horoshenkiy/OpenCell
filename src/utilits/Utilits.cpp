@@ -1,9 +1,9 @@
-#include "../core/mesh.h"
-#include "../core/voxelize.h"
-#include "../core/sdf.h"
-#include "../core/pfm.h"
-#include "../core/platform.h"
-#include "../core/convex.h"
+#include "core/mesh.h"
+#include "core/voxelize.h"
+#include "core/sdf.h"
+#include "core/pfm.h"
+#include "core/platform.h"
+#include "core/convex.h"
 
 #include "../shaders.h"
 #include "Utilits.h"
@@ -211,6 +211,34 @@ float FindMinDistToSet(Vec3 point, FruitVector<Vec4> &bufferOfSet, int startSet,
 	}
 
 	return sqrt(minDistSqr);
+}
+
+float FindMinDistToSetWithAngle(Vec3 point, Vec3 direction, float max_angle, FruitVector<Vec4> &bufferOfSet, int startSet, int endSet) {
+
+	Vec3 temp = (point - Vec3(bufferOfSet[startSet]));
+
+	float minDistSqr = temp.x * temp.x + temp.y * temp.y + temp.z * temp.z;
+	for (int i = startSet + 1; i < endSet; i++) {
+		temp = (point - Vec3(bufferOfSet[i]));
+
+		float distSqr = temp.x * temp.x + temp.y * temp.y + temp.z * temp.z;
+		if (minDistSqr > distSqr)
+		{
+			temp = Normalize(temp);
+			float angle = acos(Dot3(temp, direction));
+
+			if (angle < max_angle)
+				minDistSqr = distSqr;
+		}
+
+	}
+
+	return sqrt(minDistSqr);
+}
+
+float angleBtwVectors(const Vec3& a, const Vec3& b)
+{
+	return acos(Dot3(a, b) / Length(a) / Length(b));
 }
 
 Vec3 CalculateMean(const Vec3* particles, const int* indices, int numIndices)

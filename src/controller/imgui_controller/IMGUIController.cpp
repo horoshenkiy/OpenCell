@@ -90,6 +90,13 @@ void IMGUIController::DoMenu() {
 			g_pause = !g_pause;
 
 		imguiSeparatorLine();
+		imguiLabel("Actin Tree Parameters");
+		imguiSlider("Branch Probability", &flexParams->p_sow, 0.0f, 1.0f, 0.01f);
+		imguiSlider("Grow Probability", &flexParams->p_grow, 0.0f, 1.0f, 0.01f);
+		imguiSlider("Break Probability", &flexParams->p_break, 0.0f, 1.0f, 0.01f);
+		imguiSlider("ARP Probality", &flexParams->p_ARP, 0.0f, 1.0f, 0.0001f);
+
+		imguiSeparatorLine();
 
 		if (imguiCheck("Wireframe", renderParam->wireframe))
 			renderParam->wireframe = !renderParam->wireframe;

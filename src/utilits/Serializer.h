@@ -1,7 +1,7 @@
 #pragma once
 
-#include <maths.h>
-#include <NvFlexImplFruitExt.h>
+#include "core/maths.h"
+#include "fruit_extensions/NvFlexImplFruitExt.h"
 
 #include "../scenes/components/kernel.h"
 #include "../scenes/components/cytoplasm.h"
@@ -10,7 +10,7 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/vector.hpp>
 
-#include "../include/serialize_types.h"
+#include "serialize_types.h"
 
 #ifdef _WINDOWS
 #include <windows.h>
@@ -55,7 +55,7 @@ public:
 		CreateDirectory(pathState.c_str(), nullptr);
 
 		if (sceneCell == nullptr || buffers == nullptr) {
-			printf("Seriliazer: scene_cell or buffers are n't initialize!");
+			std::cerr << "Seriliazer: scene_cell or buffers are n't initialize!" << std::endl;
 			return false;
 		}
 

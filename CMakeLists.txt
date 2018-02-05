@@ -5,9 +5,10 @@ project(OpenCell LANGUAGES CXX CUDA)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../bin/")
 
-include_directories(core)
-include_directories(fruit_core fruit_extensions)
+include_directories(include)
+include_directories(.)
 include_directories(external/cereal/include)	
+include_directories(external/cxxopts-1.4.3/include)
 
 add_subdirectory(src)
 add_subdirectory(extensions)

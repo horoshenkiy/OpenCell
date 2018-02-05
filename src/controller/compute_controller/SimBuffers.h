@@ -1,6 +1,6 @@
 #pragma once
 
-#include <NvFlexImplFruitExt.h>
+#include "fruit_extensions/NvFlexImplFruitExt.h"
 
 #include "../../utilits/Logger.h"
 #include "../../utilits/Utilits.h"

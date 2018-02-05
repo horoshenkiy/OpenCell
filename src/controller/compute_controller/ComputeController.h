@@ -8,7 +8,7 @@
 
 #include "../../utilits/Timer.h"
 
-#include "../../../fruit_extensions/NvFlexImplFruit.h"
+#include "fruit_extensions/NvFlexImplFruit.h"
 
 extern bool g_pause;
 extern bool g_step;

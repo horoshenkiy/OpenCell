@@ -1,6 +1,6 @@
 #include "SimBuffers.h"
 
-#include "../../../fruit_extensions/NvFlexImplFruit.h"
+#include "fruit_extensions/NvFlexImplFruit.h"
 
 bool SimBuffers::isInitialize = false;
 

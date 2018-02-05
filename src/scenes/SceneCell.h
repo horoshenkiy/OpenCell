@@ -61,4 +61,3 @@ public:
 };
 
 #include "../utilits/Serializer.h"
-

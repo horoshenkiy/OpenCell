@@ -24,6 +24,10 @@ public:
 		return result;
 	}
 
+	float getRadius() {
+		return trueRadius;
+	}
+
 	// update
 	void Update() override;
 
@@ -45,6 +49,7 @@ private:
 	Vec4 positionCenter, prevPositionCenter;
 	Vec3 rateCenter;
 
+	float trueRadius;
 };
 
 #include "../../utilits/Serializer.h"
