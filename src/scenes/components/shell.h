@@ -60,7 +60,7 @@ private:
 	// asset for cloth
 	NvFlexExtAsset* asset = nullptr;
 
-	void AddInflatable(const Mesh* mesh, float overPressure, float invMass, int phase);
+	void AddCloth(const Mesh* mesh, float overPressure, float invMass, int phase);
 
 	// for random position of shell's balls
 	std::random_device gen;

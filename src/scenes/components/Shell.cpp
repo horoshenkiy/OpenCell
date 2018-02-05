@@ -1,8 +1,10 @@
 #include "shell.h"
 
-#include "../../../core/platform.h"
+#include "core/platform.h"
 
-void Shell::AddInflatable(const Mesh* mesh, float overPressure, float invMass, int phase) {
+#include "../../utilits/PrimitiveFactories.h"
+
+void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int phase) {
 	// create a cloth mesh using the global positions / indices
 	const int numParticles = int(mesh->m_positions.size());
 
@@ -20,7 +22,8 @@ void Shell::AddInflatable(const Mesh* mesh, float overPressure, float invMass, i
 	indEndPosition = buffers.positions.size();
 
 	// create asset
-	NvFlexExtAsset* cloth = NvFlexExtCreateClothFromMesh((float*)&buffers.positions[indBeginPosition],
+	NvFlexExtAsset* cloth = NvFlexExtCreateClothFromMesh(
+		reinterpret_cast<float*>(&buffers.positions[indBeginPosition]),
 		numParticles,
 		(int*)&mesh->m_indices[0],
 		mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -47,13 +50,17 @@ void Shell::AddInflatable(const Mesh* mesh, float overPressure, float invMass, i
 }
 
 void Shell::Initialize() {
-	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
+	Factory::FactoryMesh factoryMesh;
+	Mesh *mesh = factoryMesh.CreateSphere(1.2, 5);
+
+	//Mesh* mesh = CreateSphere(30, 30);//
+	//Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
 	Vec3 lower = Vec3(2.0f + 0 * 2.0f, 0.4f + 0 * 1.2f, 1.0f);
 
-	mesh->Normalize();
+	//mesh->Normalize();
 	mesh->Transform(TranslationMatrix(Point3(lower)));
 
-	AddInflatable(mesh, 1.0f, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter));
+	AddCloth(mesh, 1.0f, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter));
 
 	buffers.numSolidParticles = buffers.positions.size();
 	buffers.numExtraParticles = buffers.positions.size();

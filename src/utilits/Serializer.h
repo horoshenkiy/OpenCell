@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
 
 #include "core/maths.h"
 #include "fruit_extensions/NvFlexImplFruitExt.h"
@@ -142,3 +143,5 @@ private:
 
 #include "../scenes/SceneCell.h"
 #include "../scenes/cell.h"
+
+#endif // SERIALIZER_H
