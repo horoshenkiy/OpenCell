@@ -51,11 +51,11 @@ void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int ph
 
 void Shell::Initialize() {
 	Factory::FactoryMesh factoryMesh;
-	Mesh *mesh = factoryMesh.CreateSphere(1.2, 5);
+	Mesh *mesh = factoryMesh.CreateSphere(0.55, 5);
 
 	//Mesh* mesh = CreateSphere(30, 30);//
 	//Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
-	Vec3 lower = Vec3(2.0f + 0 * 2.0f, 0.4f + 0 * 1.2f, 1.0f);
+	Vec3 lower = Vec3(2.5f + 0 * 2.0f, 0.8f + 0 * 1.2f, 1.5f);
 
 	//mesh->Normalize();
 	mesh->Transform(TranslationMatrix(Point3(lower)));

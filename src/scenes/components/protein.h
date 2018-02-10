@@ -1,5 +1,7 @@
 #pragma once
+
 #include "component.h"
+#include "../../controller/compute_controller/FlexParams.h"
 
 enum ProteinType
 {
@@ -9,7 +11,7 @@ enum ProteinType
 
 struct Protein
 {
-	Protein(Vec3 begin_, Vec3 direction_, Quat rotation_)
+	Protein(Vec3 begin_, Vec3 direction_, Quat rotation_, Vec3 streamDirection_)
 	{
 		length = 1;
 		begin_type = Actin;
@@ -18,6 +20,7 @@ struct Protein
 		begin = begin_;
 		direction = direction_;
 		rotation = rotation_;
+		streamDirection = streamDirection_;
 
 		forward_protein = nullptr;
 		angle_protein = nullptr;
@@ -25,9 +28,14 @@ struct Protein
 	
 	Shape makeShape()
 	{
-		auto half_len = halfSectionLength*length;
+		FlexParams &flexParams = FlexParams::Get();
+
+		Vec3 x_ax = Vec3(1.0, 0.0, 0.0);
+		Vec3 y_ax = Vec3(0.0, 1.0, 0.0);
+
+		auto half_len = flexParams.sectionLength*0.5f*length;
 		auto center = begin + Normalize(direction)*half_len;
-		auto dirShape = AddCapsule(radius, half_len, center, QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), -M_PI / 4) * rotation); //angle M_PI/4 is not constant - nedeed to calculate angle btw your direction vector and (1,0,0);
+		auto dirShape = AddCapsule(flexParams.sectionRadius, half_len, center, QuatFromAxisAngle(y_ax, -angleBtwVectors(streamDirection, x_ax)) * rotation); 
 		return dirShape;
 	}
 
@@ -38,13 +46,13 @@ struct Protein
 
 	Vec3 begin;
 	Vec3 direction;
+	
+	Vec3 streamDirection; // this parameter needs to compute angle btw old stream direciton and own current direction of branch
+
 	Quat rotation;
 
 	Protein* forward_protein;
 	Protein* angle_protein;
 
-	int length;
-	float halfSectionLength = 0.002f; // variable parameter
-	float radius = 0.005f;
-	
+	int length;	
 };

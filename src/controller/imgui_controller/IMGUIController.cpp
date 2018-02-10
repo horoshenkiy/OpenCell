@@ -90,13 +90,6 @@ void IMGUIController::DoMenu() {
 			g_pause = !g_pause;
 
 		imguiSeparatorLine();
-		imguiLabel("Actin Tree Parameters");
-		imguiSlider("Branch Probability", &flexParams->p_sow, 0.0f, 1.0f, 0.01f);
-		imguiSlider("Grow Probability", &flexParams->p_grow, 0.0f, 1.0f, 0.01f);
-		imguiSlider("Break Probability", &flexParams->p_break, 0.0f, 1.0f, 0.01f);
-		imguiSlider("ARP Probality", &flexParams->p_ARP, 0.0f, 1.0f, 0.0001f);
-
-		imguiSeparatorLine();
 
 		if (imguiCheck("Wireframe", renderParam->wireframe))
 			renderParam->wireframe = !renderParam->wireframe;
@@ -124,6 +117,20 @@ void IMGUIController::DoMenu() {
 
 		if (imguiCheck("Draw Contacts", renderParam->drawContacts))
 			renderParam->drawContacts = !renderParam->drawContacts;
+
+		imguiSeparatorLine();
+
+		imguiLabel("Actin Tree Parameters");
+		imguiSlider("Branch Probability", &flexParams->p_sow, 0.0f, 1.0f, 0.01f);
+		imguiSlider("Grow Probability", &flexParams->p_grow, 0.0f, 1.0f, 0.01f);
+		imguiSlider("Break Probability", &flexParams->p_break, 0.0f, 1.0f, 0.01f);
+		imguiSlider("ARP Probality", &flexParams->p_ARP, 0.0f, 0.003f, 0.0001f);
+
+		imguiSeparatorLine();
+
+		imguiSlider("Section Length", &flexParams->sectionLength, 0.001f, 0.01f, 0.001f);
+		imguiSlider("Section Radius", &flexParams->sectionRadius, 0.001f, 0.01f, 0.001f);
+		imguiSlider("Direction Angle", &flexParams->directionAngle, 0.0f, -M_PI, M_PI*0.0027f); // M_PI*0.0027 - it is 1 degree
 
 		imguiSeparatorLine();
 
