@@ -6,6 +6,7 @@
 #include "components\Cytoskeleton.h"
 #include "components\cytoskeleton2.h"
 #include "components\Receptors.h"
+#include "components\Ligands.h"
 
 #include "BiologyObject.h"
 
@@ -21,6 +22,7 @@ public:
 	std::unique_ptr<Shell> shell;
 	std::unique_ptr<Cytoskeleton> cytoskeleton;
 	Cytoskeleton2* cytoskeleton2;
+	LigandGroup* ligandGroup;
 	//Receptors*	receptors;
 
 	// constructors and initialize

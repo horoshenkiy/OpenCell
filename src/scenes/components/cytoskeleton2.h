@@ -37,7 +37,7 @@ public:
 
 			float MinDist = FindMinDistToSetWithAngle(kerPos, streamDirection, phi / 2, buffers->positions, indBeginPositionShell, indEndPositionShell);
 			float largerRadius = MinDist;
-			float smallerRadius = kernel->getRadius() + 0.05f;
+			float smallerRadius = kernel->getRadius() + 0.06f;
 
 			float ksi = (rand() / (float)RAND_MAX *phi) - phi / 2;
 			float teta = (rand() / (float)RAND_MAX *phi) - phi / 2;
@@ -162,16 +162,18 @@ public:
 	void clearShapes()
 	{
 		shapes.clear();
-		buffers->shapeGeometry.resize(0);
-		buffers->shapePositions.resize(0);
-		buffers->shapeRotations.resize(0);
-		buffers->shapePrevPositions.resize(0);
-		buffers->shapePrevRotations.resize(0);
-		buffers->shapeFlags.resize(0);
+		buffers->shapeGeometry.resize(prevSize[0]);
+		buffers->shapePositions.resize(prevSize[1]);
+		buffers->shapeRotations.resize(prevSize[2]);
+		buffers->shapePrevPositions.resize(prevSize[3]);
+		buffers->shapePrevRotations.resize(prevSize[4]);
+		buffers->shapeFlags.resize(prevSize[5]);
 	}
 
 	void pushShapesInBuffer()
 	{
+		checkPrevSize();
+
 		for (int i = 0; i < shapes.size(); i++)
 		{
 			buffers->shapeGeometry.push_back(shapes[i].geometry);
@@ -194,8 +196,20 @@ public:
 		buffers = buffers_;
 		kernel = kernel_;
 		shell = shell_;
+
+		prevSize.resize(6);
+		checkPrevSize();
 	}
 
+	void checkPrevSize()
+	{
+		prevSize[0] = buffers->shapeGeometry.size();
+		prevSize[1] = buffers->shapePositions.size();
+		prevSize[2] = buffers->shapeRotations.size();
+		prevSize[3] = buffers->shapePrevPositions.size();
+		prevSize[4] = buffers->shapePrevRotations.size();
+		prevSize[5] = buffers->shapeFlags.size();
+	}
 
 	void Update()
 	{
@@ -221,6 +235,8 @@ private:
 
 	std::vector<Protein*> tree;
 	std::vector<Shape> shapes;
+
+	std::vector<int> prevSize;
 
 	float phi = M_PI/4;
 	float branchin_angle  = 1.256f;

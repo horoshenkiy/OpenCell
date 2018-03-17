@@ -67,9 +67,9 @@ void Cell::PostInitialize() {
 	float radius = 0.1f;
 
 	buffers.numExtraParticles = 20000;
-	flexParams.numSubsteps = 10;
+	flexParams.numSubsteps = 7;
 
-	flexParams.params.solidRestDistance = 0.100f;
+	flexParams.params.solidRestDistance = 0.1;
 
 	flexParams.params.radius = radius;
 	flexParams.params.dynamicFriction = 0.125f;
@@ -112,6 +112,8 @@ void Cell::Update() {
 
 	// need to refactoring
 	static int j = 0;
+	
+	static auto ligandGroup = new LigandGroup(&buffers, kernel.get());
 
 	cytoplasm->Update();
 	shell->Update();
@@ -124,7 +126,7 @@ void Cell::Update() {
 
 	if (j == 400) {
 		j++;
-
+	//	ligandGroup->find();
 		std::clog << "Cytoskeleton create" << std::endl;
 		cytoskeleton2 = new Cytoskeleton2(&buffers, kernel.get(), shell.get());
 		return;
@@ -136,8 +138,6 @@ void Cell::Update() {
 void Cell::Sync()
 {
 	//std::unique_ptr<Fruit> fruit(new FruitNvFlex());
-
-
 }
 
 void Cell::Draw() {
