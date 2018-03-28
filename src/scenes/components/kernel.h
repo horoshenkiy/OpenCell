@@ -41,8 +41,6 @@ private:
 	
 	friend bool operator==(const Kernel &lKernel, const Kernel &rKernel);
 
-	//int group = -1;
-
 	//fields of center
 	int indexCenter = -1;
 

@@ -1,6 +1,6 @@
 #include "cytoplasm.h"
 
-#include <flex/core/platform.h>
+#include "../../../core/platform.h"
 
 #include "../../controller/compute_controller/FlexParams.h"
 

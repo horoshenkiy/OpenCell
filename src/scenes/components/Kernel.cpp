@@ -1,6 +1,6 @@
 #include "kernel.h"
 
-#include <flex/core/platform.h>
+#include "../../../core/platform.h"
 
 void Kernel::Initialize() {
 

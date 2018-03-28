@@ -159,12 +159,12 @@ void Cytoskeleton2::tryToBreak() {
 void Cytoskeleton2::clearShapes()
 {
 	shapes.clear();
-	buffers.shapeGeometry.resize(prevSize[0]);
-	buffers.shapePositions.resize(prevSize[1]);
-	buffers.shapeRotations.resize(prevSize[2]);
-	buffers.shapePrevPositions.resize(prevSize[3]);
-	buffers.shapePrevRotations.resize(prevSize[4]);
-	buffers.shapeFlags.resize(prevSize[5]);
+	buffers.shapeGeometry.resize(prevSize);
+	buffers.shapePositions.resize(prevSize);
+	buffers.shapeRotations.resize(prevSize);
+	buffers.shapePrevPositions.resize(prevSize);
+	buffers.shapePrevRotations.resize(prevSize);
+	buffers.shapeFlags.resize(prevSize);
 }
 
 void Cytoskeleton2::pushShapesInBuffer()
@@ -193,16 +193,10 @@ Cytoskeleton2::Cytoskeleton2(Kernel* kernel_, Shell* shell_)
 	kernel = kernel_;
 	shell = shell_;
 
-	prevSize.resize(6);
 	checkPrevSize();
 }
 
 void Cytoskeleton2::checkPrevSize()
 {
-	prevSize[0] = buffers.shapeGeometry.size();
-	prevSize[1] = buffers.shapePositions.size();
-	prevSize[2] = buffers.shapeRotations.size();
-	prevSize[3] = buffers.shapePrevPositions.size();
-	prevSize[4] = buffers.shapePrevRotations.size();
-	prevSize[5] = buffers.shapeFlags.size();
+	prevSize = buffers.shapeGeometry.size();
 }

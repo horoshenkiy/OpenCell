@@ -28,6 +28,7 @@ public:
 	}
 
 	Vec3 coord;
+	int index;
 	bool isFree;
 };
 
@@ -35,21 +36,14 @@ class LigandGroup
 {
 public:
 
-	float RandomFloat(float a, float b) {
-		float random = ((float)rand()) / (float)RAND_MAX;
-		float diff = b - a;
-		float r = random * diff;
-		return a + r;
-	}
-
 	void Sow()
 	{
 		Vec3 kerPos = kernel->GetPositionCenter();
 		Vec3 tmp;
 		while (ligands.size() < ligandsCount)
 		{
-			tmp.x = RandomFloat(-sowRadius, sowRadius);
-			tmp.z = RandomFloat(-sowRadius, sowRadius);
+			tmp.x = Randf(-sowRadius, sowRadius);
+			tmp.z = Randf(-sowRadius, sowRadius);
 			tmp.y = 0;
 
 			if (tmp.x*tmp.x + tmp.z*tmp.z < sowRadius)
@@ -62,50 +56,58 @@ public:
 		}
 	}
 
-	void find()
-	{
-		bgi::rtree< value, bgi::quadratic<16> > rtree;
-
-		// create some values
-		for (unsigned i = 0; i < ligands.size(); ++i)
-		{
-			point p = point(ligands[i]->coord.x, ligands[i]->coord.y, ligands[i]->coord.z);
-			rtree.insert(std::make_pair(p, i));
-		}
-
-		// search for nearest neighbours
-		std::vector<value> returned_values;
-		Vec3 kerPos = kernel->GetPositionCenter();
-		point sought = point(kerPos.x, kerPos.y, kerPos.z);
-
-		rtree.query(bgi::satisfies([&](value const& v) {return bg::distance(v.first, sought) < searchRadius; }),
-			std::back_inserter(returned_values));
-
-		// print returned values
-		value to_print_out;
-		for (size_t i = 0; i < returned_values.size(); i++) {
-			to_print_out = returned_values[i];
-			float x = to_print_out.first.get<0>();
-			float y = to_print_out.first.get<1>();
-			float z = to_print_out.first.get<2>();
-			std::cout << "Select point: " << to_print_out.second << std::endl;
-			std::cout << "x: " << x << ", y: " << y << ", z: " << z << std::endl;
-		}
-	}
-
 	void pushSpheresInBuffer()
 	{
 		Quat q = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), 0);
 
-		for (int i = 0; i < ligands.size(); i++)
-			AddSphere(buffers, 0.03f, ligands[i]->coord, q);
+			// add particles to system
+		indBeginPosition = buffers->positions.size();
+		for (auto it = ligands.begin(); it!= ligands.end(); it++)
+		{
+			const Vec3 p = (*it)->coord;
+			float invMass = 0.0001f;
+
+			buffers->positions.push_back(Vec4(p.x, p.y, p.z, invMass));
+			buffers->velocities.push_back(Vec3(0.0f));
+			buffers->phases.push_back(0);
+			buffers->restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+
+			buffers->numParticles++;
+			buffers->maxParticles++;
+			buffers->activeIndices.push_back(buffers->positions.size() - 1);
+
+			(*it)->index = buffers->positions.size() - 1;
+		}
+
+		indEndPosition = buffers->positions.size();
 	}
 
 	LigandGroup(SimBuffers *buffers_, Kernel* kernel_)
 	{
 		kernel = kernel_;
 		buffers = buffers_;
+
 		Sow();
+		pushSpheresInBuffer();
+	}
+
+	void lock_ligand(int index)
+	{
+		ligands[index]->isFree = false;
+	}
+
+	void open_ligand(int index)
+	{
+		ligands[index]->isFree = true;
+	}
+
+	std::vector<Ligand*> get_ligands()
+	{
+		return ligands;
+	}
+
+	void Update()
+	{
 		pushSpheresInBuffer();
 	}
 
@@ -113,7 +115,11 @@ private:
 
 	int ligandsCount = 100;
 	int sowRadius = 10;
-	int searchRadius = 5;
+
+	int indBeginPosition;
+	int indEndPosition;
+
+	int baseIndex;
 
 	std::vector<Ligand*> ligands;
 

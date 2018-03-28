@@ -3,9 +3,9 @@
 #include "components\cytoplasm.h"
 #include "components\kernel.h"
 #include "components\shell.h"
-#include "components\Cytoskeleton.h"
 #include "components\Receptors.h"
 #include "components\Ligands.h"
+#include "components\Receptors.h"
 
 #include "BiologyObject.h"
 
@@ -21,10 +21,9 @@ public:
 	std::unique_ptr<Cytoplasm> cytoplasm;
 	std::unique_ptr<Kernel>	kernel;
 	std::unique_ptr<Shell> shell;
-	std::unique_ptr<Cytoskeleton> cytoskeleton;
 	Cytoskeleton2* cytoskeleton2;
 	LigandGroup* ligandGroup;
-	//Receptors*	receptors;
+	Receptors*	receptors;
 
 	// constructors and initialize
 	Cell() : BiologyObject() {}
@@ -34,9 +33,6 @@ public:
 	virtual void InitializeFromFile() override;
 
 	virtual void PostInitialize() override;
-
-	// destructors (need add delete)
-	~Cell() = default;
 
 	void clearBuffers();
 
@@ -80,4 +76,5 @@ private:
 };
 
 #include "../utilits/Serializer.h"
+
 #include "components\cytoskeleton2.h"
