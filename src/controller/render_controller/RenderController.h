@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../external/SDL2-2.0.4/include/SDL.h"
-#include "../../../core/maths.h"
+#include <SDL.h>
+#include <flex/core/maths.h>
 
 #include "RenderParam.h"
 #include "RenderBuffer.h"

@@ -1,6 +1,6 @@
 #include "shell.h"
 
-#include "core/platform.h"
+#include <flex/core/platform.h>
 
 #include "../../utilits/PrimitiveFactories.h"
 

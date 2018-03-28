@@ -1,6 +1,6 @@
 #include "Video.h"
 
-#include "../core/tga.h"
+#include <flex/core/tga.h>
 
 bool Video::GetCapture() {
 	return capture;

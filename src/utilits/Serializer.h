@@ -1,7 +1,7 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
-#include "core/maths.h"
+#include <flex/core/maths.h>
 #include "fruit_extensions/NvFlexImplFruitExt.h"
 
 #include "../scenes/components/kernel.h"

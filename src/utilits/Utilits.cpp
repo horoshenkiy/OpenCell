@@ -1,9 +1,9 @@
-#include "core/mesh.h"
-#include "core/voxelize.h"
-#include "core/sdf.h"
-#include "core/pfm.h"
-#include "core/platform.h"
-#include "core/convex.h"
+#include <flex/core/mesh.h>
+#include <flex/core/voxelize.h>
+#include <flex/core/sdf.h>
+#include <flex/core/pfm.h>
+#include <flex/core/platform.h>
+#include <flex/core/convex.h>
 
 #include "../shaders.h"
 #include "Utilits.h"

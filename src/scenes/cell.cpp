@@ -128,7 +128,7 @@ void Cell::Update() {
 		j++;
 	//	ligandGroup->find();
 		std::clog << "Cytoskeleton create" << std::endl;
-		cytoskeleton2 = new Cytoskeleton2(&buffers, kernel.get(), shell.get());
+		cytoskeleton2 = new Cytoskeleton2(kernel.get(), shell.get());
 		return;
 	}
 

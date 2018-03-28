@@ -1,8 +1,8 @@
 ﻿#ifndef PRIMITIVE_FACTORY_H
 #define PRIMITIVE_FACTORY_H
 
-#include <core/maths.h>
-#include "core/mesh.h"
+#include <flex/core/maths.h>
+#include <flex/core/mesh.h>
 
 #include <vector>
 

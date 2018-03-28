@@ -27,10 +27,10 @@
 
 #include "shader.h"
 
-#include "../../core/types.h"
-#include "../../core/maths.h"
-#include "../../core/platform.h"
-#include "../../core/tga.h"
+#include <flex/core/types.h>
+#include <flex/core/maths.h>
+#include <flex/core/platform.h>
+#include <flex/core/tga.h>
 
 #include <stdarg.h>
 #include <stdio.h>

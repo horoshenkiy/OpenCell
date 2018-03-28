@@ -27,12 +27,12 @@
 
 #include "../shaders.h"
 
-#include "../../core/mesh.h"
-#include "../../core/tga.h"	
-#include "../../core/platform.h"
-#include "../../core/extrude.h"
+#include <flex/core/mesh.h>
+#include <flex/core/tga.h>	
+#include <flex/core/platform.h>
+#include <flex/core/extrude.h>
 
-#include "../../external/SDL2-2.0.4/include/SDL.h"
+#include <SDL.h>
 
 #include "imguiRenderGL.h"
 #include "shader.h"

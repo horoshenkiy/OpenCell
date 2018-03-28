@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/maths.h"
-#include "core/mesh.h"
-#include "cereal/types/vector.hpp"
+#include <flex/core/maths.h>
+#include <flex/core/mesh.h>
+#include <cereal/types/vector.hpp>
 
-#include "NvFlexExt.h"
+#include <flex/NvFlexExt.h>
 
 template<class Archive>
 void serialize(Archive &archive, Vec2 &vec2) {

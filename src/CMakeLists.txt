@@ -1,8 +1,5 @@
-link_directories("../lib/win64")
-link_directories("../external/SDL2-2.0.4/lib/x64")
-link_directories("../external/glew/lib/x64")
-
-file(GLOB CORE "../core/*.h" "../core/*.cpp")
+file(GLOB CORE "../external/flex-1.1.0/core/include/flex/core/*.h" 
+			   "../external/flex-1.1.0/core/src/*.cpp")
 
 file(GLOB SRC "./*.cpp" "./*.h")
 
@@ -43,16 +40,13 @@ add_executable(OpenCell main.cpp
 									
 target_link_libraries(OpenCell optimized NvFlexReleaseCUDA_x64)
 target_link_libraries(OpenCell optimized NvFlexDeviceRelease_x64)
-target_link_libraries(OpenCell optimized NvFlexExtReleaseCUDA_x64)
+target_link_libraries(OpenCell optimized NvFlexExtReleaseCUDA_x64.lib)
 	
 target_link_libraries(OpenCell debug NvFlexDebugCUDA_x64)
 target_link_libraries(OpenCell debug NvFlexDeviceDebug_x64)
 target_link_libraries(OpenCell debug NvFlexExtDebugCUDA_x64)
 
-
-target_link_libraries(OpenCell SDL2)
-target_link_libraries(OpenCell SDL2main)
-target_link_libraries(OpenCell glew32)
+target_link_libraries(OpenCell SDL2 SDL2main glew32)
 
 source_group(core FILES ${CORE}) 
 

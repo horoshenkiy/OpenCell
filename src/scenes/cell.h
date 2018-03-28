@@ -4,13 +4,14 @@
 #include "components\kernel.h"
 #include "components\shell.h"
 #include "components\Cytoskeleton.h"
-#include "components\cytoskeleton2.h"
 #include "components\Receptors.h"
 #include "components\Ligands.h"
 
 #include "BiologyObject.h"
 
 class Serializer;
+
+class Cytoskeleton2;
 
 class Cell : public BiologyObject {
 
@@ -79,3 +80,4 @@ private:
 };
 
 #include "../utilits/Serializer.h"
+#include "components\cytoskeleton2.h"

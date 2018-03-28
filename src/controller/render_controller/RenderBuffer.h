@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/mesh.h"
+#include <flex/core/mesh.h>
 
 #include <vector>
 #include <map>

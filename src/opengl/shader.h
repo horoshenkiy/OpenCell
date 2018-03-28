@@ -27,14 +27,14 @@
 
 #pragma once
 
-#include "../../core/maths.h"
+#include <flex/core/maths.h>
 
 #if _WIN32
 
 #define ENABLE_SIMPLE_FLUID 0
 
-#include "../../external/glew/include/gl/glew.h"
-#include "../../external/SDL2-2.0.4/include/SDL.h"
+#include <gl/glew.h>
+#include <SDL.h>
 
 #pragma comment (lib, "glu32.lib")    /* link OpenGL Utility lib     */
 #pragma comment (lib, "opengl32.lib") /* link Microsoft OpenGL lib   */

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../core/cloth.h"
+#include <flex/core/cloth.h>
 
 class Camera {
 

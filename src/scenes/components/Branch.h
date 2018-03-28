@@ -1,7 +1,7 @@
 #pragma once
 
 #include "component.h"
-#include "../../../core/maths.h"
+#include <flex/core/maths.h>
 #include <random>
 
 class Cytoskeleton;

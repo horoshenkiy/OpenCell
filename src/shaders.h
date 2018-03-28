@@ -5,8 +5,8 @@
 
 #define STRINGIFY(A) #A
 
-#include "core/maths.h"
-#include "core/mesh.h"
+#include <flex/core/maths.h>
+#include <flex/core/mesh.h>
 
 #include "controller/render_controller/Shadows.h"
 

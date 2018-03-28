@@ -1,15 +1,15 @@
-#include <core/types.h>
-#include "core/maths.h"
-#include "core/platform.h"
-#include "core/mesh.h"
-#include "core/tga.h"
-#include "core/cloth.h"
+#include <flex/core/types.h>
+#include <flex/core/maths.h>
+#include <flex/core/platform.h>
+#include <flex/core/mesh.h>
+#include <flex/core/tga.h>
+#include <flex/core/cloth.h>
 
-#include "external/SDL2-2.0.4/include/SDL.h"
+#include <SDL.h>
 
 #include "fruit_core/platform.h"
 
-#include "NvFlex.h"
+#include <flex/NvFlex.h>
 
 #include <iomanip>
 #include <map>

@@ -1,10 +1,10 @@
 #pragma once 
 
-#include "../core/cloth.h"
-#include "../core/mesh.h"
+#include <flex/core/cloth.h>
+#include <flex/core/mesh.h>
 
-#include "../include/NvFlex.h"
-#include "../include/Fruit.h"
+#include <flex/NvFlex.h>
+#include <Fruit.h>
 #include <stdarg.h>
 
 struct SimBuffers;

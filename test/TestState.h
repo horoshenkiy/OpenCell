@@ -1,6 +1,13 @@
 #pragma once
 
-#include <controller/compute_controller/FlexController.h>
+#include <gtest\gtest.h>
+
+TEST(SimpleCase, SimpleTest)
+{
+	printf("Simple test\n");
+}
+
+/*#include <controller/compute_controller/FlexController.h>
 #include <controller/render_controller/RenderParam.h>
 #include <controller/render_controller/RenderController.h>
 #include <controller/render_controller/RenderBuffer.h>
@@ -801,4 +808,5 @@ bool operator==(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRende
 
 bool operator!=(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRenderBuffers) {
 	return !(lRenderBuffers == rRenderBuffers);
-}
+}*/
+
