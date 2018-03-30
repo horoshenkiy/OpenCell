@@ -10,22 +10,21 @@ HunterGate(
 
 project(OpenCell LANGUAGES CXX CUDA)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 #########################################################################
-# Flex project
+# Flex project (DLL)
 #########################################################################
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../../../bin/")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+
 add_subdirectory(external/flex-1.1.0/extension)
+add_subdirectory(external/flex-1.1.0/core)
 
 #########################################################################
-# main project
+# fruit project (Static lib)
 #########################################################################
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../bin/")
-
-# add include directories 
-include_directories(include)
-include_directories(.)
 
 include_directories(external/cereal/include)	
 include_directories(external/cxxopts-1.4.3/include)
@@ -41,6 +40,8 @@ link_directories(external/flex-1.1.0/lib/win64)
 link_directories(external/SDL2-2.0.4/lib/x64)
 link_directories(external/glew/lib/x64)
 
+link_directories(${CMAKE_BINARY_DIR}/lib/Release ${CMAKE_BINARY_DIR}/lib/Debug)
+
 # add boost
 hunter_add_package(Boost)
 find_package(Boost)
@@ -51,11 +52,15 @@ if(Boost_FOUND)
 endif()
 
 # add source
+add_subdirectory(external/fruit-0.0.1)
+
+#########################################################################
+# open_cell project
+#########################################################################
+
+include_directories(external/fruit-0.0.1/include)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/)
+
 add_subdirectory(src)
-
-#########################################################################
-# test 
-#########################################################################
-
-include_directories(src)
 add_subdirectory(test)

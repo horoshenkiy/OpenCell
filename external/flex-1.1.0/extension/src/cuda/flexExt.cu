@@ -35,7 +35,7 @@
 #include "flex/core/core.h"
 #include "flex/core/maths.h"
 
-#include "flex/NvFlex.h"
+#include <flex/NvFlex.h>
 #include <flex/NvFlexExt.h>
 
 #define CudaCheck(x) { cudaError_t err = x; if (err != cudaSuccess) { printf("Cuda error: %d in %s at %s:%d\n", err, #x, __FILE__, __LINE__); assert(0); } }

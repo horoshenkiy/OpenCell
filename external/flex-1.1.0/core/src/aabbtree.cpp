@@ -36,7 +36,7 @@
 using namespace std;
 
 #if _WIN32
-_declspec (thread) uint32_t AABBTree::s_traceDepth;
+	_declspec (thread) uint32_t AABBTree::s_traceDepth;
 #endif
 
 AABBTree::AABBTree(const Vec3* vertices, uint32_t numVerts, const uint32_t* indices, uint32_t numFaces) 

@@ -1,14 +1,3 @@
-set(SOURCE_CORE
-	../../core/src/aabbtree.cpp
-	../../core/src/maths.cpp
-	../../core/src/sdf.cpp
-	../../core/src/voxelize.cpp
-)
-
-set(SOURCE_EXT_CUDA
-	cuda/flexExt.cu
-)
-
 set(SOURCE_EXT
 	flexExtCloth.cpp
 	flexExtContainer.cpp
@@ -19,8 +8,8 @@ set(SOURCE_EXT
 )
 
 add_library(NvFlexExtCUDA SHARED ${SOURCE_EXT} ${SOURCE_EXT_CUDA} ${SOURCE_CORE})
-target_link_libraries(NvFlexExtCUDA optimized NvFlexReleaseCUDA_x64)
-target_link_libraries(NvFlexExtCUDA debug NvFlexDebugCUDA_x64)
+target_link_libraries(NvFlexExtCUDA optimized NvFlexReleaseCUDA_x64 optimized NvFlexCoreRelease_x64)
+target_link_libraries(NvFlexExtCUDA debug NvFlexDebugCUDA_x64 debug NvFlexCoreDebug_x64)
 
 set_target_properties(NvFlexExtCUDA PROPERTIES OUTPUT_NAME_DEBUG NvFlexExtDebugCUDA_x64)
 set_target_properties(NvFlexExtCUDA PROPERTIES OUTPUT_NAME_RELEASE NvFlexExtReleaseCUDA_x64)
