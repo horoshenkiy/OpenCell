@@ -4,17 +4,19 @@
 #include <flex/core/cloth.h>
 #include <flex/core/mesh.h>
 #include <flex/NvFlex.h>
+#include <stdarg.h>
 
 #include <fruit/fruit.h>
-#include <stdarg.h>
-#include "primitive.h"
+#include <fruit/controller/compute_controller/sim_buffers.h>
+#include <fruit/primitives/primitive.h>
+#include <fruit/controller/render_controller/render_buffer.h>
 
-using namespace FruitWork::Primitive;
+namespace FruitWork {
+namespace Utilits {
 
-class SimBuffers;
-class RenderBuffers;
-
-class SceneCell;
+using namespace Primitives;
+using namespace Compute;
+using namespace Render;
 
 ///////////////////////////////////////////////////////////
 // simple helper functions
@@ -125,8 +127,6 @@ struct Seed
 //////////////////////////////////////////////////////////////
 // functions for create
 ////////////////////////////////////////////////////////
-
-// TODO: Add namespace
 
 // create rigid capsule
 
@@ -268,6 +268,9 @@ void AddSDF(SimBuffers *buffers, NvFlexDistanceFieldId sdf, Vec3 translation, Qu
 Shape AddCapsule(float radius, float halfHeight, Vec3 position, Quat rotation);
 
 Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, Quat rotation);
+
+}
+}
 
 #endif // UTILITS_H
 

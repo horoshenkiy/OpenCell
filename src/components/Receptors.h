@@ -43,7 +43,7 @@ class Receptors {
 
 public:
 
-	Receptors(SimBuffers* buffers_, Shell* shell_, LigandGroup* ligands_group_)
+	Receptors(Compute::SimBuffers* buffers_, Shell* shell_, LigandGroup* ligands_group_)
 	{
 		buffers = buffers_;
 		shell = shell_;
@@ -223,6 +223,6 @@ private:
 	float breakRadius = 1.2f;
 	float stiffness = 1.0f;
 
-	SimBuffers* buffers;
+	Compute::SimBuffers* buffers;
 	Shell* shell;
 };

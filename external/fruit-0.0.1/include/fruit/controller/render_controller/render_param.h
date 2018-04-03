@@ -3,6 +3,9 @@
 
 #include "render_gl/shader.h"
 
+namespace FruitWork {
+namespace Render {
+
 struct RenderParam {
 
 	static RenderParam& Instance() {
@@ -86,5 +89,8 @@ private:
 	RenderParam(const RenderParam &other) = delete;
 	RenderParam operator=(const RenderParam &other) = delete;
 };
+
+}
+}
 
 #endif // RENDER_PARAM_H

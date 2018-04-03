@@ -7,6 +7,8 @@
 
 #include <flex/NvFlexExt.h>
 
+namespace FruitWork {
+
 template<class Archive>
 void serialize(Archive &archive, Vec2 &vec2) {
 	archive(vec2.x, vec2.y);
@@ -150,6 +152,8 @@ void serialize(Archive &archive, Mesh &mesh) {
 	archive(mesh.m_texcoords);
 	archive(mesh.m_indices);
 	archive(mesh.m_colours);
+}
+
 }
 
 #endif // SERIALIZE_TYPES_H

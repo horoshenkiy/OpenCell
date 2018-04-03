@@ -6,6 +6,9 @@
 #include <flex/NvFlexDevice.h>
 #include <application.h>
 
+namespace FruitWork {
+namespace Compute {
+
 void ErrorCallback(NvFlexErrorSeverity, const char* msg, const char* file, int line) {
 	printf("Flex: %s - %s:%d\n", msg, file, line);
 }
@@ -28,7 +31,7 @@ FlexController::FlexController() {
 
 	NvFlexInitDesc desc;
 	desc.deviceIndex = device;
-	desc.enableExtensions = FruitWork::AppParams::g_extensions;
+	desc.enableExtensions = AppParams::g_extensions;
 	desc.renderDevice = 0;
 	desc.renderContext = 0;
 	desc.computeType = eNvFlexCUDA;
@@ -45,4 +48,7 @@ FlexController::FlexController() {
 
 	// store device name
 	strcpy(deviceName, NvFlexGetDeviceName(lib));
+}
+
+}
 }

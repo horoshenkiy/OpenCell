@@ -1,6 +1,8 @@
 #include <controller/compute_controller/sim_buffers.h>
+#include "utilits/utilits.h"
 
-#include "fruit_extensions/NvFlexImplFruit.h"
+namespace FruitWork {
+namespace Compute {
 
 bool SimBuffers::isInitialize = false;
 
@@ -312,7 +314,7 @@ void SimBuffers::BuildConstraints() {
 
 		// calculate local rest space positions
 		rigidLocalPositions.resize(rigidOffsets.back());
-		CalculateRigidLocalPositions(&positions.get(0), positions.size(), &rigidOffsets[0], &rigidIndices[0], numRigids, &rigidLocalPositions[0]);
+		Utilits::CalculateRigidLocalPositions(&positions.get(0), positions.size(), &rigidOffsets[0], &rigidIndices[0], numRigids, &rigidLocalPositions[0]);
 
 		rigidRotations.resize(rigidOffsets.size() - 1, Quat());
 		rigidTranslations.resize(rigidOffsets.size() - 1, Vec3());
@@ -340,3 +342,5 @@ void SimBuffers::EndLogging() {
 	printf("End logging...\n");
 }
 
+}
+}

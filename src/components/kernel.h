@@ -2,7 +2,8 @@
 
 #include "component.h"
 
-class Serializer;
+using namespace FruitWork;
+namespace FruitWork { class Serializer; }
 
 class Kernel : public Component {
 public:

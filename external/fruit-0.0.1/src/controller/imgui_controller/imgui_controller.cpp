@@ -4,11 +4,13 @@
 
 #include <application.h>
 
-using namespace FruitWork;
+namespace FruitWork {
+namespace IMGUI {
 
 // do statistic and menu 
 //////////////////////////////////////////////
 void IMGUIController::DoStatistic(int numParticles, int numDiffuse) {
+	Utilits::Timer& timer = Utilits::Timer::Get();
 
 	x += 180;
 	fontHeight = 13;
@@ -16,20 +18,16 @@ void IMGUIController::DoStatistic(int numParticles, int numDiffuse) {
 	imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Frame: %d", AppParams::g_frame);
 	y -= fontHeight * 2;
 
-	if (!Application::video.GetFFMpeg())
-	{
-		imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Frame Time: %.2fms", Application::timer.realdt*1000.0f); y -= fontHeight * 2;
+	imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Frame Time: %.2fms", timer.realdt*1000.0f); y -= fontHeight * 2;
 
-		// If detailed profiling is enabled, then these timers will contain the overhead of the detail timers, so we won't display them.
-		if (!flexParams->profile)
-		{
-			imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Sim Time (CPU): %.2fms", Application::timer.updateTime*1000.0f); y -= fontHeight;
-			imguiDrawString(x, y, 0.97f, 0.59f, 0.27f, IMGUI_ALIGN_RIGHT, "Sim Latency (GPU): %.2fms", Application::timer.simLatency); y -= fontHeight * 2;
-		}
-		else
-		{
-			y -= fontHeight * 3;
-		}
+	// If detailed profiling is enabled, then these timers will contain the overhead of the detail timers, so we won't display them.
+	if (!flexParams->profile) {
+		imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Sim Time (CPU): %.2fms", timer.updateTime*1000.0f); y -= fontHeight;
+		imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Wait Time (CPU): %.2fms", timer.waitTime*1000.0f); y -= fontHeight;
+		imguiDrawString(x, y, 0.97f, 0.59f, 0.27f, IMGUI_ALIGN_RIGHT, "Sim Latency (GPU): %.2fms", timer.simLatency); y -= fontHeight;
+		imguiDrawString(x, y, 0.97f, 0.59f, 0.27f, IMGUI_ALIGN_RIGHT, "Render time: %.2fms", timer.renderTime); y -= fontHeight * 2;
+	} else {
+		y -= fontHeight * 3;
 	}
 
 	imguiDrawString(x, y, 1.0f, 1.0f, 1.0f, IMGUI_ALIGN_RIGHT, "Particle Count: %d", numParticles); y -= fontHeight;
@@ -79,14 +77,14 @@ void IMGUIController::DoMenu() {
 	int uiOffset = 250;
 	int uiBorder = 20;
 	int uiWidth = 200;
-	int uiHeight = renderController->GetHeight() - uiOffset - uiBorder * 3;
+	int uiHeight = renderController->screenHeight - uiOffset - uiBorder * 3;
 	int uiLeft = uiBorder;
 
 	if (tweakPanel)
 	{
 		static int scroll = 0;
 
-		imguiBeginScrollArea("Options", uiLeft, renderController->GetHeight() - uiBorder - uiHeight - uiBorder, uiWidth, uiHeight, &scroll);
+		imguiBeginScrollArea("Options", uiLeft, renderController->screenHeight - uiBorder - uiHeight - uiBorder, uiWidth, uiHeight, &scroll);
 		imguiSeparatorLine();
 
 		// global options
@@ -261,7 +259,7 @@ void IMGUIController::Draw()
 	glPushMatrix();
 	glLoadIdentity();
 
-	const Matrix44 ortho = OrthographicMatrix(0.0f, float(renderController->GetWidth()), 0.0f, float(renderController->GetHeight()), -1.0f, 1.0f);
+	const Matrix44 ortho = OrthographicMatrix(0.0f, float(renderController->screenWidth), 0.0f, float(renderController->screenHeight), -1.0f, 1.0f);
 
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -275,7 +273,7 @@ void IMGUIController::Draw()
 	glDisable(GL_TEXTURE_2D);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-	imguiRenderGLDraw();
+	GL::imguiRenderGLDraw();
 
 	// restore camera transform (for picking)
 	glMatrixMode(GL_MODELVIEW);
@@ -288,17 +286,16 @@ void IMGUIController::Draw()
 // initialize
 /////////////////////////////////////////////////////
 void IMGUIController::Initialize(Scene *scene,
-								 FlexController *flexController, 
-								 FlexParams *flexParams, 
-								 RenderController *renderController, 
-								 RenderParam *renderParam,
-								 SDLController *sdlController) {
+                                 Compute::FlexParams *flexParams,
+                                 Render::RenderController *renderController,
+                                 Render::RenderParam *renderParam,
+                                 Control::SDLController *sdlController) {
 
 	this->scene = scene;
 
-	this->flexController = flexController;
+	this->flexController = &Compute::FlexController::Get();
 	this->flexParams = flexParams;
-	this->buffers = &SimBuffers::Get();
+	this->buffers = &Compute::SimBuffers::Get();
 
 	this->renderController = renderController;
 	this->renderParam = renderParam;
@@ -315,8 +312,8 @@ int IMGUIController::DoUI(int numParticles, int numDiffuse) {
 
 	if (renderParam->showGUI)
 	{
-		x = renderController->GetWidth() - 200;
-		y = renderController->GetHeight() - 23;
+		x = renderController->screenWidth - 200;
+		y = renderController->screenHeight - 23;
 
 		// imgui
 		unsigned char button = 0;
@@ -325,7 +322,7 @@ int IMGUIController::DoUI(int numParticles, int numDiffuse) {
 		else if (sdlController->GetLastB() == SDL_BUTTON_RIGHT)
 			button = IMGUI_MBUT_RIGHT;
 
-		imguiBeginFrame(sdlController->GetLastX(), renderController->GetHeight() - sdlController->GetLastY(), button, 0);
+		imguiBeginFrame(sdlController->GetLastX(), renderController->screenHeight - sdlController->GetLastY(), button, 0);
 
 		DoStatistic(numParticles, numDiffuse);
 		DoMenu();
@@ -337,4 +334,7 @@ int IMGUIController::DoUI(int numParticles, int numDiffuse) {
 	}
 
 	return newScene;
+}
+
+}
 }

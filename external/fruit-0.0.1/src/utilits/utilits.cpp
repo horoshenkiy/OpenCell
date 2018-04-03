@@ -12,6 +12,12 @@
 #include <controller/compute_controller/sim_buffers.h>
 #include <controller/compute_controller/flex_controller.h>
 
+namespace FruitWork {
+namespace Utilits {
+
+using namespace Compute;
+using namespace Render;
+
 /////////////////////////////////////////////////////////////
 // simple helper functions
 ///////////////////////////////////////////////////////////
@@ -100,7 +106,7 @@ NvFlexDistanceFieldId CreateSDF(RenderBuffers *renderBuffers, const char* meshFi
 	NvFlexUpdateDistanceField(flexController.GetLib(), sdf, dim, dim, dim, field.buffer);
 
 	// entry in the collision->render map
-	renderBuffers->fields[sdf] = CreateGpuMesh(mesh);
+	renderBuffers->fields[sdf] = GL::CreateGpuMesh(mesh);
 
 	delete mesh;
 
@@ -862,7 +868,7 @@ NvFlexTriangleMeshId CreateTriangleMesh(Mesh* m, RenderBuffers *renderBuffers) {
 							(float*)&upper);
 
 	// entry in the collision->render map
-	renderBuffers->meshes[flexMesh] = CreateGpuMesh(m);
+	renderBuffers->meshes[flexMesh] = GL::CreateGpuMesh(m);
 
 	return flexMesh;
 }
@@ -1551,4 +1557,7 @@ Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, 
 	shape.prevRotation = rotation;
 
 	return shape;
+}
+
+}
 }

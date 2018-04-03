@@ -2,6 +2,8 @@
 
 #include <flex/NvFlex.h>
 
+namespace FruitWork {
+
 struct FruitLibrary {
 private:
 
@@ -49,3 +51,5 @@ public:
 		return flexBuffer;
 	}
 };
+
+}

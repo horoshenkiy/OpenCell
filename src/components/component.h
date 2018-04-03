@@ -4,16 +4,21 @@
 #include "fruit/controller/compute_controller/sim_buffers.h"
 #include "fruit/controller/render_controller/render_buffer.h"
 
+using namespace FruitWork;
+
 class Component {
 protected:
-	SimBuffers &buffers;
-	RenderBuffers &renderBuffers;
+	Compute::SimBuffers &buffers;
+	Render::RenderBuffers &renderBuffers;
 
 	int group;
 
 public:
 
-	Component() : buffers(SimBuffers::Get()), renderBuffers(RenderBuffers::Get()) {
+	Component() : 
+		buffers(Compute::SimBuffers::Get()), 
+		renderBuffers(Render::RenderBuffers::Get()) 
+	{
 		static int count = 0;
 		group = count++;
 	}

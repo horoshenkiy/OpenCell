@@ -23,6 +23,10 @@
 #include <controller/render_controller/render_gl/shader.h>
 #include <controller/imgui_controller/imgui.h>
 
+namespace FruitWork {
+namespace IMGUI {
+namespace GL {
+
 // Some math headers don't have PI defined.
 static const float PI = 3.14159265f;
 
@@ -480,4 +484,8 @@ void imguiRenderGLDraw()
 		}
 	}
 	glDisable(GL_SCISSOR_TEST);
+}
+
+}
+}
 }

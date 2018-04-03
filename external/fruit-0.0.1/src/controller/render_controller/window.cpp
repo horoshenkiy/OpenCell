@@ -2,6 +2,9 @@
 #include <controller/render_controller/render_controller.h>
 #include <application.h>
 
+namespace FruitWork {
+namespace Render {
+
 void RenderController::InitRender(Camera *camera) {
 
 	// TODO: control for initialize
@@ -11,9 +14,9 @@ void RenderController::InitRender(Camera *camera) {
 	this->renderBuffers = &RenderBuffers::Get();
 	this->renderParam = &RenderParam::Get();
 
-	this->flexController = &FlexController::Get();
-	this->flexParams = &FlexParams::Get();
-	this->buffers = &SimBuffers::Get();
+	this->flexController = &Compute::FlexController::Get();
+	this->flexParams = &Compute::FlexParams::Get();
+	this->buffers = &Compute::SimBuffers::Get();
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -32,37 +35,37 @@ void RenderController::InitRender(Camera *camera) {
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	imguiRenderGLInit("../../data/DroidSans.ttf");
+	IMGUI::GL::imguiRenderGLInit("../../data/DroidSans.ttf");
 	ReshapeWindow();
 }
 
 void RenderController::ReshapeWindow(int width, int height)
 {
-	if (!FruitWork::AppParams::g_benchmark)
+	if (!AppParams::g_benchmark)
 		printf("Reshaping\n");
 
 	ReshapeRender(window);
 
-	if (!fluidRenderer || (width != this->screenWidth || height != this->screenHeight))
+	if (!fluidRenderer || (width != this->screenWidth || height != this->_screenHeight))
 	{
 		if (fluidRenderer)
 			DestroyFluidRenderer(fluidRenderer);
-		fluidRenderer = CreateFluidRenderer(width, height);
+		fluidRenderer = Fluid::CreateFluidRenderer(width, height, renderParam->msaaFbo);
 	}
 
-	screenWidth = width;
-	screenHeight = height;
+	_screenWidth = width;
+	_screenHeight = height;
 }
 
 void RenderController::ReshapeWindow() {
-	if (!FruitWork::AppParams::g_benchmark)
+	if (!AppParams::g_benchmark)
 		printf("Reshaping\n");
 
 	ReshapeRender(window);
 
 	if (fluidRenderer)
 		DestroyFluidRenderer(fluidRenderer);
-	fluidRenderer = CreateFluidRenderer(screenWidth, screenHeight);
+	fluidRenderer = Fluid::CreateFluidRenderer(screenWidth, _screenHeight, renderParam->msaaFbo);
 }
 
 void RenderController::ReshapeRender(SDL_Window* window)
@@ -105,4 +108,7 @@ void RenderController::ReshapeRender(SDL_Window* window)
 
 		glEnable(GL_MULTISAMPLE);
 	}
+}
+
+}
 }

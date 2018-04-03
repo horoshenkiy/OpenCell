@@ -4,12 +4,19 @@
 #include <fruit/controller/render_controller/render_controller.h>
 #include <fstream>
 
-class Video {
+namespace FruitWork {
+namespace Utilits {
 
+class Video {
 public:
 
-	bool GetCapture();
-	void SetCapture(bool capture);
+	/*! Status of enabling the frame record */
+	bool capture = false;
+
+	/*! 
+	 * Get FILE of writing frames
+	 * @return pointer of FILE
+	 */
 
 	FILE* GetFFMpeg() const;
 
@@ -22,8 +29,10 @@ public:
 
 private:
 	
-	bool capture = false;
 	FILE* ffmpeg = nullptr;
 };
+
+}
+}
 
 #endif // VIDEO_H

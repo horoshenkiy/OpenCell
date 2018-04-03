@@ -4,7 +4,8 @@
 #include <flex/NvFlex.h>
 #include <iostream>
 
-class Scene;
+namespace FruitWork {
+namespace Compute {
 
 class FlexParams {
 
@@ -19,14 +20,17 @@ public:
 		return Instance();
 	}
 
-	~FlexParams() = default;
+	// the time delta used for simulation
+	float dt = 1.0f / 120.0f;	
 
+	// neighbors for PBD Fluid
 	unsigned char maxNeighborsPerParticle = 96;
 
 	int numSubsteps = 2;
 
 	bool warmup = false;
 
+	// TODO: remove from this file
 	//actin tree parameters
 	float p_sow = 0.02f;
 	float p_grow = 0.05f;
@@ -58,8 +62,10 @@ private:
 
 	FlexParams(const FlexParams &other) = delete;
 	FlexParams operator=(const FlexParams &other) = delete;
-
 };
+
+}
+}
 
 #endif // FLEX_PARAMS_H
 

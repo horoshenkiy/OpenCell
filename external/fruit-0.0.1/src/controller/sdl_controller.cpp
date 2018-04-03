@@ -1,25 +1,32 @@
-#include <controller/sdl_controller.h>
-#include <utilits/serializer.h>
-#include <application.h>
+#include <fruit/controller/sdl_controller.h>
+#include <fruit/application.h>
+
+namespace FruitWork {
+namespace Control {
 
 // initialize and loop
 ////////////////////////////////////////////////////////////////////////
-void SDLController::SDLInit(RenderController *renderController, Camera *camera, const char* title) {
-	this->camera = camera;
+void SDLController::SDLInit(Render::RenderController *renderController, 
+							Render::Camera *camera, const char* title) 
+{
+	this->flexParams  = &Compute::FlexParams::Get();
+	this->renderParam = &Render::RenderParam::Get();
+
 	this->renderController = renderController;
+	this->camera = camera;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)	// Initialize SDL's Video subsystem and game controllers
 		printf("Unable to initialize SDL");
 
 	// Create our window centered
 	renderController->SetWindow(SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		renderController->GetWidth(), renderController->GetHeight(), SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE));
+		renderController->screenWidth, renderController->screenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE));
 
 	windowId = SDL_GetWindowID(renderController->GetWindow());
 }
 
-void SDLController::SDLPostInit(Serializer *serializer) {
-	this->serializer = serializer;
+void SDLController::SDLPostInit(Serializer *_serializer) {
+	this->serializer = _serializer;
 }
 
 // return true, if program is running
@@ -133,48 +140,48 @@ bool SDLController::InputKeyboardDown(unsigned char key, int x, int y)
 	}
 	case 'r':
 	{
-		FruitWork::AppParams::g_reset = true;
+		AppParams::g_reset = true;
 		break;
 	}
 	case 'p':
 	{
-		FruitWork::AppParams::g_pause = !FruitWork::AppParams::g_pause;
+		AppParams::g_pause = !AppParams::g_pause;
 		break;
 	}
 	case 'o':
 	{
-		FruitWork::AppParams::g_step = true;
+		AppParams::g_step = true;
 		break;
 	}
 	case 'h':
 	{
 		// переделать возможно
-		FruitWork::Application::renderParam->showGUI = !FruitWork::Application::renderParam->showGUI;
+		renderParam->showGUI = !renderParam->showGUI;
 		break;
 	}
 	case 'e':
 	{
-		FruitWork::Application::renderParam->drawEllipsoids = !FruitWork::Application::renderParam->drawEllipsoids;
+		renderParam->drawEllipsoids = !renderParam->drawEllipsoids;
 		break;
 	}
 	case 't':
 	{
-		FruitWork::Application::renderParam->drawOpaque = !FruitWork::Application::renderParam->drawOpaque;
+		renderParam->drawOpaque = !renderParam->drawOpaque;
 		break;
 	}
 	case 'v':
 	{
-		FruitWork::Application::renderParam->drawPoints = !FruitWork::Application::renderParam->drawPoints;
+		renderParam->drawPoints = !renderParam->drawPoints;
 		break;
 	}
 	case 'f':
 	{
-		FruitWork::Application::renderParam->drawSprings = (FruitWork::Application::renderParam->drawSprings + 1) % 3;
+		renderParam->drawSprings = (renderParam->drawSprings + 1) % 3;
 		break;
 	}
 	case 'm':
 	{
-		FruitWork::Application::renderParam->drawMesh = !FruitWork::Application::renderParam->drawMesh;
+		renderParam->drawMesh = !renderParam->drawMesh;
 		break;
 	}
 	case '.':
@@ -193,7 +200,7 @@ bool SDLController::InputKeyboardDown(unsigned char key, int x, int y)
 	}
 	case ';':
 	{
-		FruitWork::AppParams::g_debug = !FruitWork::AppParams::g_debug;
+		AppParams::g_debug = !AppParams::g_debug;
 		break;
 	}
 	case 'b':
@@ -273,5 +280,8 @@ void SDLController::MouseMotionFunc(unsigned state, int x, int y) {
 		camAngle.y -= Clamp(dy*kSensitivity, -kMaxDelta, kMaxDelta);
 		camera->SetCamAngle(camAngle);
 	}
+}
+
+}
 }
 

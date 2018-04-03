@@ -13,6 +13,8 @@ project(OpenCell LANGUAGES CXX CUDA)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+link_directories(${CMAKE_BINARY_DIR}/lib/Release ${CMAKE_BINARY_DIR}/lib/Debug)
+
 #########################################################################
 # Flex project (DLL)
 #########################################################################
@@ -39,8 +41,6 @@ include_directories(external/glew/include)
 link_directories(external/flex-1.1.0/lib/win64)
 link_directories(external/SDL2-2.0.4/lib/x64)
 link_directories(external/glew/lib/x64)
-
-link_directories(${CMAKE_BINARY_DIR}/lib/Release ${CMAKE_BINARY_DIR}/lib/Debug)
 
 # add boost
 hunter_add_package(Boost)

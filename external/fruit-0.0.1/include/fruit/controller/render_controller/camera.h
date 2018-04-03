@@ -1,6 +1,10 @@
-#pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include <flex/core/cloth.h>
+
+namespace FruitWork {
+namespace Render {
 
 class Camera {
 
@@ -16,7 +20,16 @@ private:
 	float camFar = 1000.0f;
 
 public:
-	Camera() {}
+
+	void Initialize(Vec3 sceneLower, Vec3 sceneUpper) {
+		camPos = Vec3(
+			(sceneLower.x + sceneUpper.x)*0.5f,
+			std::min(sceneUpper.y*1.25f, 6.0f),
+			sceneUpper.z + std::min(sceneUpper.y, 6.0f)*2.0f
+		);
+
+		camAngle = Vec3(0.0f, -DegToRad(15.0f), 0.0f);
+	}
 
 	// инкапсул€ци€
 	float GetCamSpeed() const {
@@ -81,3 +94,8 @@ public:
 		camPos += (forward * camSmoothVel.z + right * camSmoothVel.x + Cross(right, forward) * camSmoothVel.y);
 	}
 }; 
+
+}
+}
+
+#endif // CAMERA_H

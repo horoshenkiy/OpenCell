@@ -1,6 +1,8 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
+namespace FruitWork {
+
 /*#include <flex/core/maths.h>
 #include "fruit_extensions/NvFlexImplFruitExt.h"
 
@@ -143,5 +145,7 @@ private:
 
 //#include "../scenes/SceneCell.h"
 //#include "../scenes/cell.h"
+
+}
 
 #endif // SERIALIZER_H

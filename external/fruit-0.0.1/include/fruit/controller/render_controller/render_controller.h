@@ -4,12 +4,9 @@
 #include <SDL.h>
 #include <flex/core/maths.h>
 
-// temp
 #include <fruit/controller/render_controller/render_param.h>
 #include <fruit/controller/render_controller/render_buffer.h>
-///
 #include "camera.h"
-#include "shadows.h"
 #include "fluid/fluid_renderer.h"
 
 #include <fruit/controller/compute_controller/flex_controller.h>
@@ -18,14 +15,132 @@
 
 #include <fruit/scene.h>
 
+namespace FruitWork {
+namespace Render {
+
 class RenderController {
+
+public:
+
+	////////////////////////////////////////
+	//Constructors and initialize
+	/////////////////////////////////////////////
+	void InitRender(Camera *camera);
+	
+	void PostInitRender(Scene *scene) {
+		this->scene = scene;
+		shadowMap = GL::ShadowCreate();
+	}
+
+	void Reset() {
+		Compute::FlexController& flexController = Compute::FlexController::Get();
+		DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
+
+		for (auto& iter : renderBuffers->meshes) {
+			NvFlexDestroyTriangleMesh(flexController.GetLib(), iter.first);
+			GL::DestroyGpuMesh(iter.second);
+		}
+
+		for (auto& iter : renderBuffers->fields) {
+			NvFlexDestroyDistanceField(flexController.GetLib(), iter.first);
+			GL::DestroyGpuMesh(iter.second);
+		}
+
+		for (auto& iter : renderBuffers->convexes) {
+			NvFlexDestroyConvexMesh(flexController.GetLib(), iter.first);
+			GL::DestroyGpuMesh(iter.second);
+		}
+
+		renderBuffers->fields.clear();
+		renderBuffers->meshes.clear();
+		renderBuffers->convexes.clear();
+
+		delete renderBuffers->mesh;
+		renderBuffers->mesh = new Mesh();
+	}
+
+	void DestroyRender() {
+		for (auto& iter : renderBuffers->meshes) {
+			NvFlexDestroyTriangleMesh(flexController->GetLib(), iter.first);
+			Render::GL::DestroyGpuMesh(iter.second);
+		}
+
+		for (auto& iter : renderBuffers->fields) {
+			NvFlexDestroyDistanceField(flexController->GetLib(), iter.first);
+			Render::GL::DestroyGpuMesh(iter.second);
+		}
+
+		for (auto& iter : renderBuffers->convexes) {
+			NvFlexDestroyConvexMesh(flexController->GetLib(), iter.first);
+			Render::GL::DestroyGpuMesh(iter.second);
+		}
+
+		renderBuffers->fields.clear();
+		renderBuffers->meshes.clear();
+
+		if (fluidRenderer)
+			Fluid::DestroyFluidRenderer(fluidRenderer);
+
+		DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
+
+		GL::ShadowDestroy(shadowMap);
+		GL::DestroyRender();
+	}
+
+
+	//////////////////////////////////////////////
+	// main render
+	/////////////////////////////////////////////////
+	void Render(int numParticles, int numDiffuse) {
+		GL::StartFrame(Vec4(renderParam->clearColor, 1.0f), renderParam->msaaFbo);
+
+		RenderScene(numParticles, numDiffuse);
+		RenderDebug();
+
+		GL::EndFrame(screenWidth, screenHeight, renderParam->msaaFbo);
+	}
+
+	void RenderScene(int numParticles, int numDiffuse);
+	
+	void RenderDebug();
+
+	/////////////////////////////////////////////////////
+	// getters and setters
+	////////////////////////////////////////////
+
+	Fluid::FluidRenderer* GetFluidRenderer() const { return fluidRenderer; }
+
+	Scene* GetScene() const { return scene; }
+	void SetScene(Scene *scene) { this->scene = scene; }
+
+	/////////////////////////////////////////////////////////////////////
+	//public interface and values for windows
+	//////////////////////////////////////////////////////////////////////
+
+	SDL_Window* GetWindow() const { return window; }
+	void SetWindow(SDL_Window* window) { this->window = window; }
+
+	bool GetFullscreen() const { return this->fullscreen; }
+	void SetFullscreen(bool fullscreen) { this->fullscreen = fullscreen; }
+
+	PROPERTY(uint32_t, screenWidth);
+	GET(screenWidth) { return _screenWidth; }
+
+	PROPERTY(uint32_t, screenHeight);
+	GET(screenHeight) { return _screenHeight; }
+
+	void ReshapeWindow(int width, int height);
+	void ReshapeWindow();
+
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 
 private:
 
 	//Compute params and buffers
-	FlexController *flexController;
-
-	SimBuffers *buffers;
+	Compute::FlexController *flexController;
+	Compute::FlexParams *flexParams;
+	Compute::SimBuffers *buffers;
 
 	//Render params and buffers
 	RenderBuffers *renderBuffers;
@@ -51,8 +166,8 @@ private:
 	SDL_Window* window;			// window handle
 	bool fullscreen = false;
 
-	uint32_t screenWidth = 1280;
-	uint32_t screenHeight = 720;
+	uint32_t _screenWidth = 1280;
+	uint32_t _screenHeight = 720;
 
 	/////////////////////////////////////////////
 	//functions for rendering
@@ -62,71 +177,16 @@ private:
 	/////////////////////////////////////////////////////////
 	// private renderers
 	/////////////////////////////////////////////////////////
-	FluidRenderer *fluidRenderer;
-	ShadowMap *shadowMap;
+	Fluid::FluidRenderer *fluidRenderer;
+	GL::ShadowMap *shadowMap;
 
 	//////////////////////////////////////////////////////
 	//scene
 	////////////////////////////////////////////////////////
 	Scene *scene;
-
-public:
-
-	FlexParams *flexParams;
-
-	//public fields
-	//////////////////////////////////////////////
-	Shadows shadows = Shadows();
-
-	////////////////////////////////////////
-	//Constructors and initialize
-	/////////////////////////////////////////////
-	RenderController() = default;
-
-	void InitRender(Camera *camera);
-
-	//////////////////////////////////////////////
-	// main render
-	/////////////////////////////////////////////////
-	void RenderScene(int numParticles, int numDiffuse);
-	void RenderDebug();
-
-	//костыль потому и по-русски
-	void DrawShapes() const;
-
-	/////////////////////////////////////////////////////
-	// getters and setters
-	////////////////////////////////////////////
-
-	FluidRenderer* GetFluidRenderer() const { return fluidRenderer; }
-
-	Scene* GetScene() const { return scene; }
-	void SetScene(Scene *scene) { this->scene = scene; }
-
-	ShadowMap* GetShadowMap() const { return shadowMap; }
-	void SetShadowMap(ShadowMap *shadowMap) { this->shadowMap = shadowMap; }
-
-	/////////////////////////////////////////////////////////////////////
-	//public interface for windows
-	//////////////////////////////////////////////////////////////////////
-
-	SDL_Window* GetWindow() const { return window; }
-	void SetWindow(SDL_Window* window) { this->window = window; }
-
-	bool GetFullscreen() const { return this->fullscreen; }
-	void SetFullscreen(bool fullscreen) { this->fullscreen = fullscreen; }
-
-	uint32_t GetWidth() const { return this->screenWidth; }
-	void SetWidth(uint32_t width) { this->screenWidth = width; }
-
-	uint32_t GetHeight() const { return this->screenHeight; }
-	void SetHeight(uint32_t height) { this->screenHeight = height; }
-
-	void ReshapeWindow(int width, int height);
-	void ReshapeWindow();
-
-	//////////////////////////////////////////////////////////////////////
-	//////////////////////////////////////////////////////////////////////
 };
+
+}
+}
 
 #endif // RENDER_CONTROLLER_H

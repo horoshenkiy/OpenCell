@@ -29,7 +29,6 @@
 #include <controller/render_controller/render_buffer.h>
 #include <controller/render_controller/render_gl/shaders.h>
 #include <controller/render_controller/render_gl/shader.h>
-#include <controller/render_controller/shadows.h>
 #include <controller/imgui_controller/imgui_render_gl.h>
 
 #include <flex/core/mesh.h>
@@ -44,6 +43,12 @@
 
 #include <controller/compute_controller/flex_controller.h>
 #include <controller/render_controller/render_param.h>
+
+namespace FruitWork {
+namespace Render {
+namespace GL {
+
+using namespace Fluid;
 
 namespace {
 
@@ -65,9 +70,14 @@ Colour gColors[] =
 	Colour(0.612f, 0.194f, 0.394f)
 };
 
+struct ShadowMap {
+	GLuint texture;
+	GLuint framebuffer;
+};
+
 void DestroyRender() {}
 
-void StartFrame(Vec4 clearColor)
+void StartFrame(Vec4 clearColor, GLuint msaaFBO)
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -76,17 +86,17 @@ void StartFrame(Vec4 clearColor)
 
 	glPointSize(5.0f);
 
-	glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, FruitWork::Application::renderParam->msaaFbo));
+	glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, msaaFBO));
 	glVerify(glClearColor(powf(clearColor.x, 1.0f / 2.2f), powf(clearColor.y, 1.0f / 2.2f), powf(clearColor.z, 1.0f / 2.2f), 0.0f));
 	glVerify(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void EndFrame(uint32_t width, uint32_t height)
+void EndFrame(uint32_t width, uint32_t height, GLuint msaaFBO)
 {
-	if (FruitWork::Application::renderParam->msaaFbo)
+	if (msaaFBO)
 	{
 		// blit the msaa buffer to the window
-		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, FruitWork::Application::renderParam->msaaFbo));
+		glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, msaaFBO));
 		glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0));
 		glVerify(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR));
 	}
@@ -149,11 +159,11 @@ void ReadFrame(int* backbuffer, int width, int height)
 	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer);
 }
 
-void PresentFrame(bool fullsync)
+void PresentFrame(bool fullsync, SDL_Window *window)
 {
 	SDL_GL_SetSwapInterval(fullsync);
 	glFinish();
-	SDL_GL_SwapWindow(FruitWork::Application::renderController.GetWindow());
+	SDL_GL_SwapWindow(window);
 }
 
 // fixes some banding artifacts with repeated blending during thickness and diffuse rendering
@@ -486,7 +496,7 @@ void DrawPoints(GLuint positions, GLuint colors, GLuint indices, int n, int offs
 	static int sprogram = -1;
 	if (sprogram == -1)
 	{
-		sprogram = CompileProgram(vertexPointShader, fragmentPointShader);
+		sprogram = GL::CompileProgram(vertexPointShader, fragmentPointShader);
 	}
 
 	if (sprogram)
@@ -559,6 +569,35 @@ static GLuint s_shadowProgram = GLuint(-1);
 
 static const int kShadowResolution = 2048;
 
+ShadowMap* ShadowCreate() {
+	GLuint texture;
+	GLuint framebuffer;
+
+	glVerify(glGenFramebuffers(1, &framebuffer));
+	glVerify(glGenTextures(1, &texture));
+	glVerify(glBindTexture(GL_TEXTURE_2D, texture));
+
+	glVerify(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	glVerify(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+	// This is to allow usage of shadow2DProj function in the shader 
+	glVerify(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE));
+	glVerify(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL));
+	glVerify(glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY));
+
+	glVerify(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, kShadowResolution, kShadowResolution, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL));
+
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, framebuffer));
+
+	glVerify(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture, 0));
+
+	ShadowMap* map = new ShadowMap();
+	map->texture = texture;
+	map->framebuffer = framebuffer;
+
+	return map;
+}
+
 void ShadowDestroy(ShadowMap* map)
 {
 	glVerify(glDeleteTextures(1, &map->texture));
@@ -583,17 +622,17 @@ void ShadowBegin(ShadowMap* map)
 
 	// bind shadow shader
 	if (s_shadowProgram == GLuint(-1))
-		s_shadowProgram = CompileProgram(vertexShader, passThroughShader);
+		s_shadowProgram = GL::CompileProgram(vertexShader, passThroughShader);
 
 	glUseProgram(s_shadowProgram);
 	glVerify(glUniformMatrix4fv(glGetUniformLocation(s_shadowProgram, "objectTransform"), 1, false, Matrix44::kIdentity));
 }
 
-void ShadowEnd()
+void ShadowEnd(GLuint msaaFBO)
 {
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, FruitWork::Application::renderParam->msaaFbo));
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, msaaFBO));
 
 	glEnable(GL_CULL_FACE);
 	glUseProgram(0);
@@ -604,7 +643,7 @@ void BindSolidShader(uint32_t width, uint32_t height, Vec3 lightPos, Vec3 lightT
 	glVerify(glViewport(0, 0, width, height));
 
 	if (s_diffuseProgram == GLuint(-1))
-		s_diffuseProgram = CompileProgram(vertexShader, fragmentShader);
+		s_diffuseProgram = GL::CompileProgram(vertexShader, fragmentShader);
 
 	if (s_diffuseProgram)
 	{
@@ -650,7 +689,7 @@ void DrawPlanes(Vec4* planes, int n, float bias)
 		Vec4 p = planes[i];
 		p.w -= bias;
 
-		DrawPlane(p, false);
+		GL::DrawPlane(p, false);
 	}
 
 	glVerify(glUniform1i(uGrid, 0));
@@ -787,6 +826,99 @@ void DrawRope(Vec4* positions, int* indices, int numIndices, float radius, int c
 
 }
 
+// move to render_gl
+void DrawShapes() {
+	Compute::SimBuffers* buffers = &Compute::SimBuffers::Get();
+	
+	RenderBuffers* renderBuffers = &RenderBuffers::Get();
+	RenderParam* renderParam = &RenderParam::Get();
+
+	for (size_t i = 0; i < buffers->shapeFlags.size(); ++i) {
+		const int flags = buffers->shapeFlags[i];
+
+		// unpack flags
+		int type = int(flags&eNvFlexShapeFlagTypeMask);
+		//bool dynamic = int(flags&eNvFlexShapeFlagDynamic) > 0;
+
+		Vec3 color = Vec3(0.9f);
+
+		if (flags & eNvFlexShapeFlagTrigger) {
+			color = Vec3(0.6f, 1.0, 0.6f);
+
+			SetFillMode(true);
+		}
+
+		// render with prev positions to match particle update order
+		// can also think of this as current/next
+		const Quat rotation = buffers->shapePrevRotations[i];
+		const Vec3 position = Vec3(buffers->shapePrevPositions[i]);
+
+		NvFlexCollisionGeometry geo = buffers->shapeGeometry[i];
+
+		if (type == eNvFlexShapeSphere) {
+			Mesh* sphere = CreateSphere(20, 20, geo.sphere.radius);
+
+			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation));
+			sphere->Transform(xform);
+
+			DrawMesh(sphere, Vec3(color));
+
+			delete sphere;
+		}
+		else if (type == eNvFlexShapeCapsule) {
+			Mesh* capsule = CreateCapsule(10, 20, geo.capsule.radius, geo.capsule.halfHeight);
+
+			// transform to world space
+			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*RotationMatrix(DegToRad(-90.0f), Vec3(0.0f, 0.0f, 1.0f));
+			capsule->Transform(xform);
+
+			DrawMesh(capsule, Vec3(color));
+
+			delete capsule;
+		}
+		else if (type == eNvFlexShapeBox) {
+			Mesh* box = CreateCubeMesh();
+
+			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(Vec3(geo.box.halfExtents)*2.0f);
+			box->Transform(xform);
+
+			DrawMesh(box, Vec3(color));
+			delete box;
+		}
+		else if (type == eNvFlexShapeConvexMesh) {
+			if (renderBuffers->convexes.find(geo.convexMesh.mesh) != renderBuffers->convexes.end()) {
+				GpuMesh* m = renderBuffers->convexes[geo.convexMesh.mesh];
+
+				if (m) {
+					Matrix44 xform = TranslationMatrix(Point3(buffers->shapePositions[i]))*RotationMatrix(Quat(buffers->shapeRotations[i]))*ScaleMatrix(geo.convexMesh.scale);
+					DrawGpuMesh(m, xform, Vec3(color));
+				}
+			}
+		}
+		else if (type == eNvFlexShapeTriangleMesh) {
+			if (renderBuffers->meshes.find(geo.triMesh.mesh) != renderBuffers->meshes.end()) {
+				GpuMesh* m = renderBuffers->meshes[geo.triMesh.mesh];
+
+				if (m) {
+					Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(geo.triMesh.scale);
+					DrawGpuMesh(m, xform, Vec3(color));
+				}
+			}
+		}
+		else if (type == eNvFlexShapeSDF) {
+			if (renderBuffers->fields.find(geo.sdf.field) != renderBuffers->fields.end()) {
+				GpuMesh* m = renderBuffers->fields[geo.sdf.field];
+
+				if (m) {
+					Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(geo.sdf.scale);
+					DrawGpuMesh(m, xform, Vec3(color));
+				}
+			}
+		}
+	}
+
+	SetFillMode(renderParam->wireframe);
+}
 
 struct ReflectMap
 {
@@ -859,7 +991,7 @@ void ReflectBegin(ReflectMap* map, Vec4 plane, int width, int height)
 	glVerify(glUniform4fv( glGetUniformLocation(s_diffuseProgram, "clipPlane"), 1, plane));
 }
 
-void ReflectEnd(ReflectMap* map, int width, int height)
+void ReflectEnd(ReflectMap* map, int width, int height, GLuint msaaFBO)
 {
 	// copy frame buffer to texture
 	glVerify(glActiveTexture(GL_TEXTURE0));
@@ -874,7 +1006,7 @@ void ReflectEnd(ReflectMap* map, int width, int height)
 	glVerify(glDisable(GL_CLIP_PLANE0));
 	glVerify(glFrontFace(GL_CCW));
 
-	glBindFramebuffer(GL_FRAMEBUFFER, FruitWork::Application::renderParam->msaaFbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, msaaFBO);
 
 	// maybe this wrong (get width and height from render controller)
 	glViewport(0, 0, width, height);
@@ -926,11 +1058,21 @@ void RenderFullscreenQuad()
 	glEnd();
 }
 
-void RenderEllipsoids(FluidRenderer* render, FluidRenderBuffers buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug)
+
+// TODO: refactoring this very big method
+void RenderEllipsoids(
+					FluidRenderer* render, FluidRenderBuffers buffers, 
+					Mesh* mesh,
+					int n, int offset, float radius, 
+					float screenWidth, float screenAspect, GLuint msaaFBO, float fov,
+					Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, 
+					ShadowMap* shadowMap, 
+					Vec4 color, float blur, float ior, 
+					bool debug)
 {
 #if !ENABLE_SIMPLE_FLUID
 	// resolve msaa back buffer to texture
-	glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, FruitWork::Application::renderParam->msaaFbo));
+	glVerify(glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, msaaFBO));
 	glVerify(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, render->mSceneFbo));
 	glVerify(glBlitFramebuffer(0, 0, GLsizei(screenWidth), GLsizei(screenWidth/screenAspect), 0, 0, GLsizei(screenWidth), GLsizei(screenWidth/screenAspect), GL_COLOR_BUFFER_BIT, GL_LINEAR));
 
@@ -946,10 +1088,10 @@ void RenderEllipsoids(FluidRenderer* render, FluidRenderBuffers buffers, int n, 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_CULL_FACE);
 
-	if (FruitWork::Application::renderBuffers->mesh)
-		DrawMesh(FruitWork::Application::renderBuffers->mesh, Vec3(1.0f));
+	if (mesh)
+		DrawMesh(mesh, Vec3(1.0f));
 
-	FruitWork::Application::renderController.DrawShapes();
+	DrawShapes();
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -1066,7 +1208,7 @@ void RenderEllipsoids(FluidRenderer* render, FluidRenderBuffers buffers, int n, 
 	//---------------------------------------------------------------
 	// composite with scene
 
-	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, FruitWork::Application::renderParam->msaaFbo));
+	glVerify(glBindFramebuffer(GL_FRAMEBUFFER, msaaFBO));
 	glVerify(glEnable(GL_DEPTH_TEST));
 	glVerify(glDepthMask(GL_TRUE));
 	glVerify(glDisable(GL_BLEND));
@@ -1330,3 +1472,6 @@ void EndPoints()
 	glEnd();
 }
 
+}
+}
+}

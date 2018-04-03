@@ -3,6 +3,9 @@
 
 #include <windows.h>
 
+namespace FruitWork {
+namespace Core {
+
 static double FruitGetSeconds() {
 	static LARGE_INTEGER lastTime;
 	static LARGE_INTEGER freq;
@@ -28,6 +31,9 @@ static double FruitGetSeconds() {
 	lastTime = t;
 
 	return time;
+}
+
+}
 }
 
 #endif /* _PLATFORM_H */ 

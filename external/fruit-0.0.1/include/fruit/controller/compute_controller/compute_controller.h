@@ -1,48 +1,42 @@
-#ifndef COMPUTE_CONTROLLER_H
-#define COMPUTE_CONTROLLER_H
+#ifndef ABST_COMPUTE_CONTROLLER_H
+#define ABST_COMPUTE_CONTROLLER_H
 
-#include "fruit_extensions/NvFlexImplFruit.h"
+#include <fruit/fruit.h>
 
-#include <controller/compute_controller/flex_controller.h>
-#include <controller/compute_controller/flex_params.h>
-#include <controller/compute_controller/sim_buffers.h>
+namespace FruitWork {
+namespace Compute {
 
-#include <scene.h>
-#include <utilits/timer.h>
-
-class ComputeController {
+class ComputeController : public Fruit {
 
 public:
 
-	void Initialize();
+	virtual void Initialize(bool debug) = 0;
 
-	void PostInitialize(Scene *scene);
+	virtual void PostInitialize() = 0;
 
-	void InitializeGPU();
+	virtual void InitializeGPU() = 0;
 
-	void MapBuffers();
+	virtual bool IsInitialize() = 0;
 
-	void UnmapBuffers();
+	virtual void Reset() = 0;
 
-	int GetActiveCount() const;
+	virtual void Destroy() = 0;
 
-	int GetDiffuseParticles() const;
+	virtual void Update() = 0;
 
-	void Update();
+	virtual void MapBuffers() = 0;
 
-	void SendBuffers(NvFlexSolver *flex);
+	virtual void UnmapBuffers() = 0;
 
-	void Sync();
+	virtual void Sync() = 0;
 
-private:
-	
-	FlexController *flexController = nullptr;
-	FlexParams *flexParams = nullptr;
-	SimBuffers *buffers = nullptr;
+	/////////////////////////////////////////////
+	virtual int GetActiveCount() const = 0;
 
-	Scene *scene = nullptr;
-
-	FruitNvFlex *fruit = new FruitNvFlex();
+	virtual int GetDiffuseParticles() const = 0;
 };
 
-#endif // COMPUTE_CONTROLLER_H
+}
+}
+
+#endif // ABST_COMPUTE_CONTROLLER_H

@@ -1,7 +1,10 @@
 #include <memory>
 
-#include "fruit_extensions/NvFlexImplFruit.h"
+#include "fruit/controller/compute_controller/flex_compute_controller.h"
 #include <controller/render_controller/render_controller.h>
+
+namespace FruitWork {
+namespace Render {
 
 void RenderController::SkinMesh() {
 	if (renderBuffers->mesh)
@@ -39,120 +42,17 @@ void RenderController::SkinMesh() {
 	}
 }
 
-// move to render_gl
-void RenderController::DrawShapes() const {
-	for (size_t i = 0; i < buffers->shapeFlags.size(); ++i) {
-		const int flags = buffers->shapeFlags[i];
-
-		// unpack flags
-		int type = int(flags&eNvFlexShapeFlagTypeMask);
-		//bool dynamic = int(flags&eNvFlexShapeFlagDynamic) > 0;
-
-		Vec3 color = Vec3(0.9f);
-
-		if (flags & eNvFlexShapeFlagTrigger)
-		{
-			color = Vec3(0.6f, 1.0, 0.6f);
-
-			SetFillMode(true);
-		}
-
-		// render with prev positions to match particle update order
-		// can also think of this as current/next
-		const Quat rotation = buffers->shapePrevRotations[i];
-		const Vec3 position = Vec3(buffers->shapePrevPositions[i]);
-
-		NvFlexCollisionGeometry geo = buffers->shapeGeometry[i];
-
-		if (type == eNvFlexShapeSphere)
-		{
-			Mesh* sphere = CreateSphere(20, 20, geo.sphere.radius);
-
-			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation));
-			sphere->Transform(xform);
-
-			DrawMesh(sphere, Vec3(color));
-
-			delete sphere;
-		}
-		else if (type == eNvFlexShapeCapsule)
-		{
-			Mesh* capsule = CreateCapsule(10, 20, geo.capsule.radius, geo.capsule.halfHeight);
-
-			// transform to world space
-			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*RotationMatrix(DegToRad(-90.0f), Vec3(0.0f, 0.0f, 1.0f));
-			capsule->Transform(xform);
-
-			DrawMesh(capsule, Vec3(color));
-
-			delete capsule;
-		}
-		else if (type == eNvFlexShapeBox)
-		{
-			Mesh* box = CreateCubeMesh();
-
-			Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(Vec3(geo.box.halfExtents)*2.0f);
-			box->Transform(xform);
-
-			DrawMesh(box, Vec3(color));
-			delete box;
-		}
-		else if (type == eNvFlexShapeConvexMesh)
-		{
-			if (renderBuffers->convexes.find(geo.convexMesh.mesh) != renderBuffers->convexes.end())
-			{
-				GpuMesh* m = renderBuffers->convexes[geo.convexMesh.mesh];
-
-				if (m)
-				{
-					Matrix44 xform = TranslationMatrix(Point3(buffers->shapePositions[i]))*RotationMatrix(Quat(buffers->shapeRotations[i]))*ScaleMatrix(geo.convexMesh.scale);
-					DrawGpuMesh(m, xform, Vec3(color));
-				}
-			}
-		}
-		else if (type == eNvFlexShapeTriangleMesh)
-		{
-			if (renderBuffers->meshes.find(geo.triMesh.mesh) != renderBuffers->meshes.end())
-			{
-				GpuMesh* m = renderBuffers->meshes[geo.triMesh.mesh];
-
-				if (m)
-				{
-					Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(geo.triMesh.scale);
-					DrawGpuMesh(m, xform, Vec3(color));
-				}
-			}
-		}
-		else if (type == eNvFlexShapeSDF)
-		{
-			if (renderBuffers->fields.find(geo.sdf.field) != renderBuffers->fields.end())
-			{
-				GpuMesh* m = renderBuffers->fields[geo.sdf.field];
-
-				if (m)
-				{
-					Matrix44 xform = TranslationMatrix(Point3(position))*RotationMatrix(Quat(rotation))*ScaleMatrix(geo.sdf.scale);
-					DrawGpuMesh(m, xform, Vec3(color));
-				}
-			}
-		}
-	}
-
-	SetFillMode(renderParam->wireframe);
-}
-
 // main render
 void RenderController::RenderScene(int numParticles, int numDiffuse)
 {
 	//---------------------------------------------------
 	// use VBO buffer wrappers to allow Flex to write directly to the OpenGL buffers
 	// Flex will take care of any CUDA interop mapping/unmapping during the get() operations
-
 	if (numParticles)
 	{
 		if (flexParams->interop) {
 			// copy data directly from solver to the renderer buffers
-			UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers, 
+			Fluid::UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers, 
 									flexController->GetSolver(), 
 									renderParam->drawEllipsoids, 
 									renderParam->drawDensity);
@@ -162,7 +62,8 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 
 			if (renderParam->drawEllipsoids) {
 				// if fluid surface rendering then update with smooth positions and anisotropy
-				UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers,
+				Fluid::UpdateFluidRenderBuffers(
+					renderBuffers->fluidRenderBuffers,
 					&buffers->smoothPositions[0],
 					(renderParam->drawDensity) ? &buffers->densities[0] : (float*)&buffers->phases[0],
 					&buffers->anisotropy1[0],
@@ -175,7 +76,8 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 			else
 			{
 				// otherwise just send regular positions and no anisotropy
-				UpdateFluidRenderBuffers(renderBuffers->fluidRenderBuffers,
+				Fluid::UpdateFluidRenderBuffers(
+					renderBuffers->fluidRenderBuffers,
 					&buffers->positions[0],
 					(float*)&buffers->phases[0],
 					NULL, NULL, NULL,
@@ -190,7 +92,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 	// setup view and state
 
 	float fov = kPi / 4.0f;
-	float aspect = float(screenWidth) / float(screenHeight);
+	float aspect = float(screenWidth) / float(_screenHeight);
 
 	Vec3 camAngle = camera->GetCamAngle();
 	Vec3 camPos = camera->GetCamPos();
@@ -242,21 +144,21 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 		SkinMesh();
 
 	// create shadow maps
-	ShadowBegin(shadowMap);
+	GL::ShadowBegin(shadowMap);
 
-	SetView(lightView, lightPerspective);
-	SetCullMode(false);
+	GL::SetView(lightView, lightPerspective);
+	GL::SetCullMode(false);
 
 	// give scene a chance to do custom drawing
 	scene->Draw();
 
 	if (renderParam->drawMesh)
-		DrawMesh(renderBuffers->mesh, renderParam->meshColor);
+		GL::DrawMesh(renderBuffers->mesh, renderParam->meshColor);
 
-	DrawShapes();
+	GL::DrawShapes();
 
 	if (renderParam->drawCloth && buffers->triangles.size()) {
-		DrawCloth(&buffers->positions[0], 
+		GL::DrawCloth(&buffers->positions[0], 
 			&buffers->normals[0], 
 			buffers->uvs.size() ? &buffers->uvs[0].x : NULL, 
 			&buffers->triangles[0], 
@@ -287,32 +189,32 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 	}
 
 	if (buffers->activeIndices.size())
-		DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
+		GL::DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
 			renderBuffers->fluidRenderBuffers.mDensityVBO,
 			renderBuffers->fluidRenderBuffers.mIndices,
 			shadowParticles, shadowParticlesOffset,
 			radius, 2048, 1.0f, lightFov, lightPos, lightTarget, lightTransform, shadowMap, renderParam->drawDensity);
 
-	ShadowEnd();
+	GL::ShadowEnd(renderParam->msaaFbo);
 
 	//----------------
 	// lighting pass
 
-	BindSolidShader(screenWidth, screenHeight, lightPos, lightTarget, lightTransform, shadowMap, 0.0f, Vec4(renderParam->clearColor, renderParam->fogDistance));
+	GL::BindSolidShader(screenWidth, _screenHeight, lightPos, lightTarget, lightTransform, shadowMap, 0.0f, Vec4(renderParam->clearColor, renderParam->fogDistance));
 
-	SetView(view, proj);
-	SetCullMode(true);
+	GL::SetView(view, proj);
+	GL::SetCullMode(true);
 
-	DrawPlanes((Vec4*)flexParams->params.planes, flexParams->params.numPlanes, renderParam->drawPlaneBias);
+	GL::DrawPlanes((Vec4*)flexParams->params.planes, flexParams->params.numPlanes, renderParam->drawPlaneBias);
 
 	if (renderParam->drawMesh)
-		DrawMesh(renderBuffers->mesh, renderParam->meshColor);
+		GL::DrawMesh(renderBuffers->mesh, renderParam->meshColor);
 
 
-	DrawShapes();
+	GL::DrawShapes();
 
 	if (renderParam->drawCloth && buffers->triangles.size())
-		DrawCloth(&buffers->positions[0], 
+		GL::DrawCloth(&buffers->positions[0], 
 			      &buffers->normals[0], 
 				  buffers->uvs.size() ? &buffers->uvs[0].x : NULL, 
 				  &buffers->triangles[0], 
@@ -324,26 +226,45 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 	// give scene a chance to do custom drawing
 	scene->Draw();
 
-	UnbindSolidShader();
+	GL::UnbindSolidShader();
 
 	if (renderParam->drawEllipsoids && flexParams->params.fluid)
 	{
 		// draw solid particles separately
 		if (buffers->numSolidParticles && renderParam->drawPoints)
-			DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
+			GL::DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
 				renderBuffers->fluidRenderBuffers.mDensityVBO,
 				renderBuffers->fluidRenderBuffers.mIndices,
 				buffers->numSolidParticles, 0, radius, float(screenWidth),
 				aspect, fov, lightPos, lightTarget, lightTransform, shadowMap, renderParam->drawDensity);
 
-		// render fluid surface
-		RenderEllipsoids(fluidRenderer,
+
+		//int numSolidParticles = buffers->numSolidParticles;
+		int numSolidParticles = 0;
+		
+		/*GL::RenderEllipsoids(
+			fluidRenderer,
 			renderBuffers->fluidRenderBuffers,
-			numParticles - buffers->numSolidParticles,
-			buffers->numSolidParticles, radius,
+			renderBuffers->mesh,
+			numParticles - numSolidParticles,
+			numSolidParticles, radius,
 			float(screenWidth),
-			aspect, fov, lightPos, lightTarget,
-			lightTransform, shadowMap, renderParam->fluidColor,
+			aspect, renderParam->msaaFbo, fov, lightPos, lightTarget,
+			lightTransform, shadowMap, Vec4(0.88f, 0.84f, 0.33f, 0.7f),
+			renderParam->blur, renderParam->ior, renderParam->drawOpaque);
+		
+		numSolidParticles = 0;*/
+
+		// render fluid surface
+		GL::RenderEllipsoids(
+			fluidRenderer,
+			renderBuffers->fluidRenderBuffers,
+			renderBuffers->mesh,
+			numParticles - numSolidParticles,
+			numSolidParticles, radius,
+			float(screenWidth),
+			aspect, renderParam->msaaFbo, fov, lightPos, lightTarget,
+			lightTransform, shadowMap, Vec4(0.26f, 0.77f, 0.27f, 1.0f),
 			renderParam->blur, renderParam->ior, renderParam->drawOpaque);
 	}
 	else
@@ -351,13 +272,13 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 		// draw all particles as spheres
 		if (renderParam->drawPoints)
 		{
-			int offset = renderParam->drawMesh ? buffers->numSolidParticles : 0;
-				 
+			//int offset = renderParam->drawMesh ? buffers->numSolidParticles : 0;
+
 			if (buffers->activeIndices.size())
-				DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
+				GL::DrawPoints(renderBuffers->fluidRenderBuffers.mPositionVBO,
 					renderBuffers->fluidRenderBuffers.mDensityVBO,
 					renderBuffers->fluidRenderBuffers.mIndices,
-					numParticles - offset, offset, radius, float(screenWidth),
+					numParticles, 0, radius, float(screenWidth),
 					aspect, fov, lightPos, lightTarget, lightTransform, shadowMap, renderParam->drawDensity);
 		}
 	}
@@ -365,10 +286,6 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 }
 
 void RenderController::RenderDebug() {
-	std::unique_ptr<Fruit> fruit(new FruitNvFlex());
-	FruitSolver fruitSolver;
-	fruitSolver.SetSolver(flexController->GetSolver());
-
 	// springs
 	if (renderParam->drawSprings)
 	{
@@ -385,7 +302,7 @@ void RenderController::RenderDebug() {
 			color = Vec4(0.0f, 1.0f, 0.0f, 0.8f);
 		}
 
-		BeginLines();
+		GL::BeginLines();
 
 		for (size_t i = 0; i < buffers->springLengths.size(); ++i)
 		{
@@ -397,10 +314,10 @@ void RenderController::RenderDebug() {
 			size_t a = buffers->springIndices[i * 2];
 			size_t b = buffers->springIndices[i * 2 + 1];
 
-			DrawLine(Vec3(buffers->positions[a]), Vec3(buffers->positions[b]), color);
+			GL::DrawLine(Vec3(buffers->positions[a]), Vec3(buffers->positions[b]), color);
 		}
 
-		EndLines();
+		GL::EndLines();
 	}
 
 	// visualize contacts against the environment
@@ -421,7 +338,7 @@ void RenderController::RenderDebug() {
 		contactIndices.map();
 		contactCounts.map();
 
-		BeginLines();
+		GL::BeginLines();
 
 		for (int i = 0; i < int(buffers->activeIndices.size()); ++i)
 		{
@@ -434,20 +351,20 @@ void RenderController::RenderDebug() {
 			{
 				Vec4 plane = contactPlanes[contactIndex*maxContactsPerParticle + c];
 
-				DrawLine(Vec3(buffers->positions[buffers->activeIndices[i]]),
+				GL::DrawLine(Vec3(buffers->positions[buffers->activeIndices[i]]),
 					Vec3(buffers->positions[buffers->activeIndices[i]]) + Vec3(plane)*scale,
 					Vec4(0.0f, 1.0f, 0.0f, 0.0f));
 			}
 		}
 
-		EndLines();
+		GL::EndLines();
 	}
 
 	if (renderParam->drawBases)
 	{
 		for (int i = 0; i < int(buffers->rigidRotations.size()); ++i)
 		{
-			BeginLines();
+			GL::BeginLines();
 
 			float size = 0.1f;
 
@@ -458,28 +375,30 @@ void RenderController::RenderDebug() {
 
 				Matrix33 frame(buffers->rigidRotations[i]);
 
-				DrawLine(Vec3(buffers->rigidTranslations[i]),
+				GL::DrawLine(Vec3(buffers->rigidTranslations[i]),
 					Vec3(buffers->rigidTranslations[i] + frame.cols[b] * size),
 					Vec4(color, 0.0f));
 			}
 
-			EndLines();
+			GL::EndLines();
 		}
 	}
 
 	if (renderParam->drawNormals) {
-		// rewrite сильная связность модулей
-		fruit->GetNormals();
+		Application::computeController.GetNormals();
 
-		BeginLines();
+		GL::BeginLines();
 
 		for (int i = 0; i < buffers->normals.size(); ++i)
 		{
-			DrawLine(Vec3(buffers->positions[i]),
+			GL::DrawLine(Vec3(buffers->positions[i]),
 				Vec3(buffers->positions[i] - buffers->normals[i] * buffers->normals[i].w),
 				Vec4(0.0f, 1.0f, 0.0f, 0.0f));
 		}
 
-		EndLines();
+		GL::EndLines();
 	}
+}
+
+}
 }

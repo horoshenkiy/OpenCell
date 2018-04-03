@@ -37,6 +37,10 @@
 
 #define WITH_GLEW
 
+namespace FruitWork {
+namespace Render {
+namespace GL {
+
 void GlslPrintShaderLog(GLuint obj)
 {
 #if !PLATFORM_IOS
@@ -244,5 +248,9 @@ void DrawPlane(const Vec4& p, bool color)
 	}
 
 	glEnd();
+}
+
+}
+}
 }
 

@@ -11,6 +11,8 @@
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 
+using namespace FruitWork;
+
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
 
@@ -82,7 +84,7 @@ public:
 		indEndPosition = buffers->positions.size();
 	}
 
-	LigandGroup(SimBuffers *buffers_, Kernel* kernel_)
+	LigandGroup(Compute::SimBuffers *buffers_, Kernel* kernel_)
 	{
 		kernel = kernel_;
 		buffers = buffers_;
@@ -124,5 +126,5 @@ private:
 	std::vector<Ligand*> ligands;
 
 	Kernel *kernel;
-	SimBuffers *buffers;
+	Compute::SimBuffers *buffers;
 };

@@ -3,7 +3,8 @@
 #include "component.h"
 #include <random>
 
-class Serializer;
+using namespace FruitWork;
+namespace FruitWork { class Serializer; }
 
 // TODO: add constructor copy
 class Shell : public Component {

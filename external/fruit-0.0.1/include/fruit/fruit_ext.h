@@ -3,6 +3,8 @@
 
 #include "fruit_ext_types.h"
 
+namespace FruitWork {
+
 template <typename T>
 class FruitVector
 {
@@ -70,5 +72,7 @@ public:
 		return !(*this == rVector);
 	}
 };
+
+}
 
 #endif // FRUIT_EXT_H

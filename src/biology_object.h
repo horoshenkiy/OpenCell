@@ -7,24 +7,15 @@
 #include <fruit/controller/render_controller/render_buffer.h>
 #include <fruit/controller/render_controller/render_param.h>
 
-class BiologyObject
-{
-protected:
-	FlexController &flexController;
-	FlexParams &flexParams;
-	SimBuffers &buffers;
-
-	RenderBuffers &renderBuffers;
-	RenderParam &renderParam;
-
+class BiologyObject {
 public:
 
 	BiologyObject() : 
-		flexController(FlexController::Instance()),
-		flexParams(FlexParams::Get()),
-		buffers(SimBuffers::Get()), 
-		renderBuffers(RenderBuffers::Get()),
-		renderParam(RenderParam::Get()) {}
+		flexController(Compute::FlexController::Get()),
+		flexParams(Compute::FlexParams::Get()),
+		buffers(Compute::SimBuffers::Get()), 
+		renderBuffers(Render::RenderBuffers::Get()),
+		renderParam(Render::RenderParam::Get()) {}
 
 	virtual void Initialize() = 0;
 
@@ -39,6 +30,14 @@ public:
 	virtual void Sync() {}
 
 	virtual void Draw(int pass) {}
+
+protected:
+	Compute::FlexController &flexController;
+	Compute::FlexParams &flexParams;
+	Compute::SimBuffers &buffers;
+
+	Render::RenderBuffers &renderBuffers;
+	Render::RenderParam &renderParam;
 };
 
 #endif // BIOLOGY_OBJECT_H

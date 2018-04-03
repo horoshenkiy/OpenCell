@@ -78,7 +78,14 @@
 void glAssert(const char* msg, long line, const char* file);
 #endif
 
+namespace FruitWork {
+namespace Render {
+namespace GL {
+
 GLuint CompileProgram(const char *vsource=NULL, const char *fsource=NULL, const char* gsource=NULL);
 
 void DrawPlane(const Vec4& p, bool color=true);
 
+}
+}
+}

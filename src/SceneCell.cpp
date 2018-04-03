@@ -3,15 +3,16 @@
 
 void SceneCell::Initialize() {
 	this->buffers = &SimBuffers::Get();
-	this->flexParams = &FlexParams::Get();
+	this->flexParams = &Compute::FlexParams::Get();
 
 	cell = new Cell();
 	cell->Initialize();
 }
 
 void SceneCell::InitializeFromFile() {
+	
 	this->buffers = &SimBuffers::Get();
-	this->flexParams = &FlexParams::Get();
+	this->flexParams = &Compute::FlexParams::Get();
 }
 
 void SceneCell::PostInitialize() {

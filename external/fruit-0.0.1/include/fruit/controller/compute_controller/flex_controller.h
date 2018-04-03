@@ -3,6 +3,9 @@
 
 #include <flex/NvFlex.h>
 
+namespace FruitWork {
+namespace Compute {
+
 void ErrorCallback(NvFlexErrorSeverity, const char* msg, const char* file, int line);
 
 class FlexController {
@@ -68,5 +71,8 @@ private:
 
 	bool error = false;
 };
+
+}
+}
 
 #endif // FLEX_CONTROLLER_H

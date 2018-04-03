@@ -2,10 +2,10 @@
 
 #include "component.h"
 #include <flex/core/maths.h>
-#include <fruit/utilits/primitive.h>
+#include <fruit/primitives/primitive.h>
 #include <random>
 
-using namespace FruitWork::Primitive;
+using namespace FruitWork::Primitives;
 
 class Cytoskeleton;
 

@@ -16,6 +16,9 @@ source_group(include\\fruit FILES ${FRUIT})
 file(GLOB HEADERS_UTILITS "../include/fruit/utilits/*.h")
 source_group(include\\fruit\\utilits FILES ${HEADERS_UTILITS})
 
+file(GLOB HEADERS_PRIMITIVES "../include/fruit/primitives/*.h")
+source_group(include\\fruit\\primitives FILES ${HEADERS_PRIMITIVES})
+
 file(GLOB HEADERS_CONTROLLER "../include/fruit/controller/*.h")
 source_group(include\\fruit\\controller FILES ${HEADERS_CONTROLLER})
 
@@ -43,6 +46,9 @@ source_group(src FILES ${SRC})
 file(GLOB UTILITS "utilits/*.h" "utilits/*.cpp")
 source_group(src\\utilits FILES ${UTILITS})
 
+set(PRIMITIVES primitives/primitive_factory.cpp)
+source_group(src\\primitives FILES ${PRIMITIVES})
+
 # add source controllers
 file(GLOB CONTROLLER "controller/*.cpp" "controller/*.h")
 source_group(src\\controller FILES ${CONTROLLER})
@@ -68,6 +74,7 @@ add_library(FruitWork STATIC
 								${INCLUDE} 
 									${FRUIT}
 										${HEADERS_UTILITS}
+										${HEADERS_PRIMITIVES}
 										${HEADERS_CONTROLLER}
 											${HEADERS_COMPUTE_CONTROLLER}
 											${HEADERS_IMGUI_CONTROLLER}
@@ -84,5 +91,6 @@ add_library(FruitWork STATIC
 											${FLUID}
 											${RENDER_GL}
 									${UTILITS}
+									${PRIMITIVES}
 )
 								

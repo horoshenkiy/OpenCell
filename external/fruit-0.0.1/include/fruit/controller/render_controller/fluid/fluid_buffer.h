@@ -6,6 +6,10 @@
 
 #include "../render_gl/shader.h"
 
+namespace FruitWork {
+namespace Render {
+namespace Fluid {
+
 typedef unsigned int VertexBuffer;
 typedef unsigned int IndexBuffer;
 
@@ -38,5 +42,9 @@ void UpdateFluidRenderBuffers(FluidRenderBuffers buffers,
 							  Vec4* anisotropy1, Vec4* anisotropy2, 
 							  Vec4* anisotropy3, int numParticles, 
 							  int* indices, int numIndices);
+
+}
+}
+}
 
 #endif // FLUID_BUFFER_H

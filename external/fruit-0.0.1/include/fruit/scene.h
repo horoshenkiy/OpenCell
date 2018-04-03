@@ -4,6 +4,8 @@
 #include <maths.h>
 #include <cfloat>
 
+namespace FruitWork {
+
 class Scene {
 public:
 
@@ -51,5 +53,7 @@ protected:
 
 	const char* mName;
 };
+
+}
 
 #endif // SCENE_H

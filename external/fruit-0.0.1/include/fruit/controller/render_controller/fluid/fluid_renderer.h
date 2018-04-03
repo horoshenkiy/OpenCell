@@ -6,6 +6,10 @@
 
 #define STRINGIFY(A) #A
 
+namespace FruitWork {
+namespace Render {
+namespace Fluid {
+
 struct FluidRenderer
 {
 	GLuint mDepthFbo;
@@ -31,8 +35,12 @@ struct FluidRenderer
 	int mSceneHeight;
 };
 
-FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height);
+FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height, GLuint msaaFbo);
 
 void DestroyFluidRenderer(FluidRenderer* renderer);
+
+}
+}
+}
 
 #endif // FLUID_RENDERER_H

@@ -1,7 +1,10 @@
 #include "shell.h"
 
 #include <flex/core/platform.h>
-#include <fruit/utilits/primitive_factory.h>
+#include <fruit/primitives/primitive_factory.h>
+
+using namespace FruitWork::Primitives;
+using namespace FruitWork::Utilits;
 
 void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int phase) {
 	// create a cloth mesh using the global positions / indices
@@ -49,7 +52,7 @@ void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int ph
 }
 
 void Shell::Initialize() {
-	Factory::FactoryMesh factoryMesh;
+	FactoryMesh factoryMesh;
 	Mesh *mesh = factoryMesh.CreateSphere(0.55, 5);
 
 	//Mesh* mesh = CreateSphere(30, 30);//

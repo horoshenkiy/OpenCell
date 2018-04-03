@@ -3,6 +3,10 @@
 
 #include <fruit/controller/compute_controller/flex_params.h>
 #include "component.h"
+#include "fruit/utilits/utilits.h"
+
+using namespace FruitWork::Primitives;
+using namespace FruitWork::Utilits;
 
 enum ProteinType
 {
@@ -29,7 +33,7 @@ struct Protein
 	
 	Shape makeShape()
 	{
-		FlexParams &flexParams = FlexParams::Get();
+		Compute::FlexParams &flexParams = Compute::FlexParams::Get();
 
 		Vec3 x_ax = Vec3(1.0, 0.0, 0.0);
 		Vec3 y_ax = Vec3(0.0, 1.0, 0.0);

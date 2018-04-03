@@ -9,12 +9,11 @@
 #include <cereal/access.hpp>
 #include <fruit/serialize_types.h>
 
+namespace FruitWork {
+namespace Extension {
+
 template <typename T>
 class FruitNvFlexVector : public FruitVector<T> {
-
-private:
-	NvFlexLibrary* lib = nullptr;
-	NvFlexBuffer* buffer = nullptr;
 
 public:
 
@@ -215,6 +214,13 @@ public:
 			count -= end - start;
 		}
 	}
+
+private:
+	NvFlexLibrary* lib = nullptr;
+	NvFlexBuffer* buffer = nullptr;
 };
+
+}
+}
 
 #endif // NV_FLEX_IMPL_FRUIT_EXT_H

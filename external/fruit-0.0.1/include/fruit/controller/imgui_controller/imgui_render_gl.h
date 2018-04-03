@@ -19,8 +19,16 @@
 #ifndef IMGUI_RENDER_GL_H
 #define IMGUI_RENDER_GL_H
 
+namespace FruitWork {
+namespace IMGUI {
+namespace GL {
+
 bool imguiRenderGLInit(const char* fontpath);
 void imguiRenderGLDestroy();
 void imguiRenderGLDraw();
+
+}
+}
+}
 
 #endif // IMGUI_RENDER_GL_H

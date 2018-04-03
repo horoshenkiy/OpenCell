@@ -10,17 +10,17 @@
 #include <fruit/scene.h>
 
 namespace FruitWork {
+namespace IMGUI {
 
 class IMGUIController {
 public:
 
 	// initialize
 	void Initialize(Scene *scene,
-					FlexController *flexController, 
-					FlexParams *flexParams,
-					RenderController *renderController, 
-					RenderParam *renderParam, 
-					SDLController *sdlController);
+	                Compute::FlexParams *flexParams,
+	                Render::RenderController *renderController,
+	                Render::RenderParam *renderParam,
+	                Control::SDLController *sdlController);
 
 	//setters and getters
 	void SetTweakPanel(bool tweakPanel) { this->tweakPanel = tweakPanel; }
@@ -42,18 +42,19 @@ private:
 
 	Scene *scene;
 
-	FlexController *flexController;
-	RenderController *renderController;
-	SDLController *sdlController;
+	Compute::FlexController *flexController;
+	Render::RenderController *renderController;
+	Control::SDLController *sdlController;
 
-	FlexParams *flexParams;
-	RenderParam *renderParam;
+	Compute::FlexParams *flexParams;
+	Render::RenderParam *renderParam;
 
-	SimBuffers *buffers;
+	Compute::SimBuffers *buffers;
 
 	bool tweakPanel = true;
 };
 
+}
 }
 
 #endif

@@ -4,7 +4,11 @@
 #include <fruit/controller/render_controller/render_controller.h>
 #include <fruit/controller/render_controller/camera.h>
 
+namespace FruitWork {
+
 class Serializer;
+
+namespace Control {
 
 class SDLController {
 public:
@@ -21,11 +25,16 @@ public:
 	void SetLastB(int lastb) { this->lastb = lastb; }
 
 	// initialize
-	void SDLInit(RenderController *renderController, 
-				 Camera *camera, 
+	void SDLInit(Render::RenderController *renderController,
+	             Render::Camera *camera, 
 				 const char* title);
 
-	void SDLPostInit(Serializer *serializer);
+	void SDLPostInit(Serializer *_serializer);
+
+	void SDLDestroy() {
+		SDL_DestroyWindow(renderController->GetWindow());
+		SDL_Quit();
+	}
 
 	// return true, if program is running
 	bool SDLMainLoop();
@@ -48,11 +57,12 @@ private:
 	void MouseMotionFunc(unsigned state, int x, int y);
 
 	// for control of window and camera
-	RenderController *renderController = nullptr;
-	Camera *camera = nullptr;
+	Render::RenderController *renderController = nullptr;
+	Render::Camera *camera = nullptr;
 
-	// for control of parameters for flex
-	FlexParams *flexParams = nullptr;
+	// for control parameters 
+	Compute::FlexParams *flexParams = nullptr;
+	Render::RenderParam *renderParam = nullptr;
 
 	// for save state
 	Serializer *serializer;
@@ -65,5 +75,8 @@ private:
 	unsigned int windowId = -1;
 
 };
+
+}
+}
 
 #endif // SDL_CONTROLLER_H

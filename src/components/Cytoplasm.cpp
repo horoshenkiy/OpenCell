@@ -15,7 +15,7 @@ void Cytoplasm::Initialize() {
 	mesh->Transform(TranslationMatrix(Point3(lower)));
 
 	std::vector<Vec3> positions(10000);
-	int n = PoissonSample3D(0.45f, FlexParams::Get().params.radius*0.42f, &positions[0], positions.size(), 10000);
+	int n = PoissonSample3D(0.45f, Compute::FlexParams::Get().params.radius*0.42f, &positions[0], positions.size(), 10000);
 
 	const int vertStart = 0 * mesh->GetNumVertices();
 	const int vertEnd = vertStart + mesh->GetNumVertices();

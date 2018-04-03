@@ -1,6 +1,9 @@
 #include "kernel.h"
 
 #include <flex/core/platform.h>
+#include "fruit/utilits/utilits.h"
+
+using namespace FruitWork::Utilits;
 
 void Kernel::Initialize() {
 

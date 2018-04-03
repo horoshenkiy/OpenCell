@@ -8,6 +8,9 @@
 #include <vector>
 #include <map>
 
+namespace FruitWork {
+namespace Render {
+
 class RenderBuffers {
 
 public:
@@ -19,6 +22,16 @@ public:
 
 	static RenderBuffers& Get() {
 		return Instance();
+	}
+
+	void Initialize(size_t maxParticles, bool interop) {
+		// save mesh positions for skinning
+		if (mesh)
+			meshRestPositions = mesh->m_positions;
+		else
+			meshRestPositions.resize(0);
+
+		fluidRenderBuffers = Fluid::CreateFluidRenderBuffers(maxParticles, interop);
 	}
 
 	void Destroy() {
@@ -35,11 +48,11 @@ public:
 	std::vector<Point3> meshRestPositions;
 	
 	// mapping of collision mesh to render mesh
-	std::map<NvFlexConvexMeshId, GpuMesh*> convexes;
-	std::map<NvFlexTriangleMeshId, GpuMesh*> meshes;
-	std::map<NvFlexDistanceFieldId, GpuMesh*> fields;
+	std::map<NvFlexConvexMeshId, GL::GpuMesh*> convexes;
+	std::map<NvFlexTriangleMeshId, GL::GpuMesh*> meshes;
+	std::map<NvFlexDistanceFieldId, GL::GpuMesh*> fields;
 
-	FluidRenderBuffers fluidRenderBuffers;
+	Fluid::FluidRenderBuffers fluidRenderBuffers;
 
 	// serialize
 	template<class Archive>
@@ -55,5 +68,8 @@ private:
 	RenderBuffers(const RenderBuffers &other) = delete;
 	RenderBuffers operator=(const RenderBuffers &other) = delete;
 };
+
+}
+}
 
 #endif // RENDER_BUFFER_H

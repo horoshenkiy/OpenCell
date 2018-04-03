@@ -1,8 +1,6 @@
 #include "cell.h"
 #include <memory>
 
-#include "fruit_extensions/NvFlexImplFruit.h"
-
 // initialize
 void Cell::Initialize() {
 

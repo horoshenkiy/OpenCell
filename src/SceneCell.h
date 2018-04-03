@@ -5,7 +5,9 @@
 #include <fruit/controller/compute_controller/sim_buffers.h>
 #include <fruit/controller/compute_controller/flex_params.h>
 
-class Serializer;
+using namespace FruitWork;
+namespace FruitWork { class Serializer; }
+
 class Cell;
 
 class SceneCell : public Scene {
@@ -60,8 +62,8 @@ private:
 
 	Cell *cell = nullptr;
 
-	SimBuffers *buffers = nullptr;
-	FlexParams *flexParams = nullptr;
+	Compute::SimBuffers *buffers = nullptr;
+	Compute::FlexParams *flexParams = nullptr;
 
 };
 

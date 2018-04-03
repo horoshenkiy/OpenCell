@@ -1,6 +1,9 @@
 #include <controller/compute_controller/flex_params.h>
 #include <scene.h>
 
+namespace FruitWork {
+namespace Compute {
+
 FlexParams::FlexParams() {
 	// sim params
 	params.gravity[0] = 0.0f;
@@ -90,10 +93,13 @@ FlexParams::FlexParams() {
 	Vec3 sceneLower = Vec3(FLT_MAX);//scene->GetSceneLower();
 	Vec3 sceneUpper = Vec3(-FLT_MAX);//scene->GetSceneUpper();
 
-	(Vec4&)params.planes[0] = Vec4(up.x, up.y, up.z, 0.0f);
-	(Vec4&)params.planes[1] = Vec4(0.0f, 0.0f, 1.0f, -sceneLower.z);
-	(Vec4&)params.planes[2] = Vec4(1.0f, 0.0f, 0.0f, -sceneLower.x);
-	(Vec4&)params.planes[3] = Vec4(-1.0f, 0.0f, 0.0f, sceneUpper.x);
-	(Vec4&)params.planes[4] = Vec4(0.0f, 0.0f, -1.0f, sceneUpper.z);
-	(Vec4&)params.planes[5] = Vec4(0.0f, -1.0f, 0.0f, sceneUpper.y);
+	reinterpret_cast<Vec4&>(params.planes[0]) = Vec4(up.x, up.y, up.z, 0.0f);
+	reinterpret_cast<Vec4&>(params.planes[1]) = Vec4(0.0f, 0.0f, 1.0f, -sceneLower.z);
+	reinterpret_cast<Vec4&>(params.planes[2]) = Vec4(1.0f, 0.0f, 0.0f, -sceneLower.x);
+	reinterpret_cast<Vec4&>(params.planes[3]) = Vec4(-1.0f, 0.0f, 0.0f, sceneUpper.x);
+	reinterpret_cast<Vec4&>(params.planes[4]) = Vec4(0.0f, 0.0f, -1.0f, sceneUpper.z);
+	reinterpret_cast<Vec4&>(params.planes[5]) = Vec4(0.0f, -1.0f, 0.0f, sceneUpper.y);
+}
+
+}
 }

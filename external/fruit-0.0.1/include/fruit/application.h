@@ -1,7 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include <fruit/abst_compute_controller.h>
+#include <fruit/controller/compute_controller/compute_controller.h>
 #include <fruit/controller/console_controller.h>
 #include <fruit/controller/render_controller/camera.h>
 
@@ -11,6 +11,75 @@
 #include "fruit/scene.h"
 
 namespace FruitWork {
+
+	class Application {
+	public:
+
+		/* ! Load scene for simulation */
+		static void LoadScene(Scene *_scene) { scene = _scene; }
+
+		/* ! Run Fruit framework */
+		static void Run(int argc, char* argv[]);
+
+		// TODO: Add singleton for compute controller
+		static Compute::ComputeController &computeController;
+
+	private:
+
+		/* ! Main looper of application */
+		static void MainLoop();
+
+		static void InitCompute();
+		static void InitRender();
+
+		static void InitSceneCompute();
+		static void InitSceneRender();
+
+		static void Initialize();
+
+		static void Reset();
+		static void Shutdown();
+
+		static void UpdateFrame();
+		static void UpdateScene();
+		
+		static void Render();
+
+		// values 
+		////////////////////////////////////////////////////////
+
+		// scene
+		static Scene *scene;
+
+		// controllers
+
+		static Render::RenderController renderController;
+		static IMGUI::IMGUIController imguiController;
+		static Control::SDLController sdlController;
+		static Control::ConsoleController consoleController;
+
+		// buffers
+		static Compute::SimBuffers *buffers;
+		static Render::RenderBuffers *renderBuffers;
+
+		//parameters
+		static Compute::FlexParams *flexParams;
+		static Render::RenderParam *renderParam;
+
+		// camera
+		static Render::Camera camera;
+
+		//timer
+		static Utilits::Timer *timer;
+
+		//video
+		static Utilits::Video video;
+
+		// serializer
+		static Serializer serializer;
+
+		////////////////////////////////////////////////////////
+	};
 
 	struct AppParams {
 
@@ -30,68 +99,6 @@ namespace FruitWork {
 		// logging
 		static bool g_teamCity;
 
-	};
-
-	class Application {
-	public:
-
-		static void LoadScene(Scene *_scene) {
-			scene = _scene;
-		}
-
-		static void MainLoop();
-		static void Run(int argc, char* argv[]);
-
-		static void InitCompute();
-		static void InitRender();
-
-		static void InitSceneCompute();
-		static void InitSceneRender();
-
-		static void Initialize();
-
-		static void Reset();
-		static void Shutdown();
-
-		static void UpdateFrame();
-		static void UpdateScene();
-		
-		static float Render();
-
-		// serializer
-		static Serializer serializer;
-
-		// camera
-		static Camera camera;
-
-		// scene
-		static Scene *scene;
-
-		//timer
-		static Timer timer;
-
-		//video
-		static Video video;
-
-		// controllers
-		static ConsoleController consoleController;
-		static IMGUIController imguiController;
-		static RenderController renderController;
-		static SDLController sdlController;
-		static FlexController *flexController;
-		static AbstComputeController &computeController;
-
-		// buffers
-		static SimBuffers *buffers;
-		static RenderBuffers *renderBuffers;
-
-		//parameters
-		static RenderParam *renderParam;
-		static FlexParams *flexParams;
-
-
-	private:
-		
 	};
 }
 

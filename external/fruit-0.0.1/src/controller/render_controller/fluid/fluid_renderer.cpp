@@ -1,6 +1,10 @@
 #include <controller/render_controller/fluid/fluid_renderer.h>
 #include "controller/compute_controller/compute_controller.h"
 
+namespace FruitWork {
+namespace Render {
+namespace Fluid {
+
 //shaders for points
 //-----------------------------------------------------------------------------------------------------
 // vertex shader
@@ -537,7 +541,7 @@ void main()
 }
 );
 
-FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height)
+FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height, GLuint msaaFbo)
 {
 	FluidRenderer* renderer = new FluidRenderer();
 
@@ -593,7 +597,7 @@ FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height)
 	glVerify(glReadBuffer(GL_COLOR_ATTACHMENT0));
 
 	glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	glBindFramebuffer(GL_FRAMEBUFFER, FruitWork::Application::renderParam->msaaFbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, msaaFbo);
 
 	// reflect texture
 	glVerify(glGenTextures(1, &renderer->mReflectTex));
@@ -635,16 +639,16 @@ FluidRenderer* CreateFluidRenderer(uint32_t width, uint32_t height)
 	glVerify(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, thickz));
 
 	glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	glBindFramebuffer(GL_FRAMEBUFFER, FruitWork::Application::renderParam->msaaFbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, msaaFbo);
 
 	// compile shaders
-	renderer->mPointThicknessProgram = CompileProgram(vertexPointDepthShader, fragmentPointThicknessShader);
+	renderer->mPointThicknessProgram = GL::CompileProgram(vertexPointDepthShader, fragmentPointThicknessShader);
 
 	//renderer->mEllipsoidThicknessProgram = CompileProgram(vertexEllipsoidDepthShader, fragmentEllipsoidThicknessShader);
-	renderer->mEllipsoidDepthProgram = CompileProgram(vertexEllipsoidDepthShader, fragmentEllipsoidDepthShader, geometryEllipsoidDepthShader);
+	renderer->mEllipsoidDepthProgram = GL::CompileProgram(vertexEllipsoidDepthShader, fragmentEllipsoidDepthShader, geometryEllipsoidDepthShader);
 
-	renderer->mCompositeProgram = CompileProgram(vertexPassThroughShader, fragmentCompositeShader);
-	renderer->mDepthBlurProgram = CompileProgram(vertexPassThroughShader, fragmentBlurDepthShader);
+	renderer->mCompositeProgram = GL::CompileProgram(vertexPassThroughShader, fragmentCompositeShader);
+	renderer->mDepthBlurProgram = GL::CompileProgram(vertexPassThroughShader, fragmentBlurDepthShader);
 
 	return renderer;
 }
@@ -659,4 +663,8 @@ void DestroyFluidRenderer(FluidRenderer* renderer)
 
 	glVerify(glDeleteFramebuffers(1, &renderer->mThicknessFbo));
 	glVerify(glDeleteTextures(1, &renderer->mThicknessTex));
+}
+
+}
+}
 }

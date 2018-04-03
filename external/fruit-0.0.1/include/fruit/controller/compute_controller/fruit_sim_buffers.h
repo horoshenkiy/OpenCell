@@ -3,6 +3,9 @@
 
 #include <fruit/utilits/property.h>
 
+namespace FruitWork {
+namespace Compute {
+
 // rename to SimBuffers
 template <template<class> class TypeVector>
 struct FruitSimBuffers 
@@ -72,5 +75,8 @@ struct FruitSimBuffers
 	TypeVector<Vec3> uvs;
 
 };
+
+}
+}
 
 #endif // FRUIT_SIM_BUFFERS_H

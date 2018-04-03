@@ -1,9 +1,11 @@
 #include <application.h>
 
 #include "fruit_core/platform.h"
-#include <fruit_extensions/NvFlexImplFruit.h>
+#include "controller/compute_controller/flex_compute_controller.h"
 
-using namespace FruitWork;
+namespace FruitWork {
+
+using namespace Compute;
 
 ///////////////////////////////////////////////////////////////////////
 // Application params
@@ -67,6 +69,9 @@ void Application::Initialize() {
 	// init render 
 	InitRender();
 
+	// TODO: add method InitUtilits()
+	timer = &Utilits::Timer::Get();
+
 	// init default scene
 	InitSceneCompute();
 	InitSceneRender();
@@ -77,17 +82,16 @@ void Application::InitCompute() {
 	computeController.Initialize(true);
 
 	// it's temp
-	flexController = &FlexController::Get();
 	flexParams = &FlexParams::Get();
 	buffers = &SimBuffers::Get();
 }
 
 void Application::InitRender() {
 	// create render buffer
-	renderBuffers = &RenderBuffers::Instance();
+	renderBuffers = &Render::RenderBuffers::Instance();
 
 	// init render param
-	renderParam = &RenderParam::Instance();
+	renderParam = &Render::RenderParam::Instance();
 
 	// init controller
 	sdlController.SDLInit(&renderController, &camera, "Open Cell");
@@ -130,70 +134,35 @@ void Application::InitSceneCompute() {
 }
 
 void Application::InitSceneRender() {
-	// save mesh positions for skinning
-	if (renderBuffers->mesh)
-		renderBuffers->meshRestPositions = renderBuffers->mesh->m_positions;
-	else
-		renderBuffers->meshRestPositions.resize(0);
 
+	// create render buffers	
+	renderBuffers->Initialize(buffers->maxParticles, flexParams->interop);
+
+	// camera positioning
+	////////////////////////////////////////////////////////////////////////////////////////
+	
 	// center camera on particles
-	Vec3 sceneLower = scene->GetSceneLower();
-	Vec3 sceneUpper = scene->GetSceneUpper();
-
-	camera.SetCamPos(Vec3((sceneLower.x + sceneUpper.x)*0.5f,
-		std::min(sceneUpper.y*1.25f, 6.0f),
-		sceneUpper.z + std::min(sceneUpper.y, 6.0f)*2.0f));
-
-	camera.SetCamAngle(Vec3(0.0f, -DegToRad(15.0f), 0.0f));
+	camera.Initialize(scene->GetSceneLower(), scene->GetSceneUpper());
 
 	// give scene a chance to modify camera position
 	scene->CenterCamera();
 
-	// create render buffers
-	renderBuffers->fluidRenderBuffers = CreateFluidRenderBuffers(buffers->maxParticles, flexParams->interop);
-	imguiController.Initialize(scene, flexController, flexParams, &renderController, renderParam, &sdlController);
+	////////////////////////////////////////////////////////////////////////////////////////
+	
+	// initialize values
+	imguiController.Initialize(scene, flexParams, &renderController, renderParam, &sdlController);
 
+	// add serializer
 	sdlController.SDLPostInit(&serializer);
-	renderController.SetScene(scene);
 
 	// create shadow maps
-	renderController.SetShadowMap(renderController.shadows.ShadowCreate());
+	renderController.PostInitRender(scene);
 }
 
 void Application::Reset() {
-	FlexController &flexController = FlexController::Get();
-
-	if (flexController.GetSolver()) {
-		if (buffers)
-			buffers->Reset(flexController.GetLib());
-
-		DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
-
-		for (auto& iter : renderBuffers->meshes) {
-			NvFlexDestroyTriangleMesh(flexController.GetLib(), iter.first);
-			DestroyGpuMesh(iter.second);
-		}
-
-		for (auto& iter : renderBuffers->fields) {
-			NvFlexDestroyDistanceField(flexController.GetLib(), iter.first);
-			DestroyGpuMesh(iter.second);
-		}
-
-		for (auto& iter : renderBuffers->convexes) {
-			NvFlexDestroyConvexMesh(flexController.GetLib(), iter.first);
-			DestroyGpuMesh(iter.second);
-		}
-
-		renderBuffers->fields.clear();
-		renderBuffers->meshes.clear();
-		renderBuffers->convexes.clear();
-
-		delete renderBuffers->mesh;
-		renderBuffers->mesh = new Mesh();
-
-		NvFlexDestroySolver(flexController.GetSolver());
-		flexController.SetSolver(nullptr);
-
+	if (computeController.IsInitialize()) {
+		computeController.Reset();
+		renderController.Reset();
 		scene->Reset();
 	}
 
@@ -202,39 +171,9 @@ void Application::Reset() {
 }
 
 void Application::Shutdown() {
-	FlexController *flexController = &FlexController::Get();
-
-	for (auto& iter : renderBuffers->meshes) {
-		NvFlexDestroyTriangleMesh(flexController->GetLib(), iter.first);
-		DestroyGpuMesh(iter.second);
-	}
-
-	for (auto& iter : renderBuffers->fields) {
-		NvFlexDestroyDistanceField(flexController->GetLib(), iter.first);
-		DestroyGpuMesh(iter.second);
-	}
-
-	for (auto& iter : renderBuffers->convexes) {
-		NvFlexDestroyConvexMesh(flexController->GetLib(), iter.first);
-		DestroyGpuMesh(iter.second);
-	}
-
-	renderBuffers->fields.clear();
-	renderBuffers->meshes.clear();
-
-	NvFlexDestroySolver(flexController->GetSolver());
-	NvFlexShutdown(flexController->GetLib());
-
-	if (renderController.GetFluidRenderer())
-		DestroyFluidRenderer(renderController.GetFluidRenderer());
-
-	DestroyFluidRenderBuffers(renderBuffers->fluidRenderBuffers);
-
-	ShadowDestroy(renderController.GetShadowMap());
-	DestroyRender();
-
-	SDL_DestroyWindow(renderController.GetWindow());
-	SDL_Quit();
+	computeController.Destroy();
+	renderController.DestroyRender();
+	sdlController.SDLDestroy();
 }
 
 void Application::UpdateFrame() {
@@ -242,27 +181,30 @@ void Application::UpdateFrame() {
 	static double lastTime = 0;
 
 	// real elapsed frame time
-	double frameBeginTime = FruitGetSeconds();
-	timer.realdt = float(frameBeginTime - lastTime);
+	double frameBeginTime = Core::FruitGetSeconds();
+	timer->realdt = float(frameBeginTime - lastTime);
 	lastTime = frameBeginTime;
+
+	// map buffers
+	timer->waitTime = Utilits::TimeMeasurement(computeController, &ComputeController::MapBuffers);
+	
+	// get time of GPU simulation
+	timer->simLatency = timer->GetDeviceLatency();
 
 	//-------------------------------------------------------------------
 	// Scene Update
 
-	double waitBeginTime = FruitGetSeconds();
-	computeController.MapBuffers();
-	double waitEndTime = FruitGetSeconds();
-
 	camera.UpdateCamera();
-
 	if (!AppParams::g_pause || AppParams::g_step)
 		UpdateScene();
 
-	float newSimLatency = timer.GetDeviceLatency();
-
 	//-------------------------------------------------------------------
 	// Render
-	float newRenderTime = Render();
+	
+	timer->renderTime = Utilits::TimeMeasurement(&Application::Render);
+
+	//-------------------------------------------------------------------
+	// Serialize state
 
 	/*if (serializer.GetIsNeedSave()) {
 		std::time_t t = std::time(0);
@@ -273,6 +215,7 @@ void Application::UpdateFrame() {
 		serializer.SetIsNeedSave(false);
 	}*/
 
+	// unmap buffers
 	computeController.UnmapBuffers();
 
 	// if user requested a scene reset process it now
@@ -283,26 +226,10 @@ void Application::UpdateFrame() {
 
 	//-------------------------------------------------------------------
 	// Flex Update
+	timer->updateTime = Utilits::TimeMeasurement(computeController, &ComputeController::Update);
 
-	double updateBeginTime = FruitGetSeconds();
-	computeController.Update();
-	double updateEndTime = FruitGetSeconds();
-
-	//-------------------------------------------------------
-	// Update the on-screen timers
-
-	float newUpdateTime = float(updateEndTime - updateBeginTime);
-	float newWaitTime = float(waitEndTime - waitBeginTime);
-
-	// Exponential filter to make the display easier to read
-	const float timerSmoothing = 0.05f;
-
-	timer.updateTime = (timer.updateTime == 0.0f) ? newUpdateTime : Lerp(timer.updateTime, newUpdateTime, timerSmoothing);
-	timer.renderTime = (timer.renderTime == 0.0f) ? newRenderTime : Lerp(timer.renderTime, newRenderTime, timerSmoothing);
-	timer.waitTime = (timer.waitTime == 0.0f) ? newWaitTime : Lerp(timer.waitTime, newWaitTime, timerSmoothing);
-	timer.simLatency = (timer.simLatency == 0.0f) ? newSimLatency : Lerp(timer.simLatency, newSimLatency, timerSmoothing);
-
-	PresentFrame(renderParam->vsync);
+	// temp
+	Render::GL::PresentFrame(renderParam->vsync, renderController.GetWindow());
 }
 
 void Application::UpdateScene() {
@@ -310,28 +237,15 @@ void Application::UpdateScene() {
 	scene->Update();
 }
 
-float Application::Render() {
-	double renderBeginTime = FruitGetSeconds();
-
+void Application::Render() {
 	// main render scene //////////////////
-	// TODO: move to render controller
-	StartFrame(Vec4(renderParam->clearColor, 1.0f));
+	renderController.Render(computeController.GetActiveCount(), computeController.GetDiffuseParticles());
 
-	renderController.RenderScene(computeController.GetActiveCount(), computeController.GetDiffuseParticles());
-	renderController.RenderDebug();
-
-	// TODO: move to render controller
-	EndFrame(renderController.GetWidth(), renderController.GetHeight());
-	///////////////////////////////////////
-
+	// render ui
 	imguiController.DoUI(computeController.GetActiveCount(), computeController.GetDiffuseParticles());
 
-	if (video.GetCapture())
-		video.CreateFrame(renderController.GetWidth(), renderController.GetHeight());
-
-	double renderEndTime = FruitGetSeconds();
-
-	return float(renderEndTime - renderBeginTime);
+	if (video.capture)
+		video.CreateFrame(renderController.screenWidth, renderController.screenHeight);
 }
 
 // values
@@ -339,24 +253,25 @@ float Application::Render() {
 
 Serializer Application::serializer;
 
-Camera Application::camera;
+Render::Camera Application::camera;
 Scene* Application::scene = nullptr;
 
-Timer Application::timer;
+Utilits::Timer* Application::timer;
 
-Video Application::video;
+Utilits::Video Application::video;
 
-ConsoleController Application::consoleController;
-IMGUIController Application::imguiController;
-RenderController Application::renderController;
-SDLController Application::sdlController;
-FlexController* Application::flexController;
-AbstComputeController& Application::computeController = FruitNvFlex();
+Control::ConsoleController Application::consoleController;
+IMGUI::IMGUIController Application::imguiController;
+Render::RenderController Application::renderController;
+Control::SDLController Application::sdlController;
+Compute::ComputeController& Application::computeController = FlexComputeController();
 
-SimBuffers* Application::buffers;
-RenderBuffers* Application::renderBuffers;
+Compute::SimBuffers* Application::buffers;
+Render::RenderBuffers* Application::renderBuffers;
 
-RenderParam* Application::renderParam;
-FlexParams* Application::flexParams;
+Render::RenderParam* Application::renderParam;
+Compute::FlexParams* Application::flexParams;
 
 ///////////////////////////////////////////////////////////////////////
+
+}

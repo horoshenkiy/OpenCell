@@ -6,6 +6,9 @@
 
 // write documentation of this class
 // Loader data to GPU
+
+namespace FruitWork {
+
 class Fruit {
 
 public:
@@ -68,5 +71,7 @@ public:
 	virtual void SetDynamicTriangles() = 0;
 	virtual void GetDynamicTriangles() = 0;
 };
+
+}
 
 #endif // FRUIT_H

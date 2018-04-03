@@ -21,6 +21,9 @@
 
 #include <stdarg.h>
 
+namespace FruitWork {
+namespace IMGUI {
+
 enum imguiMouseButton
 {
 	IMGUI_MBUT_LEFT = 0x01, 
@@ -109,5 +112,7 @@ struct imguiGfxCmd
 const imguiGfxCmd* imguiGetRenderQueue();
 int imguiGetRenderQueueSize();
 
+}
+}
 
 #endif // IMGUI_H

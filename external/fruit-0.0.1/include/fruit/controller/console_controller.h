@@ -5,6 +5,9 @@
 #include <fruit/controller/render_controller/render_controller.h>
 #include <fruit/controller/imgui_controller/imgui_controller.h>
 
+namespace FruitWork {
+namespace Control {
+
 class ConsoleController {
 public:
 	
@@ -35,10 +38,9 @@ public:
 		}
 	}
 
-	void SetParamFlexController(FlexController &flexController) const {
+	void SetParamFlexController(Compute::FlexController &flexController) const {
 		if (options.count("device") > 0)
 			flexController.SetDevice(options["device"].as<int>());
-
 	}
 
 	std::string GetState() const {
@@ -51,5 +53,8 @@ public:
 private:
 	cxxopts::Options options{ "Open Cell", "Open project of MSU for researching cell's migrations." };
 };
+
+}
+}
 
 #endif // CONSOLE_CONTROLLER_H

@@ -26,6 +26,9 @@
 #	define snprintf _snprintf
 #endif
 
+namespace FruitWork {
+namespace IMGUI {
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static const unsigned TEXT_POOL_SIZE = 8000;
@@ -707,3 +710,5 @@ void imguiDrawString(int x, int y, float colorX, float colorY, float colorZ, int
 	imguiDrawText(x, y, align, buf, imguiRGBA((unsigned char)(colorX * 255), (unsigned char)(colorY * 255), (unsigned char)(colorZ * 255)));
 }
 
+}
+}

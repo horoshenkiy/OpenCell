@@ -5,13 +5,14 @@
 
 #include <fruit/controller/compute_controller/fruit_sim_buffers.h>
 #include <fruit/utilits/logger.h>
-#include <fruit/utilits/utilits.h>
 
-// need move to primitives
+namespace FruitWork {
+namespace Compute {
 
+using namespace Extension;
 
 // rename to fruit_sim_buffers
-class SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Loggable {
+class SimBuffers : public FruitSimBuffers<FruitNvFlexVector>, public Utilits::Loggable {
 
 public:
 
@@ -115,5 +116,8 @@ protected:
 	SimBuffers operator=(const SimBuffers &other) = delete;
 
 };
+
+}
+}
 
 #endif // SIM_BUFFERS_H

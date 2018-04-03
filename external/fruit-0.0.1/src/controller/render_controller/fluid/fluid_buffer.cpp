@@ -1,5 +1,9 @@
 #include <controller/render_controller/fluid/fluid_buffer.h>
 
+namespace FruitWork {
+namespace Render {
+namespace Fluid {
+
 FluidRenderBuffers CreateFluidRenderBuffers(int numFluidParticles, bool enableInterop)
 {
 	FluidRenderBuffers buffers = {};
@@ -26,7 +30,7 @@ FluidRenderBuffers CreateFluidRenderBuffers(int numFluidParticles, bool enableIn
 	glVerify(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.mIndices));
 	glVerify(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*numFluidParticles, 0, GL_DYNAMIC_DRAW));
 
-	FlexController &flexController = FlexController::Instance();
+	Compute::FlexController &flexController = Compute::FlexController::Get();
 
 	// delete it
 	if (enableInterop)
@@ -129,5 +133,8 @@ void UpdateFluidRenderBuffers(FluidRenderBuffers buffers, Vec4* particles, float
 	// reset
 	glVerify(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 	glVerify(glBindBuffer(GL_ARRAY_BUFFER, 0));
+}
 
+}
+}
 }
