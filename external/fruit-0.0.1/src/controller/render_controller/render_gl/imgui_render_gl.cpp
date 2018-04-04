@@ -24,6 +24,9 @@
 #include <controller/imgui_controller/imgui.h>
 
 namespace FruitWork {
+
+using namespace Render::GL;
+
 namespace IMGUI {
 namespace GL {
 

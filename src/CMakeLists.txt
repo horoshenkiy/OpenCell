@@ -14,8 +14,8 @@ target_link_libraries(OpenCell optimized FruitWork)
 	
 target_link_libraries(OpenCell debug NvFlexDebugCUDA_x64)
 target_link_libraries(OpenCell debug NvFlexDeviceDebug_x64)
-target_link_libraries(OpenCell debug NvFlexExtDebugCUDA_x64d)
-target_link_libraries(OpenCell debug NvFlexCoreDebug_x64d) 
+target_link_libraries(OpenCell debug NvFlexExtDebugCUDA_x64d.lib)
+target_link_libraries(OpenCell debug NvFlexCoreDebug_x64d.lib) 
 target_link_libraries(OpenCell debug FruitWorkd) 
 
 target_link_libraries(OpenCell SDL2 SDL2main glew32) 

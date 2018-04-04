@@ -2,6 +2,9 @@
 
 namespace FruitWork {
 namespace Render {
+
+using namespace GL;
+
 namespace Fluid {
 
 FluidRenderBuffers CreateFluidRenderBuffers(int numFluidParticles, bool enableInterop)

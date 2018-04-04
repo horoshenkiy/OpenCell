@@ -17,6 +17,16 @@ struct Receptor
 		isFree = true;
 	}
 
+	void lock_receptor()
+	{
+		isFree = false;
+	}
+
+	void open_receptor()
+	{
+		isFree = true;
+	}
+
 	int index;
 	bool isFree;
 };
@@ -36,7 +46,11 @@ struct Springs
 	int prevBufferSize;
 	int prevBufferIndSize;
 
-	int springsCount;
+	Springs(Compute::SimBuffers* buffers_)
+	{
+		prevBufferSize = buffers_->springLengths.size();
+		prevBufferIndSize = buffers_->springIndices.size();
+	}
 };
 
 class Receptors {
@@ -48,6 +62,8 @@ public:
 		buffers = buffers_;
 		shell = shell_;
 		ligands_group = ligands_group_;
+
+		springs = new Springs(buffers);
 
 		select_receptors();
 		create_search_tree();
@@ -82,7 +98,7 @@ public:
 		springs->springLength.push_back(Length(Vec3(buffers->positions.get(rec->index)) - Vec3(buffers->positions.get(lig->index))));
 		springs->springStiffness.push_back(stiffness);
 	}
-	
+
 	void create_search_tree()
 	{
 		auto ligands = ligands_group->get_ligands();
@@ -108,12 +124,12 @@ public:
 		//// print returned values
 		//value to_print_out;
 		//for (size_t i = 0; i < returned_values.size(); i++) {
-			//to_print_out = returned_values[i];
-			//float x = to_print_out.first.get<0>();
-			//float y = to_print_out.first.get<1>();
-			//float z = to_print_out.first.get<2>();
-			//std::cout << "Select point: " << to_print_out.second << std::endl;
-			//std::cout << "x: " << x << ", y: " << y << ", z: " << z << std::endl;
+		//to_print_out = returned_values[i];
+		//float x = to_print_out.first.get<0>();
+		//float y = to_print_out.first.get<1>();
+		//float z = to_print_out.first.get<2>();
+		//std::cout << "Select point: " << to_print_out.second << std::endl;
+		//std::cout << "x: " << x << ", y: " << y << ", z: " << z << std::endl;
 		//}
 
 		return returned_values;
@@ -140,11 +156,13 @@ public:
 						if (p < connectionProb)
 						{
 							set_spring(rec, lig);
+							lig->lock_ligand();
+							rec->lock_receptor();
 							break;
 						}
-					}		
+					}
 				}
-			}		
+			}
 		}
 	}
 
@@ -152,7 +170,7 @@ public:
 	{
 		std::list<int> deleteIndexSprins;
 
-		for (int i = 0; i < springs->springsCount; i++)
+		for (int i = 0; i < springs->springLength.size(); i++)
 		{
 			float len = Length(Vec3(buffers->positions.get(springs->springShellIndices[i])) - Vec3(buffers->positions.get(springs->springLigandIndices[i])));
 			if (len > breakRadius)
@@ -174,7 +192,7 @@ public:
 	//	springs->springShellIndices.erase(springs->springShellIndices.begin() + index);
 	//	springs->springLigandIndices.erase(springs->springLigandIndices.begin() + index);
 	//	springs->springLength.erase(springs->springLength.begin() + index);
-	//	springs->springStiffness.erase(springs->springStiffness.begin() + index);
+	//	springs->spring.erase(springs->springStiffness.begin() + index);
 
 	//	springs->springsCount--;
 	//}
@@ -184,7 +202,7 @@ public:
 		springs->prevBufferSize = buffers->springLengths.size();
 		springs->prevBufferIndSize = buffers->springIndices.size();
 
-		for (int i = 0; i < springs->springsCount; i++)
+		for (int i = 0; i < springs->springLength.size(); i++)
 		{
 			buffers->springIndices.push_back(springs->springShellIndices[i]);
 			buffers->springIndices.push_back(springs->springLigandIndices[i]);
@@ -210,18 +228,19 @@ public:
 private:
 
 	std::vector<Receptor*> receptors;
+
 	Springs* springs;
 	LigandGroup* ligands_group;
 
 	int receptorsCount = 100;
 
-	float connectionProb = 1.0f;
-	float breakProb = 1.0f;
+	float connectionProb = 1;
+	float breakProb = 1;
 
 	bgi::rtree< value, bgi::quadratic<16>> rtree;
-	float searchRadius = 1.0f;
-	float breakRadius = 1.2f;
-	float stiffness = 1.0f;
+	float searchRadius = 1;
+	float breakRadius = 1.2;
+	float stiffness = 10000;
 
 	Compute::SimBuffers* buffers;
 	Shell* shell;

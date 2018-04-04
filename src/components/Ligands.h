@@ -29,6 +29,16 @@ public:
 		isFree = true;
 	}
 
+	void lock_ligand()
+	{
+		isFree = false;
+	}
+
+	void open_ligand()
+	{
+		isFree = true;
+	}
+
 	Vec3 coord;
 	int index;
 	bool isFree;

@@ -71,16 +71,16 @@
 
 #include <vector>
 
+namespace FruitWork {
+namespace Render {
+namespace GL {
+
 #if defined(NDEBUG)
 #define glVerify(x) x
 #else
 #define glVerify(x) {x; glAssert(#x, __LINE__, __FILE__);}
-void glAssert(const char* msg, long line, const char* file);
+	void glAssert(const char* msg, long line, const char* file);
 #endif
-
-namespace FruitWork {
-namespace Render {
-namespace GL {
 
 GLuint CompileProgram(const char *vsource=NULL, const char *fsource=NULL, const char* gsource=NULL);
 

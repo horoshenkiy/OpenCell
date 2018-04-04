@@ -111,15 +111,14 @@ void Cell::Update() {
 	// TODO: need to refactoring
 	static int j = 0;
 	
-	static auto ligandGroup = new LigandGroup(&buffers, kernel.get());
-
 	cytoplasm->Update();
 	shell->Update();
 	kernel->Update();
 
+	static auto ligandGroup = new LigandGroup(&buffers, kernel.get());
 	static auto receptors = new Receptors(&buffers, shell.get(), ligandGroup);
 
-	//receptors->Update();
+	receptors->Update();
 
 	if (j < 400) {
 		j++;

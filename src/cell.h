@@ -23,7 +23,7 @@ public:
 	std::unique_ptr<Shell> shell;
 	Cytoskeleton2* cytoskeleton2;
 	LigandGroup* ligandGroup;
-	Receptors*	receptors;
+	Receptors* receptors;
 
 	// constructors and initialize
 	Cell() : BiologyObject() {}

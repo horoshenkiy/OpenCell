@@ -3,6 +3,9 @@
 
 namespace FruitWork {
 namespace Render {
+
+using namespace GL;
+
 namespace Fluid {
 
 //shaders for points

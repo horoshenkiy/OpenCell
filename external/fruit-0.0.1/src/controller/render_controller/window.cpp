@@ -5,6 +5,8 @@
 namespace FruitWork {
 namespace Render {
 
+using namespace GL;
+
 void RenderController::InitRender(Camera *camera) {
 
 	// TODO: control for initialize
