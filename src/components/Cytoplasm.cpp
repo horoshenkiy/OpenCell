@@ -1,4 +1,4 @@
-#include "cytoplasm.h"
+#include <components/cytoplasm.h>
 
 #include <flex/core/platform.h>
 #include <fruit/controller/compute_controller/flex_params.h>

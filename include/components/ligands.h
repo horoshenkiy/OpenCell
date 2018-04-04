@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LIGANDS_H
+#define LIGANDS_H
 
 #include "kernel.h"
 #include <fruit/controller/compute_controller/flex_params.h>
@@ -23,19 +24,16 @@ class Ligand
 {
 public:
 
-	Ligand(Vec3 coord_)
-	{
+	Ligand(Vec3 coord_) {
 		coord = coord_;
 		isFree = true;
 	}
 
-	void lock_ligand()
-	{
+	void lock_ligand() {
 		isFree = false;
 	}
 
-	void open_ligand()
-	{
+	void open_ligand() {
 		isFree = true;
 	}
 
@@ -138,3 +136,5 @@ private:
 	Kernel *kernel;
 	Compute::SimBuffers *buffers;
 };
+
+#endif // LIGANDS_H

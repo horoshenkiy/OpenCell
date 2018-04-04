@@ -1,5 +1,5 @@
-#include "SceneCell.h"
-#include "cell.h"
+#include <scene_cell.h>
+#include <cell.h>
 
 void SceneCell::Initialize() {
 	this->buffers = &SimBuffers::Get();

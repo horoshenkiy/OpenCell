@@ -7,12 +7,6 @@
 using namespace FruitWork;
 
 class Component {
-protected:
-	Compute::SimBuffers &buffers;
-	Render::RenderBuffers &renderBuffers;
-
-	int group;
-
 public:
 
 	Component() : 
@@ -32,6 +26,13 @@ public:
 	virtual void Sync() {}
 
 	virtual void Draw() {}
+
+protected:
+	Compute::SimBuffers &buffers;
+	Render::RenderBuffers &renderBuffers;
+
+	int group;
+
 };
 
 #endif // COMPONENT_H

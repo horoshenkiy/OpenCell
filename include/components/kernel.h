@@ -1,9 +1,7 @@
-#pragma once
+#ifndef KERNEL_H
+#define KERNEL_H
 
 #include "component.h"
-
-using namespace FruitWork;
-namespace FruitWork { class Serializer; }
 
 class Kernel : public Component {
 public:
@@ -39,8 +37,6 @@ public:
 	}
 
 private:
-	
-	friend bool operator==(const Kernel &lKernel, const Kernel &rKernel);
 
 	//fields of center
 	int indexCenter = -1;
@@ -51,4 +47,4 @@ private:
 	float trueRadius;
 };
 
-#include <fruit/utilits/serializer.h>
+#endif // KERNEL_H

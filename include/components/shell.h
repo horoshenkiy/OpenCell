@@ -1,10 +1,10 @@
-#pragma once
+#ifndef SHELL_H
+#define SHELL_H
 
 #include "component.h"
 #include <random>
 
 using namespace FruitWork;
-namespace FruitWork { class Serializer; }
 
 // TODO: add constructor copy
 class Shell : public Component {
@@ -50,8 +50,6 @@ public:
 
 private:
 
-	friend bool operator==(const Shell&, const Shell&);
-
 	// position in simbuffer
 	size_t indBeginPosition = -1;
 	size_t indEndPosition = -1;
@@ -67,3 +65,5 @@ private:
 	std::random_device gen;
 	std::uniform_real_distribution<float> urd = std::uniform_real_distribution<float>(-0.01f, 0.01f);
 };
+
+#endif // SHELL_H

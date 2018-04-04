@@ -1,4 +1,4 @@
-#include "shell.h"
+#include <components/shell.h>
 
 #include <flex/core/platform.h>
 #include <fruit/primitives/primitive_factory.h>

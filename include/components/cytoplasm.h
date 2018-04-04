@@ -4,9 +4,6 @@
 #include <fruit/controller/compute_controller/flex_params.h>
 #include "component.h"
 
-// delete this
-class Serializer;
-
 class Cytoplasm : public Component {
 
 public:
@@ -14,7 +11,7 @@ public:
 	// constructors and initialize
 	Cytoplasm();
 
-	void Initialize();
+	void Initialize() override;
 
 	// getters and setters
 	int GetNumberOfParticles() const { return numberOfParticles; }
@@ -25,8 +22,6 @@ public:
 	}
 
 private:
-
-	friend bool operator==(const Cytoplasm &lCytoplasm, const Cytoplasm &rCytoplasm);
 
 	//int group = -1;
 	int numberOfParticles = 0;

@@ -1,4 +1,4 @@
-#include "cell.h"
+#include <cell.h>
 #include <memory>
 
 // initialize
@@ -128,11 +128,11 @@ void Cell::Update() {
 	if (j == 400) {
 		j++;
 		std::clog << "Cytoskeleton create" << std::endl;
-		cytoskeleton2 = new Cytoskeleton2(kernel.get(), shell.get());
+		cytoskeleton = new Cytoskeleton(kernel.get(), shell.get());
 		return;
 	}
 
-	cytoskeleton2->Update();
+	cytoskeleton->Update();
 
 }
 

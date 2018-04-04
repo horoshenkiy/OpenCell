@@ -1,4 +1,4 @@
-#include "SceneCell.h"
+#include <scene_cell.h>
 #include <fruit/application.h>
 
 int main(int argc, char* argv[]) {

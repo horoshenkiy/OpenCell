@@ -1,45 +1,40 @@
-#pragma once
+#ifndef CELL_H
+#define CELL_H
 
 #include "components\cytoplasm.h"
 #include "components\kernel.h"
 #include "components\shell.h"
-#include "components\Receptors.h"
-#include "components\Ligands.h"
-#include "components\Receptors.h"
+#include "components\receptors.h"
+#include "components\ligands.h"
+#include "components\receptors.h"
+#include <components\cytoskeleton.h>
 
-#include "biology_object.h"
-
-class Serializer;
-
-class Cytoskeleton2;
-
-class Cell : public BiologyObject {
+class Cell {
 
 public:
+
+	Cell() = default;
 	
 	// need incapsulation
 	std::unique_ptr<Cytoplasm> cytoplasm;
 	std::unique_ptr<Kernel>	kernel;
 	std::unique_ptr<Shell> shell;
-	Cytoskeleton2* cytoskeleton2;
+	Cytoskeleton* cytoskeleton;
 	LigandGroup* ligandGroup;
 	Receptors* receptors;
 
-	// constructors and initialize
-	Cell() : BiologyObject() {}
+	void Initialize();
 
-	void Initialize() override;
+	virtual void InitializeFromFile();
 
-	virtual void InitializeFromFile() override;
-
-	virtual void PostInitialize() override;
+	virtual void PostInitialize();
 
 	void clearBuffers();
 
 	// update
-	void Update() override;
+	void Update();
 
-	void Sync() override;
+	void Sync();
 
 	void Draw();
 
@@ -68,13 +63,13 @@ public:
 
 private:
 
-	friend bool operator==(const Cell &lCell, const Cell &rCell);
-
-	int group = 0;
-
 	int mNumFluidParticles = 0;
+
+	Compute::FlexParams &flexParams = FlexParams::Get();
+	Compute::SimBuffers &buffers = SimBuffers::Get();
+
+	Render::RenderBuffers &renderBuffers = Render::RenderBuffers::Get();
+
 };
 
-#include <fruit/utilits/Serializer.h>
-
-#include "components\cytoskeleton2.h"
+#endif // CELL_H

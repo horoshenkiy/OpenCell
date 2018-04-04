@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RECEPTORS_H
+#define RECEPTORS_H
 
 #include <vector>
 #include <set>
@@ -6,24 +7,21 @@
 
 #include "shell.h"
 #include "component.h"
-#include "Ligands.h"
+#include "ligands.h"
 
 
 struct Receptor
 {
-	Receptor(int ind)
-	{
+	Receptor(int ind) {
 		index = ind;
 		isFree = true;
 	}
 
-	void lock_receptor()
-	{
+	void lock_receptor() {
 		isFree = false;
 	}
 
-	void open_receptor()
-	{
+	void open_receptor() {
 		isFree = true;
 	}
 
@@ -245,3 +243,5 @@ private:
 	Compute::SimBuffers* buffers;
 	Shell* shell;
 };
+
+#endif // RECEPTORS_H

@@ -58,7 +58,7 @@ add_subdirectory(external/fruit-0.0.1)
 # open_cell project
 #########################################################################
 
-include_directories(external/fruit-0.0.1/include)
+include_directories(external/fruit-0.0.1/include include)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin/)
 

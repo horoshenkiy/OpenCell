@@ -1,16 +1,16 @@
-#pragma once
+#ifndef CYTOSKELETON_H
+#define CYTOSKELETON_H
 
 #include "protein.h"
 #include "kernel.h"
 #include "shell.h"
 #include <fruit/controller/compute_controller/flex_params.h>
 
-
-class Cytoskeleton2 {
+class Cytoskeleton : public Component {
 
 public:
 
-	Cytoskeleton2(Kernel* kernel_, Shell* shell_);
+	Cytoskeleton(Kernel* kernel_, Shell* shell_);
 
 	void Update();
 
@@ -48,5 +48,6 @@ private:
 	float phi = M_PI/4;
 	float branchin_angle  = 1.256f;
 
-	//Vec3 main_direction = Normalize(Vec3(1.0, 0.0, 1.0));
 };
+
+#endif // CYTOSKELETON_H

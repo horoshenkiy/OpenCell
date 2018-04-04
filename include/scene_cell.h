@@ -5,10 +5,7 @@
 #include <fruit/controller/compute_controller/sim_buffers.h>
 #include <fruit/controller/compute_controller/flex_params.h>
 
-using namespace FruitWork;
-namespace FruitWork { class Serializer; }
-
-class Cell;
+#include <cell.h>
 
 class SceneCell : public Scene {
 
@@ -57,8 +54,6 @@ public:
 	}
 
 private:
-	friend Serializer;
-	friend bool operator==(const SceneCell &lScene, const SceneCell &rScene);
 
 	Cell *cell = nullptr;
 
@@ -66,7 +61,5 @@ private:
 	Compute::FlexParams *flexParams = nullptr;
 
 };
-
-#include "fruit/utilits/serializer.h"
 
 #endif // SCENE_CELL_H
