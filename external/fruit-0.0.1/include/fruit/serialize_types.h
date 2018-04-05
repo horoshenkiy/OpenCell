@@ -125,7 +125,7 @@ void load(Archive &archive, NvFlexExtAsset &asset) {
 ///// FruitVector
 ///////////////////////////////////////////////////////////
 
-template<class Archive, typename T>
+/*template<class Archive, typename T>
 void save(Archive &archive, const FruitVector<T> &vec) {
 	archive(vec.size());
 	for (size_t i = 0; i < vec.size(); i++)
@@ -140,7 +140,7 @@ void load(Archive &archive, FruitVector<T> &vec) {
 	vec.resize(sizeVec);
 	for (size_t i = 0; i < vec.size(); i++)
 		archive(vec[i]);
-}
+}*/
 
 ///// Mesh
 ///////////////////////////////////////////////////////////

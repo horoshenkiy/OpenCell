@@ -1,8 +1,6 @@
 #include <gtest\gtest.h>
 
-TEST(SimpleCase, SimpleTest) {
-	printf("Simple test\n");
-}
+#include "test_state.h"
 
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);

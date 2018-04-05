@@ -1,11 +1,169 @@
-#pragma once
+#ifndef TEST_STATE_H
+#define TEST_STATE_H
 
 #include <gtest\gtest.h>
+#include <maths.h>
+#include <cereal\archives\binary.hpp>
 
-TEST(SimpleCase, SimpleTest)
-{
-	printf("Simple test\n");
+#include <fruit\serialize_types.h>
+#include <fruit\controller\compute_controller\flex_compute_controller.h>
+#include <fruit\controller\compute_controller\sim_buffers.h>
+
+#include "comparators.h"
+
+using namespace FruitWork;
+
+std::stringstream ss;
+
+TEST(StateCase, StateQuat) {
+	Quat oQuat = Quat(1.0f, 2.0f, 3.0f, 4.0f), iQuat;
+
+	cereal::BinaryOutputArchive oArchive(ss);
+	FruitWork::serialize(oArchive, oQuat);
+
+	cereal::BinaryInputArchive iArchive(ss);
+	serialize(iArchive, iQuat);
+
+	ASSERT_EQ(oQuat, iQuat);
 }
+
+TEST(StateCase, StateVec3) {
+	Vec3 outputVec = Vec3(1.0f, 2.0f, 3.0f);
+	cereal::BinaryOutputArchive outArchive(ss);
+	serialize(outArchive, outputVec);
+
+	Vec3 inputVec;
+	cereal::BinaryInputArchive inArchive(ss);
+	serialize(inArchive, inputVec);
+
+	ASSERT_EQ(inputVec, outputVec);
+}
+
+TEST(StateCase, StateVec4) {
+	Vec4 &outputVec = Vec4(1.0f, 2.0f, 3.0f, 4.0f);
+	cereal::BinaryOutputArchive outArchive(ss);
+	serialize(outArchive, outputVec);
+
+	Vec4 inputVec;
+	cereal::BinaryInputArchive inArchive(ss);
+	serialize(inArchive, inputVec);
+
+	ASSERT_EQ(inputVec, outputVec);
+}
+
+TEST(StateCase, StateNvFlexCollisionGeometry) {
+	NvFlexCollisionGeometry oCollGeom, iCollGeom;
+	oCollGeom.capsule.halfHeight = 2.0f;
+	oCollGeom.capsule.radius = 4.0f;
+
+	cereal::BinaryOutputArchive oarchive(ss);
+	save(oarchive, oCollGeom);
+
+	cereal::BinaryInputArchive iarchive(ss);
+	load(iarchive, iCollGeom);
+
+	ASSERT_EQ(oCollGeom.capsule.halfHeight, iCollGeom.capsule.halfHeight);
+	ASSERT_EQ(iCollGeom.capsule.radius, iCollGeom.capsule.radius);
+}
+
+TEST(StateCase, StateNvFlexExtAsset) {
+
+	Compute::FlexComputeController computeController;
+	computeController.Initialize(false);
+
+	Compute::SimBuffers &buffers = Compute::SimBuffers::Get();
+
+	////////////////////////////////////////////////////////////
+	// Mapping buffers
+	buffers.MapBuffers();
+
+	Mesh* mesh = ImportMesh("../../../../data/sphere_high.ply");
+	Vec3 lower = Vec3(2.0f, 0.4f, 1.0f);
+
+	mesh->Normalize();
+	mesh->Transform(TranslationMatrix(Point3(lower)));
+
+	const int numParticles = int(mesh->m_positions.size());
+	float invMass = 0.25f;
+
+	// add particles to system
+	size_t indBeginPosition = buffers.positions.size();
+	int phase = NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter);
+
+	for (size_t i = 0; i < mesh->GetNumVertices(); ++i) {
+		const Vec3 p = Vec3(mesh->m_positions[i]);
+
+		buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
+		buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+
+		buffers.velocities.push_back(0.0f);
+		buffers.phases.push_back(phase);
+	}
+
+	// create asset
+	NvFlexExtAsset oCloth = *(NvFlexExtCreateClothFromMesh((float*)&buffers.positions[indBeginPosition],
+		numParticles,
+		(int*)&mesh->m_indices[0],
+		mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f));
+
+	cereal::BinaryOutputArchive oArchive(ss);
+	save(oArchive, oCloth);
+
+	NvFlexExtAsset iCloth = NvFlexExtAsset();
+	cereal::BinaryInputArchive iArchive(ss);
+	load(iArchive, iCloth);
+
+	ASSERT_EQ(iCloth, oCloth);
+
+	// Unmap buffers 
+	buffers.UnmapBuffers();
+	buffers.Destroy();
+}
+
+/*TEST(StateCase, StateSimBuffers) {
+
+	Compute::FlexComputeController computeController;
+	computeController.Initialize(false);
+
+	Compute::SimBuffers &buffers = Compute::SimBuffers::Get();
+
+	SceneCell *scene = new SceneCell();
+
+	SimBuffers &buffers = SimBuffers::Get();
+	RenderBuffers &renderBuffers = RenderBuffers::Get();
+
+	// mapping
+	buffers.MapBuffers();
+
+	FlexParams *flexParams = new FlexParams();
+	flexParams->InitFlexParams(scene);
+
+	renderParam = new RenderParam();
+
+	scene->Initialize(&flexController, flexParams, renderParam);
+
+	TestSimBuffers oldBuffers(flexController.GetLib());
+	oldBuffers.SaveState(buffers);
+
+	cereal::BinaryOutputArchive out(ss);
+	buffers.serialize(out);
+	buffers.Destroy();
+
+	cereal::BinaryInputArchive in(ss);
+	buffers.serialize(in);
+
+	ASSERT_EQ(buffers, (SimBuffers&)oldBuffers);
+
+	buffers.UnmapBuffers();
+
+	buffers.Destroy();
+	renderBuffers.Destroy();
+
+	delete scene;
+	delete flexParams;
+	delete renderParam;
+}
+
 
 /*#include <controller/compute_controller/FlexController.h>
 #include <controller/render_controller/RenderParam.h>
@@ -185,44 +343,6 @@ TEST(StateCase, StateRenderBuffers) {
 	renderBuffers.Destroy();
 }
  
-TEST(StateCase, StateSimBuffers) {
-	
-	SceneCell *scene = new SceneCell();
-
-	SimBuffers &buffers = SimBuffers::Get();
-	RenderBuffers &renderBuffers = RenderBuffers::Get();
-	
-	// mapping
-	buffers.MapBuffers();
-
-	FlexParams *flexParams = new FlexParams();
-	flexParams->InitFlexParams(scene);
-
-	renderParam = new RenderParam();
-
-	scene->Initialize(&flexController, flexParams, renderParam);
-
-	TestSimBuffers oldBuffers(flexController.GetLib());
-	oldBuffers.SaveState(buffers);
-
-	cereal::BinaryOutputArchive out(ss);
-	buffers.serialize(out);
-	buffers.Destroy();
-
-	cereal::BinaryInputArchive in(ss);
-	buffers.serialize(in);
-
-	ASSERT_EQ(buffers, (SimBuffers&)oldBuffers);
-
-	buffers.UnmapBuffers();
-
-	buffers.Destroy();
-	renderBuffers.Destroy();
-
-	delete scene;
-	delete flexParams;
-	delete renderParam;
-}
 
 TEST(StateCase, StateScene) {
 	SceneCell *oScene = new SceneCell();
@@ -321,59 +441,6 @@ TEST(StateCase, StateShell) {
 	buffers.Destroy();
 }
 
-TEST(StateCase, StateNvFlexExtAsset) {
-
-	SimBuffers &buffers = SimBuffers::Get();
-	
-	////////////////////////////////////////////////////////////
-	// Mapping buffers
-	buffers.MapBuffers();
-
-	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
-	Vec3 lower = Vec3(2.0f, 0.4f, 1.0f);
-
-	mesh->Normalize();
-	mesh->Transform(TranslationMatrix(Point3(lower)));
-
-	const int numParticles = int(mesh->m_positions.size());
-	float invMass = 0.25f;
-
-	// add particles to system
-	size_t indBeginPosition = buffers.positions.size();
-	int phase = NvFlexMakePhase(0, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter);
-
-	for (size_t i = 0; i < mesh->GetNumVertices(); ++i) {
-		const Vec3 p = Vec3(mesh->m_positions[i]);
-
-		buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
-		buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
-
-		buffers.velocities.push_back(0.0f);
-		buffers.phases.push_back(phase);
-	}
-
-	// create asset
-	NvFlexExtAsset oCloth = *(NvFlexExtCreateClothFromMesh((float*)&buffers.positions[indBeginPosition],
-															numParticles,
-															(int*)&mesh->m_indices[0],
-															mesh->GetNumFaces(), 0.4f, 0.0f, 0.0f, 0.0f, 0.0f));
-
-	cereal::BinaryOutputArchive oArchive(ss);
-	serializer.Save(oArchive, oCloth);
-
-	NvFlexExtAsset iCloth = NvFlexExtAsset();
-	cereal::BinaryInputArchive iArchive(ss);
-	serializer.Load(iArchive, iCloth);
-
-	ASSERT_EQ(iCloth, oCloth);
-
-	buffers.UnmapBuffers();
-	buffers.Destroy();
-	// Unmap buffers 
-	////////////////////////////////////////////////////////////
-	
-}
-
 TEST(StateCase, StateCytoplasm) {
 
 	SimBuffers &buffers = SimBuffers::Get();
@@ -409,103 +476,6 @@ TEST(StateCase, StateCytoplasm) {
 
 	delete scene;
 	delete flexParams;
-}
-
-TEST(StateCase, StateKernel) {
-
-	SimBuffers &buffers = SimBuffers::Get();
-	RenderBuffers &renderBuffers = RenderBuffers::Get();
-
-	buffers.MapBuffers();
-
-	Kernel oKernel = Kernel();
-	oKernel.Initialize();
-
-	cereal::BinaryOutputArchive oarchive(ss);
-	serializer.Save(oarchive, oKernel);
-
-	Kernel iKernel = Kernel();
-	cereal::BinaryInputArchive iarchive(ss);
-	serializer.Load(iarchive, iKernel);
-
-	ASSERT_EQ(iKernel, oKernel);
-
-	buffers.UnmapBuffers();
-	
-	buffers.Destroy();
-	renderBuffers.Destroy();
-}
-
-TEST(StateCase, StatePrimitive) {
-	int sizeMas = 100;
-	float *oMas = new float[sizeMas];
-
-	for (size_t i = 0; i < sizeMas; i++)
-		oMas[i] = i % 32;
-
-	cereal::BinaryOutputArchive oArchive(ss);
-	serializer.Save(oArchive, oMas, sizeMas);
-
-	float *iMas = nullptr;
-	cereal::BinaryInputArchive iArchive(ss);
-	serializer.Load(iArchive, &iMas, sizeMas);
-
-	for (int i = 0; i < sizeMas; i++)
-		ASSERT_EQ(iMas[i], oMas[i]);
-
-	delete[] oMas;
-	delete[] iMas;
-}
-
-TEST(StateCase, StateVec4) {
-	Vec4 &outputVec = Vec4(1.0f, 2.0f, 3.0f, 4.0f);
-	cereal::BinaryOutputArchive oarchive(ss);
-	serializer.Save(oarchive, outputVec);
-
-	Vec4 inputVec;
-	cereal::BinaryInputArchive iarchive(ss);
-	serializer.Load(iarchive, inputVec);
-
-	ASSERT_EQ(inputVec, outputVec);
-}
-
-TEST(StateCase, StateVec3) {
-	Vec3 outputVec = Vec3(1.0f, 2.0f, 3.0f);
-	cereal::BinaryOutputArchive oarchive(ss);
-	serializer.Save(oarchive, outputVec);
-
-	Vec3 inputVec;
-	cereal::BinaryInputArchive iarchive(ss);
-	serializer.Load(iarchive, inputVec);
-
-	ASSERT_EQ(inputVec, outputVec);
-}
-
-TEST(StateCase, StateNvFlexCollisionGeometry) {
-	NvFlexCollisionGeometry oCollGeom, iCollGeom;
-	oCollGeom.capsule.halfHeight = 2.0f;
-	oCollGeom.capsule.radius = 4.0f;
-
-	cereal::BinaryOutputArchive oarchive(ss);
-	serializer.Save(oarchive, oCollGeom);
-
-	cereal::BinaryInputArchive iarchive(ss);
-	serializer.Load(iarchive, iCollGeom);
-
-	ASSERT_EQ(oCollGeom.capsule.halfHeight, iCollGeom.capsule.halfHeight);
-	ASSERT_EQ(iCollGeom.capsule.radius, iCollGeom.capsule.radius);
-}
-
-TEST(StateCase, StateQuat) {
-	Quat oQuat = Quat(1.0f, 2.0f, 3.0f, 4.0f), iQuat;
-
-	cereal::BinaryOutputArchive oarchive(ss);
-	serializer.Save(oarchive, oQuat);
-
-	cereal::BinaryInputArchive iarchive(ss);
-	serializer.Load(iarchive, iQuat);
-
-	ASSERT_EQ(oQuat, iQuat);
 }
 
 
@@ -594,59 +564,7 @@ bool operator!=(const SimBuffers &lBuf, const SimBuffers &rBuf) {
 // NvFlexExtAsset
 /////////////////////////////////////////////////////////////////
 
-bool operator==(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset) {
-	// particles
-	if (lAsset.numParticles != rAsset.numParticles || lAsset.maxParticles != rAsset.maxParticles)
-		return false;
 
-	for (int i = 0; i < lAsset.numParticles; i++)
-		if (lAsset.particles[i] != rAsset.particles[i])
-			return false;
-
-	// springs
-	if (lAsset.numSprings != rAsset.numSprings)
-		return false;
-
-	for (int i = 0; i < lAsset.numSprings; i++)
-		if (lAsset.springIndices[i] != rAsset.springIndices[i] ||
-			lAsset.springCoefficients[i] != rAsset.springCoefficients[i] ||
-			lAsset.springRestLengths[i] != rAsset.springRestLengths[i])
-			return false;
-
-	// shapes
-	if (lAsset.numShapeIndices != rAsset.numShapeIndices)
-		return false;
-
-	for (int i = 0; i < lAsset.numShapeIndices; i++)
-		if (lAsset.shapeIndices[i] != rAsset.shapeIndices[i])
-			return false;
-
-	if (lAsset.numShapes != rAsset.numShapes)
-		return false;
-
-	for (int i = 0; i < lAsset.numShapes; i++)
-		if (lAsset.shapeOffsets[i] != rAsset.shapeOffsets[i] ||
-			lAsset.shapeCoefficients[i] != rAsset.shapeCoefficients[i] ||
-			lAsset.shapeCenters[i] != rAsset.shapeCenters[i])
-			return false;
-
-	// faces for cloth
-	if (lAsset.numTriangles != rAsset.numTriangles)
-		return false;
-
-	for (int i = 0; i < lAsset.numTriangles; i++)
-		if (lAsset.triangleIndices[i] != rAsset.triangleIndices[i])
-			return false;
-
-	// inflatables
-	if (lAsset.inflatable != rAsset.inflatable ||
-		lAsset.inflatablePressure != rAsset.inflatablePressure ||
-		lAsset.inflatableVolume != rAsset.inflatableVolume ||
-		lAsset.inflatableStiffness != rAsset.inflatableStiffness)
-		return false;
-
-	return true;
-}
 
 bool operator!=(const NvFlexExtAsset &lAsset, const NvFlexExtAsset &rAsset) {
 	return !(lAsset == rAsset);
@@ -810,3 +728,4 @@ bool operator!=(const RenderBuffers &lRenderBuffers, const RenderBuffers &rRende
 	return !(lRenderBuffers == rRenderBuffers);
 }*/
 
+#endif // TEST_STATE_H

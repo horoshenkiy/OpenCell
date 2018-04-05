@@ -93,4 +93,16 @@ add_library(FruitWork STATIC
 									${UTILITS}
 									${PRIMITIVES}
 )
+
+target_link_libraries(FruitWork optimized NvFlexReleaseCUDA_x64)
+target_link_libraries(FruitWork optimized NvFlexDeviceRelease_x64)
+target_link_libraries(FruitWork optimized NvFlexExtReleaseCUDA_x64) 
+target_link_libraries(FruitWork optimized NvFlexCoreRelease_x64) 
+
+target_link_libraries(FruitWork debug NvFlexDebugCUDA_x64)
+target_link_libraries(FruitWork debug NvFlexDeviceDebug_x64)
+target_link_libraries(FruitWork debug NvFlexExtDebugCUDA_x64d.lib)
+target_link_libraries(FruitWork debug NvFlexCoreDebug_x64d.lib) 
+
+target_link_libraries(FruitWork SDL2 SDL2main glew32) 
 								

@@ -9,6 +9,8 @@
 #include "components\receptors.h"
 #include <components\cytoskeleton.h>
 
+#include <fruit/controller/render_controller/render_param.h>
+
 class Cell {
 
 public:
@@ -68,7 +70,7 @@ private:
 	Compute::FlexParams &flexParams = FlexParams::Get();
 	Compute::SimBuffers &buffers = SimBuffers::Get();
 
-	Render::RenderBuffers &renderBuffers = Render::RenderBuffers::Get();
+	Render::RenderParam &renderParam = Render::RenderParam::Get();
 
 };
 
