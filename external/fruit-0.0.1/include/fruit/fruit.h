@@ -66,6 +66,7 @@ public:
 
 	// functions for springs
 	virtual void SetSprings() = 0;
+	virtual void GetSprings() = 0;
 
 	// functions for dynamic triangles
 	virtual void SetDynamicTriangles() = 0;

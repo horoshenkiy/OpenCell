@@ -97,6 +97,7 @@ public:
 		SetVelocities();
 		SetPhases();
 		SetActiveIndices();
+		SetSprings();
 
 		if (flexParams->shapesChanged) {
 			SetShapes();
@@ -128,6 +129,7 @@ public:
 		GetParticles();
 		GetVelocities();
 		GetNormals();
+		GetSprings();
 
 		// readback triangle normals
 		if (buffers->triangles.size()) {
@@ -361,6 +363,16 @@ public:
 			buffers->springLengths.size()
 		);
 	};
+
+	void GetSprings() override {
+		NvFlexSetSprings(
+			flexController->GetSolver(),
+			buffers->springIndices.GetNvBuffer(),
+			buffers->springLengths.GetNvBuffer(),
+			buffers->springStiffness.GetNvBuffer(),
+			buffers->springLengths.size()
+		);
+	}
 
 	//dynamic triangles
 	void SetDynamicTriangles() override {

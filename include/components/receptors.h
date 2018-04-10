@@ -89,11 +89,11 @@ public:
 	//	springs->springsCount++;
 	//}
 
-	void set_spring(Receptor *rec, Ligand* lig)
+	void set_spring(Receptor *rec, Ligand* lig, float dist_koef)
 	{
 		springs->springShellIndices.push_back(rec->index);
 		springs->springLigandIndices.push_back(lig->index);
-		springs->springLength.push_back(Length(Vec3(buffers->positions.get(rec->index)) - Vec3(buffers->positions.get(lig->index))));
+		springs->springLength.push_back(dist_koef * Length(Vec3(buffers->positions.get(rec->index)) - Vec3(buffers->positions.get(lig->index))));
 		springs->springStiffness.push_back(stiffness);
 	}
 
@@ -153,7 +153,9 @@ public:
 						auto p = Rand(0, 1);
 						if (p < connectionProb)
 						{
-							set_spring(rec, lig);
+
+							set_spring(rec, lig, 0.2);
+							
 							lig->lock_ligand();
 							rec->lock_receptor();
 							break;
@@ -236,9 +238,9 @@ private:
 	float breakProb = 1;
 
 	bgi::rtree< value, bgi::quadratic<16>> rtree;
-	float searchRadius = 1;
-	float breakRadius = 1.2;
-	float stiffness = 10000;
+	float searchRadius = 2;
+	float breakRadius = 0.5;
+	float stiffness = 0.5;
 
 	Compute::SimBuffers* buffers;
 	Shell* shell;

@@ -9,6 +9,7 @@ void SceneCell::Initialize() {
 	cell->Initialize();
 }
 
+
 void SceneCell::InitializeFromFile() {
 	
 	this->buffers = &SimBuffers::Get();

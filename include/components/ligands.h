@@ -75,7 +75,7 @@ public:
 		for (auto it = ligands.begin(); it!= ligands.end(); it++)
 		{
 			const Vec3 p = (*it)->coord;
-			float invMass = 0.0001f;
+			float invMass = 0.00000000001f;
 
 			buffers->positions.push_back(Vec4(p.x, p.y, p.z, invMass));
 			buffers->velocities.push_back(Vec3(0.0f));

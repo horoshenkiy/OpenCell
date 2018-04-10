@@ -28,7 +28,7 @@ void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int ph
 		reinterpret_cast<float*>(&buffers.positions[indBeginPosition]),
 		numParticles,
 		(int*)&mesh->m_indices[0],
-		mesh->GetNumFaces(), 0.6f, 0.0f, 0.0f, 0.0f, 0.0f);
+		mesh->GetNumFaces(), 0.2f, 0.0f, 0.0f, 0.0f, 0.0f);
 
 	this->asset = cloth;
 	this->splitThreshold = 4.0f;
