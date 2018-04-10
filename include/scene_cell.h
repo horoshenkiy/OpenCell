@@ -6,6 +6,7 @@
 #include <fruit/controller/compute_controller/flex_params.h>
 
 #include <cell.h>
+#include <environment.h>
 
 class SceneCell : public Scene {
 
@@ -14,9 +15,11 @@ public:
 	// constructors and initialize
 	//////////////////////////////////////////////////////
 	SceneCell() : Scene() {}
+	
 	SceneCell(const char* name) : Scene(name) {}
 
 	void Initialize() override;
+	
 	void InitializeFromFile() override;
 
 	void PostInitialize() override;
@@ -25,17 +28,13 @@ public:
 	//////////////////////////////////////////////
 	void Reset() override;
 
-	void ClearBuffers();
-
-	~SceneCell();
-
 	// update
 	/////////////////////////////////////////////////////
-	void Sync() override;
+	void Sync() override {};
 
 	void Update() override;
 
-	void Draw() override;
+	void Draw() override {};
 
 	//////////////////////////////////////////////////////
 	template<class Archive>
@@ -55,10 +54,11 @@ public:
 
 private:
 
-	Cell *cell = nullptr;
+	std::unique_ptr<Cell> cell;
+	std::unique_ptr<Environment> environment;
 
-	Compute::SimBuffers *buffers = nullptr;
-	Compute::FlexParams *flexParams = nullptr;
+	Compute::SimBuffers *buffers;
+	Compute::FlexParams *flexParams;
 
 };
 

@@ -9,7 +9,7 @@ class Cytoplasm : public Component {
 public:
 
 	// constructors and initialize
-	Cytoplasm();
+	Cytoplasm() : Component() {}
 
 	void Initialize() override;
 

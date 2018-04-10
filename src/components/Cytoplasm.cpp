@@ -3,10 +3,6 @@
 #include <flex/core/platform.h>
 #include <fruit/controller/compute_controller/flex_params.h>
 
-Cytoplasm::Cytoplasm() : Component() {
-	numberOfParticles = 0;
-}
-
 void Cytoplasm::Initialize() {
 	Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
 	Vec3 lower = Vec3(2.0f, 0.4f, 1.0f);
@@ -28,8 +24,6 @@ void Cytoplasm::Initialize() {
 
 	center /= float(vertEnd - vertStart);
 
-	//printf("%d, %d - %f %f %f\n", vertStart, vertEnd, center.x, center.y, center.z);
-
 	for (size_t i = 0; i < n; ++i) {
 		buffers.positions.push_back(Vec4(center + positions[i], 1.0f));
 		buffers.restPositions.push_back(Vec4());
@@ -38,6 +32,5 @@ void Cytoplasm::Initialize() {
 	}
 
 	numberOfParticles = n;
-
 	delete mesh;
 };

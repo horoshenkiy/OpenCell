@@ -16,29 +16,18 @@ class Cell {
 public:
 
 	Cell() = default;
-	
-	// need incapsulation
-	std::unique_ptr<Cytoplasm> cytoplasm;
-	std::unique_ptr<Kernel>	kernel;
-	std::unique_ptr<Shell> shell;
-	Cytoskeleton* cytoskeleton;
-	LigandGroup* ligandGroup;
-	Receptors* receptors;
 
 	void Initialize();
 
-	virtual void InitializeFromFile();
+	void InitializeFromFile();
 
-	virtual void PostInitialize();
-
-	void clearBuffers();
+	void PostInitialize();
 
 	// update
-	void Update();
+	void Update(LigandGroup *ligandGroup);
 
-	void Sync();
-
-	void Draw();
+	// utilits
+	Vec3 GetPositionCenter() const;
 
 	//////////////////////////////////////////////////////
 	template<class Archive>
@@ -65,13 +54,18 @@ public:
 
 private:
 
+	std::unique_ptr<Cytoplasm> cytoplasm;
+	std::unique_ptr<Kernel>	kernel;
+	std::unique_ptr<Shell> shell;
+	std::unique_ptr<Cytoskeleton> cytoskeleton;
+	std::unique_ptr<Receptors> receptors;
+
 	int mNumFluidParticles = 0;
 
 	Compute::FlexParams &flexParams = FlexParams::Get();
 	Compute::SimBuffers &buffers = SimBuffers::Get();
 
 	Render::RenderParam &renderParam = Render::RenderParam::Get();
-
 };
 
 #endif // CELL_H

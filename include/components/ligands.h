@@ -46,95 +46,41 @@ class LigandGroup
 {
 public:
 
-	void Sow()
-	{
-		Vec3 kerPos = kernel->GetPositionCenter();
-		Vec3 tmp;
-		while (ligands.size() < ligandsCount)
-		{
-			tmp.x = Randf(-sowRadius, sowRadius);
-			tmp.z = Randf(-sowRadius, sowRadius);
-			tmp.y = 0;
+	LigandGroup(Vec3& position_);
 
-			if (tmp.x*tmp.x + tmp.z*tmp.z < sowRadius)
-			{
-				tmp.x += kerPos.x;
-				tmp.z += kerPos.z;
-				Ligand* lig = new Ligand(tmp);
-				ligands.push_back(lig);
-			}
-		}
-	}
+	void Update();
 
-	void pushSpheresInBuffer()
-	{
-		Quat q = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), 0);
+	void lock_ligand(int index);
 
-			// add particles to system
-		indBeginPosition = buffers->positions.size();
-		for (auto it = ligands.begin(); it!= ligands.end(); it++)
-		{
-			const Vec3 p = (*it)->coord;
-			float invMass = 0.00000000001f;
+	void open_ligand(int index);
 
-			buffers->positions.push_back(Vec4(p.x, p.y, p.z, invMass));
-			buffers->velocities.push_back(Vec3(0.0f));
-			buffers->phases.push_back(0);
-			buffers->restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+	std::vector<Ligand*> get_ligands();
 
-			buffers->numParticles++;
-			buffers->maxParticles++;
-			buffers->activeIndices.push_back(buffers->positions.size() - 1);
-
-			(*it)->index = buffers->positions.size() - 1;
-		}
-
-		indEndPosition = buffers->positions.size();
-	}
-
-	LigandGroup(Compute::SimBuffers *buffers_, Kernel* kernel_)
-	{
-		kernel = kernel_;
-		buffers = buffers_;
-
-		Sow();
-		pushSpheresInBuffer();
-	}
-
-	void lock_ligand(int index)
-	{
-		ligands[index]->isFree = false;
-	}
-
-	void open_ligand(int index)
-	{
-		ligands[index]->isFree = true;
-	}
-
-	std::vector<Ligand*> get_ligands()
-	{
-		return ligands;
-	}
-
-	void Update()
-	{
-		pushSpheresInBuffer();
-	}
+	// Close ??
+	std::vector<value> FindCloseLigands(point sought, float searchRadius);
 
 private:
 
-	int ligandsCount = 100;
-	int sowRadius = 10;
+	// private methods
+	
+	void Sow();
 
-	int indBeginPosition;
-	int indEndPosition;
+	void PushSpheresInBuffer();
+
+	void CreateSearchTree();
+
+	// values
+
+	int ligandsCount = 100;
+	float sowRadius = 10;
 
 	int baseIndex;
 
 	std::vector<Ligand*> ligands;
+	bgi::rtree< value, bgi::quadratic<16>> rtree;
 
-	Kernel *kernel;
-	Compute::SimBuffers *buffers;
+	Vec3 centerPositionLigands;
+	Compute::SimBuffers &buffers;
 };
 
 #endif // LIGANDS_H

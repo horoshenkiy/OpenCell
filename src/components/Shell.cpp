@@ -52,14 +52,10 @@ void Shell::AddCloth(const Mesh* mesh, float overPressure, float invMass, int ph
 }
 
 void Shell::Initialize() {
+	Vec3 lower = { 2.5f, 0.8f, 1.5f };
+
 	FactoryMesh factoryMesh;
-	Mesh *mesh = factoryMesh.CreateSphere(0.55, 5);
-
-	//Mesh* mesh = CreateSphere(30, 30);//
-	//Mesh* mesh = ImportMesh("../../data/sphere_high.ply");
-	Vec3 lower = Vec3(2.5f + 0 * 2.0f, 0.8f + 0 * 1.2f, 1.5f);
-
-	//mesh->Normalize();
+	Mesh *mesh = factoryMesh.CreateSphere(0.55, 6);
 	mesh->Transform(TranslationMatrix(Point3(lower)));
 
 	AddCloth(mesh, 1.0f, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter));
@@ -71,11 +67,9 @@ void Shell::Initialize() {
 }
 
 void Shell::Update() {
-	
 	for (size_t i = indBeginPosition; i < indEndPosition; i++) {
 		buffers.positions[i].x += urd(gen);
 		buffers.positions[i].y += urd(gen);
 		buffers.positions[i].z += urd(gen);
-		
 	}
 }

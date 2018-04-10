@@ -11,16 +11,8 @@ public:
 
 	void Initialize() override;
 
-	// getters and setters
-	Vec3 GetRateCenter() const { return rateCenter; }
-
 	Vec3 GetPositionCenter() const {
-		Vec3 result;
-		result.x = positionCenter.x;
-		result.y = positionCenter.y;
-		result.z = positionCenter.z;
-
-		return result;
+		return Vec3(buffers.positions[indexCenter]);
 	}
 
 	float getRadius() {
@@ -28,21 +20,17 @@ public:
 	}
 
 	// update
-	void Update() override;
+	void Update() override {};
 
 	template<class Archive>
 	void serialize(Archive &archive) {
 		archive(group, indexCenter);
-		archive(positionCenter, prevPositionCenter, rateCenter);
 	}
 
 private:
 
 	//fields of center
 	int indexCenter = -1;
-
-	Vec4 positionCenter, prevPositionCenter;
-	Vec3 rateCenter;
 
 	float trueRadius;
 };

@@ -8,6 +8,6 @@ find_package(GTest CONFIG REQUIRED)
 
 # add tests
 add_executable(OpenCellTest main.cpp)
-target_link_libraries(OpenCellTest GTest::main FruitWork OpenCell.lib) 
+target_link_libraries(OpenCellTest GTest::main FruitWork) 
 
 gtest_add_tests(TARGET OpenCellTest)

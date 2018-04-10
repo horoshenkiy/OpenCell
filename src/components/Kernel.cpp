@@ -67,17 +67,4 @@ void Kernel::Initialize() {
 			indexCenter = i;
 		}
 	}
-
-	positionCenter = buffers.positions[indexCenter];
-	prevPositionCenter = positionCenter;
-
 };
-
-void Kernel::Update() {
-	prevPositionCenter = positionCenter;
-	positionCenter = buffers.positions[indexCenter];
-
-	rateCenter.x = positionCenter.x - prevPositionCenter.x;
-	rateCenter.y = positionCenter.y - prevPositionCenter.y;
-	rateCenter.z = positionCenter.z - prevPositionCenter.z;
-}

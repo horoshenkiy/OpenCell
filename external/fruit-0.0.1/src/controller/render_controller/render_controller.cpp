@@ -239,10 +239,10 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 				aspect, fov, lightPos, lightTarget, lightTransform, shadowMap, renderParam->drawDensity);
 
 
-		//int numSolidParticles = buffers->numSolidParticles;
-		int numSolidParticles = 0;
+		int numSolidParticles = buffers->numSolidParticles;
+		//int numSolidParticles = 0;
 		
-		/*GL::RenderEllipsoids(
+		GL::RenderEllipsoids(
 			fluidRenderer,
 			renderBuffers->fluidRenderBuffers,
 			renderBuffers->mesh,
@@ -253,7 +253,7 @@ void RenderController::RenderScene(int numParticles, int numDiffuse)
 			lightTransform, shadowMap, Vec4(0.88f, 0.84f, 0.33f, 0.7f),
 			renderParam->blur, renderParam->ior, renderParam->drawOpaque);
 		
-		numSolidParticles = 0;*/
+		numSolidParticles = 0;
 
 		// render fluid surface
 		GL::RenderEllipsoids(

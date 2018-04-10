@@ -1,7 +1,17 @@
 #include <components/cytoskeleton.h>
 #include <fruit/utilits/utilits.h>
 
-void Cytoskeleton::Update() {	
+void Cytoskeleton::Update() {
+
+	static int j = 0;
+	if (j < 400) {
+		j++;
+		return;
+	}
+
+	if (j == 400) 
+		j++, std::clog << "Cytoskeleton create" << std::endl;
+
 	clearShapes();
 
 	tryToSow();

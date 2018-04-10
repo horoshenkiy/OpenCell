@@ -5,13 +5,14 @@ void SceneCell::Initialize() {
 	this->buffers = &SimBuffers::Get();
 	this->flexParams = &Compute::FlexParams::Get();
 
-	cell = new Cell();
+	cell = std::make_unique<Cell>();
 	cell->Initialize();
+
+	environment = std::make_unique<Environment>();
+	environment->CreateLigandGroup(cell->GetPositionCenter());
 }
 
-
 void SceneCell::InitializeFromFile() {
-	
 	this->buffers = &SimBuffers::Get();
 	this->flexParams = &Compute::FlexParams::Get();
 }
@@ -38,35 +39,19 @@ void SceneCell::Reset() {
 	sceneLower = FLT_MAX;
 	sceneUpper = -FLT_MAX;
 
-	delete cell;
-}
-
-void SceneCell::ClearBuffers() {
-	cell->clearBuffers();
-}
-
-SceneCell::~SceneCell() {
-	delete cell;
+	environment.reset(nullptr);
+	cell.reset(nullptr);
 }
 
 // update
 /////////////////////////////////////////////////////
-void SceneCell::Sync() {
-	cell->Sync();
-}
 
 void SceneCell::Update() {
-	Vec3 centerScene = cell->kernel->GetPositionCenter();
-
-	sceneLower.x = centerScene.x - 2.0f;
-	sceneLower.z = centerScene.z - 2.0f;
-
-	sceneUpper.x = centerScene.x + 2.0f;
-	sceneUpper.z = centerScene.z + 2.0f;
-
-	cell->Update();
+	Vec3 centerScene = cell->GetPositionCenter();
+	sceneLower = { centerScene.x - 2.0f, 0, centerScene.z - 2.0f };
+	sceneUpper = { centerScene.x + 2.0f, 0, centerScene.z + 2.0f };
+	
+	cell->Update(environment->GetLigandGroup());
 }
 
-void SceneCell::Draw() {
-	cell->Draw();
-}
+
