@@ -4,6 +4,9 @@
 #include <flex/core/maths.h>
 #include <flex/core/mesh.h>
 
+#include <fruit/controller/compute_controller/sim_buffers.h>
+#include "primitive.h"
+
 #include <vector>
 
 namespace FruitWork {
@@ -46,6 +49,67 @@ private:
 	
 	FactorySphere factorySphere;
 	
+};
+
+class FactoryCloth {
+
+public:
+
+	FactoryCloth() {}
+	
+	Cloth* CreateCloth(const Mesh *mesh, int invMass, int phase, float stretchStiffness, float bendStiffness, float tetherStiffness) {
+
+		Compute::SimBuffers &buffers = Compute::SimBuffers::Get();
+
+		// create a cloth mesh using the global positions / indices
+		const int numParticles = int(mesh->m_positions.size());
+
+		// add particles to system
+		size_t indBeginPosition = buffers.positions.size();
+		
+		for (size_t i = 0; i < mesh->GetNumVertices(); ++i) {
+			const Vec3 p = Vec3(mesh->m_positions[i]);
+
+			buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
+			buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+
+			buffers.velocities.push_back(0.0f);
+			buffers.phases.push_back(phase);
+		}
+		
+		size_t indEndPosition = buffers.positions.size();
+
+		// create asset
+		NvFlexExtAsset* assetCloth = NvFlexExtCreateClothFromMesh(
+			reinterpret_cast<float*>(&buffers.positions[indBeginPosition]),
+			numParticles,
+			(int*)&mesh->m_indices[0],
+			mesh->GetNumFaces(), 
+			stretchStiffness, bendStiffness, tetherStiffness, 
+			0.0f, 0.0f);
+
+		// set buffers for flex
+		for (size_t i = 0; i < assetCloth->numTriangles; ++i) {
+			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 0]);
+			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 1]);
+			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 2]);
+		}
+
+		for (size_t i = 0; i < assetCloth->numSprings * 2; ++i)
+			buffers.springIndices.push_back(assetCloth->springIndices[i] + indBeginPosition);
+
+		for (size_t i = 0; i < assetCloth->numSprings; ++i) {
+			buffers.springStiffness.push_back(assetCloth->springCoefficients[i]);
+			buffers.springLengths.push_back(assetCloth->springRestLengths[i]);
+		}
+
+		return (new Cloth(assetCloth, indBeginPosition, indEndPosition));
+	}
+
+private:
+
+	//Compute::SimBuffers &buffers;
+
 };
 
 }

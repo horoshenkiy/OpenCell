@@ -25,7 +25,7 @@ void Cytoplasm::Initialize() {
 	center /= float(vertEnd - vertStart);
 
 	for (size_t i = 0; i < n; ++i) {
-		buffers.positions.push_back(Vec4(center + positions[i], 1.0f));
+		buffers.positions.push_back(Vec4(center + positions[i], 0.1f));
 		buffers.restPositions.push_back(Vec4());
 		buffers.velocities.push_back(0.0f);
 		buffers.phases.push_back(phase);

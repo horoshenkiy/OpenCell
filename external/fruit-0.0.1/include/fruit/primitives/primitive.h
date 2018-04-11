@@ -3,7 +3,9 @@
 
 #include <quat.h>
 #include <vec4.h>
+
 #include <flex/NvFlex.h>
+#include <flex/NvFlexExt.h>
 
 namespace FruitWork {
 namespace Primitives {
@@ -20,17 +22,29 @@ namespace Primitives {
 		int flag;
 	};
 
-	class RigidCapsule {
+	// wrapper for NVidia Flex Cloth
+	class Cloth {
 	public:
 
-		RigidCapsule() = default;
-		~RigidCapsule() = default;
+		Cloth() = default;
 
-		RigidCapsule(const RigidCapsule &other) = delete;
-		RigidCapsule(RigidCapsule && other) = default;
+		Cloth(NvFlexExtAsset *asset_, size_t indBegin, size_t indEnd) : 
+			asset(asset_), indBeginPos(indBegin), indEndPos(indEnd) 
+		{}
 
-		RigidCapsule operator=(const RigidCapsule &other) = delete;
+		~Cloth() {
+			if (asset)
+				NvFlexExtDestroyAsset(asset);
+		}
 
+		size_t indBeginPos, indEndPos;
+
+		// asset for cloth
+		NvFlexExtAsset* asset = nullptr;
+
+	private:
+
+		
 	};
 }
 }

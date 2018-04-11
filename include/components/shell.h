@@ -4,6 +4,8 @@
 #include "component.h"
 #include <random>
 
+#include <fruit/primitives/primitive.h>
+
 using namespace FruitWork;
 
 // TODO: add constructor copy
@@ -19,7 +21,12 @@ public:
 
 	// destructor
 	~Shell() {
-		NvFlexExtDestroyAsset(asset);
+		if (asset)
+			NvFlexExtDestroyAsset(asset);
+	
+		if (cloth)
+			delete cloth;
+	
 	}
 
 	// getters and setters
@@ -55,6 +62,9 @@ private:
 	size_t indEndPosition = -1;
 
 	float splitThreshold = -1.0;
+
+	// cloth
+	Primitives::Cloth *cloth;
 
 	// asset for cloth
 	NvFlexExtAsset* asset = nullptr;

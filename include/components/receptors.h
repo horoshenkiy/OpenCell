@@ -84,7 +84,7 @@ private:
 	float connectionProb = 1;
 	float breakProb = 1;
 
-	float searchRadius = 1.0;
+	float searchRadius = 0.2;
 	float breakRadius = 0.5;
 	float stiffness = 0.5;
 

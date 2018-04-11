@@ -58,7 +58,15 @@ void Shell::Initialize() {
 	Mesh *mesh = factoryMesh.CreateSphere(0.55, 6);
 	mesh->Transform(TranslationMatrix(Point3(lower)));
 
-	AddCloth(mesh, 1.0f, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter));
+	//AddCloth(mesh, 1.0f, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter));
+	FactoryCloth factoryCloth;
+	cloth = factoryCloth.CreateCloth(mesh, 0.25f, NvFlexMakePhase(group, eNvFlexPhaseSelfCollide | eNvFlexPhaseSelfCollideFilter), 0.6f, 0.f, 0.f);
+	
+	std::clog << cloth->indBeginPos << " " << cloth->indEndPos << std::endl;
+
+	asset = cloth->asset;
+	indBeginPosition = cloth->indBeginPos;
+	indEndPosition = cloth->indEndPos;
 
 	buffers.numSolidParticles = buffers.positions.size();
 	buffers.numExtraParticles = buffers.positions.size();
@@ -67,9 +75,9 @@ void Shell::Initialize() {
 }
 
 void Shell::Update() {
-	for (size_t i = indBeginPosition; i < indEndPosition; i++) {
+	/*for (size_t i = indBeginPosition; i < indEndPosition; i++) {
 		buffers.positions[i].x += urd(gen);
 		buffers.positions[i].y += urd(gen);
 		buffers.positions[i].z += urd(gen);
-	}
+	}*/
 }
