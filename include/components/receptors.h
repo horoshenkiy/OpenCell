@@ -2,8 +2,6 @@
 #define RECEPTORS_H
 
 #include <vector>
-#include <set>
-#include <random>
 
 #include "shell.h"
 #include "component.h"
@@ -81,12 +79,12 @@ private:
 
 	int receptorsCount = 100;
 
-	float connectionProb = 1;
-	float breakProb = 1;
+	float connectionProb = 1.f;
+	float breakProb = 1.f;
 
-	float searchRadius = 0.2;
-	float breakRadius = 0.5;
-	float stiffness = 0.5;
+	float searchRadius = 0.2f;
+	float breakRadius = 0.5f;
+	float stiffness = 0.5f;
 
 	Compute::SimBuffers &buffers;
 	Shell* shell;

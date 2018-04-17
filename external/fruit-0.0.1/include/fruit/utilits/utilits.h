@@ -1,15 +1,14 @@
 #ifndef UTILITS_H
 #define UTILITS_H
 
-#include <flex/core/cloth.h>
 #include <flex/core/mesh.h>
 #include <flex/NvFlex.h>
-#include <stdarg.h>
 
-#include <fruit/fruit.h>
 #include <fruit/controller/compute_controller/sim_buffers.h>
 #include <fruit/primitives/primitive.h>
 #include <fruit/controller/render_controller/render_buffer.h>
+
+#include <chrono>
 
 namespace FruitWork {
 namespace Utilits {
@@ -268,6 +267,24 @@ void AddSDF(SimBuffers *buffers, NvFlexDistanceFieldId sdf, Vec3 translation, Qu
 Shape AddCapsule(float radius, float halfHeight, Vec3 position, Quat rotation);
 
 Shape ResizeCapsule(Shape shape, float radius, float halfHeight, Vec3 position, Quat rotation);
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Debug
+/////////////////////////////////////////////////////////////////////////////////////
+
+template<typename TimeT = std::chrono::nanoseconds, typename F, typename ...Args>
+static typename TimeT::rep execution(uint32_t numIterations, F func, Args&&... args) {
+		
+	auto start = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < numIterations; i++)
+		func(std::forward<Args>(args)...);
+	
+	auto duration = std::chrono::duration_cast<TimeT>(
+		(std::chrono::high_resolution_clock::now() - start) / numIterations);
+	
+	return duration.count();
+}
 
 }
 }

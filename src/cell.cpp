@@ -67,7 +67,6 @@ void Cell::Update(LigandGroup *ligandGroup) {
 	cytoplasm->Update();
 	shell->Update();
 	kernel->Update();
-
 	receptors->Update(ligandGroup);
 	cytoskeleton->Update();
 }

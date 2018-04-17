@@ -8,6 +8,9 @@
 #include "primitive.h"
 
 #include <vector>
+#include <ppl.h>
+
+#include <fruit/utilits/utilits.h>
 
 namespace FruitWork {
 namespace Primitives {
@@ -55,60 +58,73 @@ class FactoryCloth {
 
 public:
 
-	FactoryCloth() {}
+	FactoryCloth() : buffers(Compute::SimBuffers::Get()) {}
 	
-	Cloth* CreateCloth(const Mesh *mesh, int invMass, int phase, float stretchStiffness, float bendStiffness, float tetherStiffness) {
-
-		Compute::SimBuffers &buffers = Compute::SimBuffers::Get();
-
+	Cloth* CreateCloth(const Mesh* mesh, float invMass, int phase) {//, NvFlexExtAsset** asset) {
 		// create a cloth mesh using the global positions / indices
 		const int numParticles = int(mesh->m_positions.size());
 
 		// add particles to system
-		size_t indBeginPosition = buffers.positions.size();
+		size_t sizeMeshVer = mesh->GetNumVertices();
 		
-		for (size_t i = 0; i < mesh->GetNumVertices(); ++i) {
+		size_t oldSizePos = buffers.positions.size(), oldSizeRestPos = buffers.restPositions.size();
+		size_t oldSizeVel = buffers.velocities.size(), oldSizePhases = buffers.phases.size();
+
+		buffers.positions.resize(oldSizePos + sizeMeshVer);
+		buffers.restPositions.resize(oldSizeRestPos + sizeMeshVer);
+		buffers.velocities.resize(oldSizeVel + sizeMeshVer);
+		buffers.phases.resize(oldSizePhases + sizeMeshVer);
+			
+		Concurrency::parallel_for(size_t(0), size_t(sizeMeshVer), [&](size_t i) {
 			const Vec3 p = Vec3(mesh->m_positions[i]);
 
-			buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
-			buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+			buffers.positions[oldSizePos + i] = { p.x, p.y, p.z, invMass };
+			buffers.restPositions[oldSizeRestPos + i] = { p.x, p.y, p.z, invMass };
 
-			buffers.velocities.push_back(0.0f);
-			buffers.phases.push_back(phase);
-		}
-		
-		size_t indEndPosition = buffers.positions.size();
+			buffers.velocities[oldSizeVel + i] = 0.0f;
+			buffers.phases[oldSizePhases + i] = phase;
+		});
 
 		// create asset
-		NvFlexExtAsset* assetCloth = NvFlexExtCreateClothFromMesh(
-			reinterpret_cast<float*>(&buffers.positions[indBeginPosition]),
+		NvFlexExtAsset* cloth = NvFlexExtCreateClothFromMesh(
+			reinterpret_cast<float*>(&buffers.positions[oldSizePos]),
 			numParticles,
 			(int*)&mesh->m_indices[0],
-			mesh->GetNumFaces(), 
-			stretchStiffness, bendStiffness, tetherStiffness, 
-			0.0f, 0.0f);
+			mesh->GetNumFaces(), 0.2f, 0.0f, 0.0f, 0.0f, 0.0f);
 
 		// set buffers for flex
-		for (size_t i = 0; i < assetCloth->numTriangles; ++i) {
-			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 0]);
-			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 1]);
-			buffers.triangles.push_back(assetCloth->triangleIndices[i * 3 + 2]);
-		}
+		// triangles
+		size_t oldSizeTriangles = buffers.triangles.size();
+		buffers.triangles.resize(oldSizeTriangles + cloth->numTriangles * 3);
 
-		for (size_t i = 0; i < assetCloth->numSprings * 2; ++i)
-			buffers.springIndices.push_back(assetCloth->springIndices[i] + indBeginPosition);
+		Concurrency::parallel_for(size_t(0), size_t(cloth->numTriangles * 3), [&](size_t i) {
+			buffers.triangles[oldSizeTriangles + i] = cloth->triangleIndices[i];
+		});
 
-		for (size_t i = 0; i < assetCloth->numSprings; ++i) {
-			buffers.springStiffness.push_back(assetCloth->springCoefficients[i]);
-			buffers.springLengths.push_back(assetCloth->springRestLengths[i]);
-		}
+		// springs
+		size_t oldSizeSpringIndeces = buffers.springIndices.size();
+		buffers.springIndices.resize(oldSizeTriangles + cloth->numSprings * 2);
+			
+		Concurrency::parallel_for(size_t(0), size_t(cloth->numSprings * 2), [&](size_t i) {
+			buffers.springIndices[oldSizeSpringIndeces + i] = cloth->springIndices[i] + oldSizePos;
+		});
 
-		return (new Cloth(assetCloth, indBeginPosition, indEndPosition));
+		size_t oldSizeSpringStiff = buffers.springStiffness.size(), oldSizeSpringLen = buffers.springLengths.size();
+		
+		buffers.springStiffness.resize(oldSizeSpringStiff + cloth->numSprings);
+		buffers.springLengths.resize(oldSizeSpringLen + cloth->numSprings);
+
+		Concurrency::parallel_for(size_t(0), size_t(cloth->numSprings), [&](size_t i) {
+			buffers.springStiffness[oldSizeSpringStiff + i] = cloth->springCoefficients[i];
+			buffers.springLengths[oldSizeSpringLen + i] = cloth->springRestLengths[i];
+		});
+
+		return new Cloth(cloth, oldSizePos, buffers.positions.size(), oldSizeTriangles, buffers.triangles.size());
 	}
 
 private:
 
-	//Compute::SimBuffers &buffers;
+	Compute::SimBuffers &buffers;
 
 };
 
