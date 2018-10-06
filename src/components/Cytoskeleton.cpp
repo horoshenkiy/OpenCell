@@ -32,7 +32,6 @@ void Cytoskeleton::tryToSow() {
 	auto p = Randf(0, 1);
 	if (p < flexParams.p_sow)
 	{
-
 		Quat q = QuatFromAxisAngle(y_ax, flexParams.directionAngle); // direction of stream from directionAngle
 		Vec3 streamDirection = Rotate(q, x_ax);
 		streamDirection = Normalize(streamDirection);
