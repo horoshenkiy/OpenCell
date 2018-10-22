@@ -22,10 +22,10 @@ struct Protein
 		begin_type = Actin;
 		end_type = Actin;
 
-		begin = begin_;
-		direction = direction_;
-		rotation = rotation_;
-		streamDirection = streamDirection_;
+		begin = begin_; // begin position
+		direction = direction_; // direction
+		rotation = rotation_; // rotation over main direction
+		streamDirection = streamDirection_;  // main direction of actin grow
 
 		forward_protein = nullptr;
 		angle_protein = nullptr;

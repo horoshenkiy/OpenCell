@@ -36,7 +36,6 @@ private:
 	Kernel* kernel;
 	Shell* shell;
 
-	// position of shell buffer
 	int indBeginPositionShell;
 	int indEndPositionShell;
 

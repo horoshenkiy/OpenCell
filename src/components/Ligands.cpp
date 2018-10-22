@@ -4,46 +4,46 @@ LigandGroup::LigandGroup(Vec3& position_) :
 		buffers(Compute::SimBuffers::Get()),
 		centerPositionLigands(position_)
 {
-	Sow();
-	PushSpheresInBuffer();
-	CreateSearchTree();
+	// this function will be called when LigandGroup will begin to construct
+	Sow(); // creating ligands
+	PushSpheresInBuffer(); // send ligands to buffer
+	CreateSearchTree(); // send ligands to search tree
 }
 
 void LigandGroup::Sow()
 {
-	while (ligands.size() < ligandsCount)
+	// creating ligands
+	while (ligands.size() < ligandsCount) // while current ligands count < needed ligands count
 	{
-		Vec3 tmp(Randf(-sowRadius, sowRadius), 0, Randf(-sowRadius, sowRadius));
-		if (tmp.x*tmp.x + tmp.z*tmp.z < sowRadius)
+		Vec3 tmp(Randf(-sowRadius, sowRadius), 0, Randf(-sowRadius, sowRadius)); // vector with random x from -max radius to max radius and random z -max radius to max radius
+		if (tmp.x*tmp.x + tmp.z*tmp.z < sowRadius) // if randius < max radius
 		{
-			tmp.x += centerPositionLigands.x;
+			tmp.x += centerPositionLigands.x; // place tmp vector into circle with radius = sowRadius and center = centerPositionLigands
 			tmp.z += centerPositionLigands.z;
-			Ligand* lig = new Ligand(tmp);
-			ligands.push_back(lig);
+			Ligand* lig = new Ligand(tmp); // creating new Ligand
+			ligands.push_back(lig); // pushin ligang to LigandGroup
 		}
 	}
 }
 
 void LigandGroup::PushSpheresInBuffer()
 {
-	Quat q = QuatFromAxisAngle(Vec3(0.0, 1.0, 0.0), 0);
-
-	// add particles to system
-	for (auto &ligand : ligands)
+	// add particles to buffer
+	for (auto &ligand : ligands) // iteratin over ligands
 	{
 		const Vec3 p = ligand->coord;
-		float invMass = 0.00000000001f;
+		float invMass = 0.00000000001f; // 1/m , where m - is very very large value (we think ligands are still)
 
 		buffers.positions.push_back(Vec4(p.x, p.y, p.z, invMass));
-		buffers.velocities.push_back(Vec3(0.0f));
+		buffers.velocities.push_back(Vec3(0.0f)); // initial velocity
 		buffers.phases.push_back(0);
-		buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass));
+		buffers.restPositions.push_back(Vec4(p.x, p.y, p.z, invMass)); // rest position is current position
 
-		buffers.numParticles++;
-		buffers.maxParticles++;
-		buffers.activeIndices.push_back(buffers.positions.size() - 1);
+		buffers.numParticles++; // increase number of particles
+		buffers.maxParticles++; // increase max number of particles
+		buffers.activeIndices.push_back(buffers.positions.size() - 1); // change active indices of buffer
 
-		ligand->index = buffers.positions.size() - 1;
+		ligand->index = buffers.positions.size() - 1; // index of current ligand in buffer
 	}
 }
 
@@ -64,11 +64,13 @@ std::vector<Ligand*> LigandGroup::get_ligands()
 
 void LigandGroup::Update()
 {
+	// this function will be calling every iteration
 	PushSpheresInBuffer();
 }
 
 void LigandGroup::CreateSearchTree()
 {
+	// creating data structure for fast searching ligands
 	for (size_t i = 0; i < ligands.size(); ++i)
 	{
 		point p = point(ligands[i]->coord.x, ligands[i]->coord.y, ligands[i]->coord.z);

@@ -38,15 +38,19 @@ void Cell::Initialize() {
 	flexParams.params.adhesion = 0.0f;
 	flexParams.params.cohesion = 0.02f;
 
+	// creating of shell
 	shell = std::make_unique<Shell>();
 	shell->Initialize();
 
+	// creating of kernel
 	kernel = std::make_unique<Kernel>();
 	kernel->Initialize();
 
+	//creating of cytoplasm
 	cytoplasm = std::make_unique<Cytoplasm>();
 	cytoplasm->Initialize();
 
+	// creating of receptors
 	receptors = std::make_unique<Receptors>(shell.get());
 	cytoskeleton = std::make_unique<Cytoskeleton>(kernel.get(), shell.get());
 
@@ -64,6 +68,7 @@ void Cell::PostInitialize() {}
 
 // main update
 void Cell::Update(LigandGroup *ligandGroup) {
+	// updating all components of cell
 	cytoplasm->Update();
 	shell->Update();
 	kernel->Update();

@@ -5,9 +5,11 @@ void SceneCell::Initialize() {
 	this->buffers = &SimBuffers::Get();
 	this->flexParams = &Compute::FlexParams::Get();
 
+	// creating of cell
 	cell = std::make_unique<Cell>();
 	cell->Initialize();
 
+	// creating of environment
 	environment = std::make_unique<Environment>();
 	environment->CreateLigandGroup(cell->GetPositionCenter());
 }

@@ -56,20 +56,15 @@ public:
 
 	std::vector<Ligand*> get_ligands();
 
-	// Close ??
 	std::vector<value> FindCloseLigands(point sought, float searchRadius);
 
 private:
-
-	// private methods
 	
 	void Sow();
 
 	void PushSpheresInBuffer();
 
 	void CreateSearchTree();
-
-	// values
 
 	int ligandsCount = 100;
 	float sowRadius = 10;
